@@ -1,12 +1,13 @@
 # DB 스크립트
 
-실제 보도 서버의 SQLite 스키마와 동일한 5개 테이블을 생성합니다. 정규화 확장안의 테이블은 포함하지 않습니다.
+실제 보도 서버의 SQLite 스키마와 동일한 기본 5개 및 v2 검수·제작 2개, 총 7개 테이블을 생성합니다. 별도의 장기 정규화 확장안은 포함하지 않습니다.
 
 | 파일 | 용도 |
 | --- | --- |
 | [001_schema.sql](001_schema.sql) | CREATE TABLE 5개, 승인 외래키, 감사 로그 수정·삭제 방지 트리거 |
 | [002_demo_seed.sql](002_demo_seed.sql) | 가상 스냅샷·문서 청크·DRAFT 기사·초기 감사 로그 INSERT |
 | [003_inspection.sql](003_inspection.sql) | 무결성·외래키·행 수·기사·근거·승인 조회 |
+| [004_workflow.sql](004_workflow.sql) | 자료·문서 검수 review_record, 제작 작업 render_job, 조회 인덱스 |
 
 ## 실행
 
@@ -20,7 +21,7 @@
 .venv/Scripts/python.exe scripts/init_db.py --path runtime/sql-demo/news.sqlite --demo
 ```
 
-sqlite3 CLI가 있는 경우 빈 DB에 `001_schema.sql` → `002_demo_seed.sql` → `003_inspection.sql` 순서로 적용할 수도 있습니다. 초기화 도구는 비어 있지 않은 DB에 예제를 넣지 않지만, SQL을 직접 실행할 때는 사용자가 대상 DB를 확인해야 합니다. 삭제·초기화 명령은 제공하지 않습니다.
+sqlite3 CLI가 있는 경우 빈 DB에 `001_schema.sql` → `004_workflow.sql` → `002_demo_seed.sql` → `003_inspection.sql` 순서로 적용할 수도 있습니다. 초기화 도구는 비어 있지 않은 DB에 예제를 넣지 않지만, SQL을 직접 실행할 때는 사용자가 대상 DB를 확인해야 합니다. 기존 앱 DB에는 004를 추가 적용하며 레코드를 삭제하지 않습니다.
 
 `approval` 테이블은 **0건**으로 시작합니다. 사람이 승인한 것처럼 INSERT하지 않으며, 실제 서비스의 editor API에서 원문 확인·다른 작성자·검증 통과·승인 사유 조건을 확인한 뒤 저장합니다. 예제의 작성자와 기록 시각은 가상 값입니다.
 

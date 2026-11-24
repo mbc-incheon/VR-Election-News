@@ -32,6 +32,7 @@ def main():
     result = dict(
         captured_at=datetime.now(timezone(timedelta(hours=9))).isoformat(),
         repository='https://github.com/mbc-incheon/VR-Election-News',
+        release_version='2.0.0',
         imported_from=dict(repository='https://github.com/mbc-incheon/election-analysis-project-01',
                            commit='00ac79dc6ec77d6bd4c1e883e152fd78f2e3ab91'),
         repository_base_commit=git('rev-parse', 'HEAD'),

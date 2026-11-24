@@ -1,0 +1,9 @@
+.git
+.venv
+runtime
+build
+outputs
+docs
+.env
+**/__pycache__
+**/users.json

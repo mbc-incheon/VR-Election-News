@@ -13,12 +13,14 @@ jobs:
           python-version: '3.12'
           cache: pip
       - run: python -m pip install -r requirements.txt
+      - run: sudo apt-get update && sudo apt-get install -y fonts-nanum
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - run: node scripts/check_ui.mjs
       - run: python -m pytest tests -q --junitxml=outputs/ci/unit_results.xml
       - run: python scripts/integration_test.py
+      - run: python scripts/platform_integration.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -27,3 +29,4 @@ jobs:
             outputs/ci/unit_results.xml
             outputs/integration_results.json
             outputs/ui_logic_results.json
+            outputs/platform_integration_results.json

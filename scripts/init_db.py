@@ -5,6 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 TABLES = ('snapshot', 'chunk', 'article', 'approval', 'audit')
+WORKFLOW_TABLES = ('review_record','render_job')
 
 
 def initialize(path, demo=False):
@@ -14,12 +15,13 @@ def initialize(path, demo=False):
         db.execute('PRAGMA foreign_keys=ON')
         existing = {r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
         if demo and existing:
-            if existing - set(TABLES) - {'sqlite_sequence'}:
+            if existing - set(TABLES+WORKFLOW_TABLES) - {'sqlite_sequence'}:
                 raise ValueError('Unrecognized database: demo seed refused')
             if any(db.execute(f'SELECT COUNT(*) FROM "{name}"').fetchone()[0]
-                   for name in TABLES if name in existing):
+                   for name in TABLES+WORKFLOW_TABLES if name in existing):
                 raise ValueError('Database contains records; demo seed refused. Choose a new path.')
         db.executescript((ROOT / 'db/001_schema.sql').read_text(encoding='utf-8'))
+        db.executescript((ROOT / 'db/004_workflow.sql').read_text(encoding='utf-8'))
         if demo:
             db.executescript((ROOT / 'db/002_demo_seed.sql').read_text(encoding='utf-8'))
         if list(db.execute('PRAGMA foreign_key_check')):

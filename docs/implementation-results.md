@@ -15,14 +15,19 @@
 | 내보내기 | APPROVED 상태를 재검증한 JSON, 문장·근거·스냅샷 고정 |
 | 화면 | 메뉴 이동·시각/출처·검색·기사 검증·승인, 결측값 미제공 표시 |
 | 승인 화면 제어 | 기사·토큰 변경 시 확인 초기화, 수동 확인·사유 전 버튼 비활성 |
-| DB | CREATE TABLE 5개, INSERT 예제, 조회 SQL, 기존 자료가 있는 DB의 예제 재입력 거부 |
+| DB | CREATE TABLE 7개, INSERT 예제, 조회 SQL, 기존 자료가 있는 DB의 예제 재입력 거부 |
+
+PC 중심 v2에서는 실제 Three.js 가상 스튜디오, 공식 원본 행 대조, 자료별 독립 검수, PDF 보존·본문 추출, 기사 수정, 감사 무결성·백업, 승인 기사 기반 FHD MP4·자막·CG·ZIP 제작을 추가했습니다. [v2 사용 안내](platform-guide.md)를 기준으로 실행합니다.
+
+![실제 PC 스튜디오](../outputs/screenshots/studio-v2.jpg)
 
 ## 실행한 시험
 
 | 시험 | 통과 | 증빙 |
 | --- | --- | --- |
-| 단위 및 SQL 및 화면 빌드 | **27/27** | [unit_results.xml](../outputs/unit_results.xml) |
+| 단위 및 SQL 및 화면 빌드 | **43/43** | [unit_results.xml](../outputs/unit_results.xml) |
 | 실제 서버 통합 | **13/13** | [integration_results.json](../outputs/integration_results.json) |
+| PC 스튜디오·영상·자료 검수 통합 | **24/24** | [platform_integration_results.json](../outputs/platform_integration_results.json) |
 | 화면 승인 제어 로직 | **7/7** | [ui_logic_results.json](../outputs/ui_logic_results.json) |
 
 통합 시험은 정상 기사 생성·검증·시험 editor 승인·내보내기와 지역 오류 주입 후 승인/내보내기 409 차단, 토큰 없는 요청 401, writer 승인 시도 403, 송신 중단 후 오류와 대체 자료 표시를 재현했습니다. `TEST-*` 계정의 자동 승인은 실제 편집 승인으로 제출하지 않습니다.
@@ -30,6 +35,8 @@
 화면 로직 시험은 실제 HTML의 JavaScript를 Node VM과 DOM 대역에서 실행했습니다. 별도로 실제 브라우저에서 1448×1086 PC와 390×844 모바일 배치, 지역·후보 변경과 근거 갱신, 초안 생성·규칙 검증, 승인/내보내기 비활성, 공식 자료실 열기를 확인했습니다. 두 화면 모두 문서 전체의 가로 넘침이 없었고, 모바일 수치 표는 내부 스크롤을 사용합니다. [PC 캡처](../outputs/screenshots/dashboard-desktop.jpg)와 [모바일 캡처](../outputs/screenshots/dashboard-mobile.jpg)는 실제 실행 화면이며 디자인 PNG와 구분합니다. 접근성 인증이나 모든 브라우저 호환성을 보장하는 시험은 아닙니다.
 
 SQL 스크립트로 만든 예제 DB는 snapshot 1건·chunk 6건·article 1건·approval 0건·audit 8건입니다. 예제 기사는 실제 검증 로직에서 PENDING_HUMAN이 되지만 승인 전 내보내기는 거부됩니다. 외래키와 감사 해시 연결, 감사 기록 수정 거부도 확인했습니다.
+
+실제 브라우저에서 PC 3D 렌더링·카메라 이동, 문서 등록·기사 생성·역할 전환·TEST 승인·5초 FHD 영상 제작을 확인했습니다. 390×844 모바일에서도 페이지 가로 넘침이 없었습니다. 영상은 승인 기사로 구성한 2D CG이며 3D 장면 녹화와 구분합니다. [영상 시험 산출물](../outputs/production_sample/README.txt)은 실제 편집 승인 보도가 아닌 자동 시험 결과입니다.
 
 ## 보존 자료와 미완료 범위
 

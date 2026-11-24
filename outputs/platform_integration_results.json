@@ -1,0 +1,104 @@
+{
+  "at": "2026-11-24T14:27:17.674287+09:00",
+  "test_actors_only": true,
+  "total": 24,
+  "passed": 24,
+  "checks": [
+    {
+      "name": "PC studio page served",
+      "passed": true
+    },
+    {
+      "name": "Offline Three.js served",
+      "passed": true
+    },
+    {
+      "name": "Workstation script served",
+      "passed": true
+    },
+    {
+      "name": "Official archive 14 districts",
+      "passed": true
+    },
+    {
+      "name": "Official archive missing baseline retained",
+      "passed": true
+    },
+    {
+      "name": "Dataset requires independent review",
+      "passed": true
+    },
+    {
+      "name": "Official unreviewed article blocked",
+      "passed": true
+    },
+    {
+      "name": "Writer cannot decide input review",
+      "passed": true
+    },
+    {
+      "name": "Simulation article validation passes",
+      "passed": true
+    },
+    {
+      "name": "Render rejects unapproved article",
+      "passed": true
+    },
+    {
+      "name": "TEST independent editor approval",
+      "passed": true
+    },
+    {
+      "name": "Approved simulation visible in studio",
+      "passed": true
+    },
+    {
+      "name": "Real encoder queued",
+      "passed": true
+    },
+    {
+      "name": "Real encoder completed",
+      "passed": true
+    },
+    {
+      "name": "Approved video download",
+      "passed": true
+    },
+    {
+      "name": "FHD encoded frame dimensions",
+      "passed": true
+    },
+    {
+      "name": "Five second sample has real duration",
+      "passed": true
+    },
+    {
+      "name": "Production package includes CG and subtitles",
+      "passed": true
+    },
+    {
+      "name": "Evidence retirement",
+      "passed": true
+    },
+    {
+      "name": "Revoked source blocks finished video download",
+      "passed": true
+    },
+    {
+      "name": "Revoked article removed from studio",
+      "passed": true
+    },
+    {
+      "name": "Audit chain valid after production",
+      "passed": true
+    },
+    {
+      "name": "Editor backup available",
+      "passed": true
+    },
+    {
+      "name": "Backup excludes credentials",
+      "passed": true
+    }
+  ]
+}

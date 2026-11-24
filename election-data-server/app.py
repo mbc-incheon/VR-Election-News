@@ -3,9 +3,12 @@ import asyncio
 import hashlib
 import json
 import os
+import sys
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+from election_common import load_official
 
 from fastapi import FastAPI, HTTPException, Header, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
@@ -59,6 +62,11 @@ class Store:
         return self.append(dict(mode='demo',label='시뮬레이션 데이터',election_id='KR-20240410-NA22',
             historical_replay=True, rows=rows), 'demo://fixtures/ballots')
 
+    def archive(self):
+        rows,ledger=load_official(Path(__file__).resolve().parents[1])
+        if any(e.get('stage')=='FINAL_FILE_AGGREGATION' and e.get('source_sha256')==ledger['sha256'] and e['rows']==rows for e in self.events):return
+        self.append(dict(mode='official',election_id='KR-20240410-NA22',stage='FINAL_FILE_AGGREGATION',rows=rows,source_sha256=ledger['sha256'],source_collected_at=ledger['collected_at'],label='2024년 공식 결과 파일 집계 · 독립 검수 필요'),ledger['catalog_url'])
+
 def validate_official(payload):
     if payload.get('mode')!='official': raise ValueError('mode must be official')
     rows=payload.get('rows',[])
@@ -85,19 +93,21 @@ def validate_official(payload):
 
 store=Store(ROOT)
 async def clock_loop():
+    mode=os.environ.get('DATA_MODE','hybrid')
     while True:
-        if os.environ.get('DATA_MODE','demo')=='demo': store.demo()
+        if mode in ['demo','hybrid']: store.demo()
         await asyncio.sleep(float(os.environ.get('DATA_INTERVAL','4')))
 
 @asynccontextmanager
 async def lifespan(app):
+    if os.environ.get('DATA_MODE','hybrid') in ['official','hybrid']:store.archive()
     task=asyncio.create_task(clock_loop())
     yield
     task.cancel()
 
 app=FastAPI(title='VR 선거보도 시스템 · 데이터 송신',lifespan=lifespan)
 @app.get('/health')
-def health(): return dict(status='ok',mode=os.environ.get('DATA_MODE','demo'),error=store.error)
+def health(): return dict(status='ok',mode=os.environ.get('DATA_MODE','hybrid'),error=store.error)
 @app.get('/snapshot')
 def snapshot(): return store.events[-1] if store.events else dict(sequence=0,mode='unavailable',rows=[])
 @app.get('/events')

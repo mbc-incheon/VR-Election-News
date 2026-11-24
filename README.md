@@ -2,6 +2,27 @@
 
 **표심 다음의 질문, 인천의 공약을 읽다**
 
+## v2 PC 가상 스튜디오와 통합 보도 업무
+
+PC에서 조작하는 **실제 3D 가상 스튜디오**와 자료 검수부터 FHD 제작까지의 업무 화면을 제공합니다. 3D 엔진은 프로젝트에 포함되어 실행 중 CDN 연결이 필요하지 않습니다.
+
+![PC 3D 가상 스튜디오 실행 화면](outputs/screenshots/studio-v2.jpg)
+
+| 기능 | 실제 동작 |
+| --- | --- |
+| PC 3D 스튜디오 | 마우스 회전·확대, 정면/좌우/전체 카메라, 지역별 결과, 승인 대본, 브라우저 읽기, PNG 캡처 |
+| 공식 결과 모드 | 인천 14개 지역구·38명 후보의 원본 해시·원본 행별 후보·득표수·누락 여부 확인, 미제공 시각·개표율 보존, 독립 검수 상태 |
+| 문서 등록 | 공식 URL·게시일·후보·권리·본문, 텍스트 PDF 추출과 원본 보존, 청크·근거 ID |
+| 독립 검수 | 등록자와 다른 editor의 자료·공약 검수, 반려·철회, 실제 기사 승인 차단 |
+| 기사 업무 | 근거 기반 정형 초안, 새 수정 버전, 수치/출처 검증, 독립 승인, JSON 내보내기 |
+| FHD 제작 | 승인 기사 선택 → 실제 MP4·SRT·대본·CG·제작 원장·ZIP, 최대 20분 |
+| 음성 | 제공한 PCM WAV 결합. 직접 녹음/AI 합성 여부를 표시하며, 없으면 무음으로 명시 |
+| 보존 | SQLite 7개 테이블, 감사 해시 점검, DB·원문 백업, 재시작 시 중단 제작 작업 실패 처리 |
+
+처음 실행은 PowerShell에서 `./setup.ps1`입니다. 설치 후 재실행은 `./start.ps1`입니다. 업무 화면은 **http://127.0.0.1:8102**, 가상 스튜디오는 **http://127.0.0.1:8102/studio**입니다. [운영 안내](docs/platform-guide.md)에 역할별 절차, Docker 설정, 제작·복구 방법을 정리했습니다.
+
+공식 결과는 불러왔지만 **사람의 독립 대조를 완료한 것으로 표시하지 않습니다**. 실제 후보 공약 본문을 등록하고 자료·문서 검수와 기사 승인을 거쳐야 실제 자료의 제작물을 내보낼 수 있습니다. 사람의 승인과 가상 TEST 계정의 시험은 구분합니다. 외부 생성형 AI와 HMD 장비 연동은 이 PC 버전에 포함하지 않습니다.
+
 2024년 제22대 국회의원선거 인천 지역구를 대상으로 공식 개표 데이터와 공약 근거를 연결하고, 기사 초안 → 팩트체크 → 독립 편집 승인 → 뉴스 제작으로 이어지는 선거보도 시스템입니다.
 
 이 저장소는 기획·설계 문서 7종, 실제 실행 소스코드, DB SQL 스크립트와 검증·형상관리 기록을 함께 제공합니다. 2026년 11월 24일에 기존 [Real-time-Election-News](https://github.com/mbc-incheon/Real-time-Election-News)의 로컬 후속 수정본을 통합했습니다. 기존 작업 폴더의 미커밋 수정은 보존했습니다.
@@ -15,7 +36,7 @@
 | 데이터 송신 서버 | [election-data-server](election-data-server) | 공식 입력 검사·원본/원장·이벤트 이력·WebSocket 송신 |
 | 보도 서버와 화면 | [election-news-server](election-news-server) | 대시보드·근거 검색·초안·검증·독립 승인·JSON 내보내기 |
 | DB 스크립트 | [db](db/README.md) | CREATE TABLE·INSERT·무결성/조회 SQL·초기화 도구 |
-| 검증 결과 | [구현 결과서](docs/implementation-results.md) | 단위/DB/화면 빌드 27개·통합 13개·화면 제어 로직 7개 통과 |
+| 검증 결과 | [구현 결과서](docs/implementation-results.md) | 단위/API/영상 43개·서버 통합 13개·전체 제작 통합 24개·화면 로직 7개 |
 | 형상관리와 협업 | [실제 기록과 협업 절차](docs/collaboration.md) | 커밋 이력·출처·PR 양식·자동 시험 설정 |
 | 기존 발표와 영상 | [2026-11-20 자료 보관함](outputs/archive/20261120) | PPT·20분 검토 영상·대본·자막·기존 보고서 |
 
@@ -27,9 +48,9 @@ python -m venv .venv
 ./start.ps1
 ```
 
-브라우저에서 http://127.0.0.1:8102를 엽니다. 첫 실행에 표시되는 writer/editor 토큰은 서로 다른 담당자가 사용합니다. 토큰 원문은 파일로 저장하지 않고 화면 메모리에서만 사용합니다. 종료는 실행 터미널에서 `Ctrl+C`입니다. 기본 실행은 시뮬레이션이며 실제 선거 속보가 아닙니다.
+브라우저에서 http://127.0.0.1:8102를 엽니다. 첫 실행에 표시되는 writer/editor 토큰은 서로 다른 담당자가 사용합니다. 토큰 원문은 파일로 저장하지 않고 화면 메모리에서만 사용합니다. 종료는 실행 터미널에서 `Ctrl+C`입니다. 화면의 기본 자료는 2024년 공식 파일 집계이며 작업 자료 메뉴에서 시뮬레이션으로 전환합니다. 현재 선거 속보가 아닙니다.
 
-데이터 서버는 8101, 보도 서버는 8102입니다. API 상세는 각 서버의 `/docs` 및 [OpenAPI JSON](outputs/openapi_news.json)에서 확인합니다. 외부 생성형 AI와 몰입형 VR 기기 연동은 현재 없습니다.
+데이터 서버는 8101, 보도 서버는 8102입니다. API 상세는 각 서버의 `/docs` 및 [OpenAPI JSON](outputs/openapi_news.json)에서 확인합니다. PC 스튜디오는 WebGL 3D이며 외부 생성형 AI와 몰입형 VR 기기 연동은 현재 없습니다.
 
 ```powershell
 # 별도 DB에 CREATE TABLE과 INSERT 예제 적용
@@ -38,6 +59,7 @@ python -m venv .venv
 # 검증 재현
 .venv/Scripts/python.exe -m pytest tests -q
 .venv/Scripts/python.exe scripts/integration_test.py
+.venv/Scripts/python.exe scripts/platform_integration.py
 # Node.js가 있으면 화면 승인 제어 로직도 확인
 node scripts/check_ui.mjs
 ```
@@ -90,7 +112,7 @@ WBS의 56시간은 작업 배분 계획이며 팀원별 실제 투입 시간은 
 
 ## 데이터베이스 구조
 
-현재 보도 서버는 SQLite의 `snapshot`, `chunk`, `article`, `approval`, `audit` 테이블을 사용합니다. **실선은 실제 외래키, 점선은 JSON 내부 ID를 이용한 논리 관계**입니다. 정규화 확장안은 문서에서 현재 구조와 구분했습니다.
+현재 보도 서버는 SQLite의 `snapshot`, `chunk`, `article`, `approval`, `audit`에 **`review_record`와 `render_job`을 추가한 7개 테이블**을 사용합니다. 신규 테이블은 [004_workflow.sql](db/004_workflow.sql)에 있습니다. 아래 v1 ERD의 실선은 실제 외래키, 점선은 JSON 내부 ID를 이용한 논리 관계입니다. v2 자료 검수·제작 관계는 [운영 안내](docs/platform-guide.md)를 참조하세요.
 
 ![데이터베이스 ERD](docs/images/erd_diagram.png)
 
@@ -131,8 +153,8 @@ WBS의 56시간은 작업 배분 계획이며 팀원별 실제 투입 시간은 
 - 공식 결과와 가상 후보·공약·수치는 분리하며, 가상 자료에는 시뮬레이션 데이터를 표시합니다. 2024년 자료를 현재 선거 속보로 표현하지 않습니다.
 - 실제 공식 결과 집계의 독립 대조와 실제 후보 공약 본문 확보·검수는 남은 작업입니다. 공식 원문이 제공하지 않은 기준시각·개표율·투표율을 임의로 채우지 않습니다.
 - 현재 근거 검색은 문단 키워드 검색이며, 초안은 근거를 연결한 정형 문장 방식입니다. 외부 생성형 AI·임베딩·벡터 DB는 연결되지 않았습니다.
-- 현재 VR은 제품명이며 기본 구현은 브라우저 대시보드입니다. HMD·WebXR·3D 가상 스튜디오는 추가 합의와 설계가 필요한 범위입니다.
-- 설계 문서의 개선 설계·확장안은 향후 작업입니다. 문서 작성과 실제 구현·시험·편집 승인 완료를 구분합니다.
+- PC 3D 가상 스튜디오를 실제 구현했습니다. 사용자 선택에 따라 HMD·WebXR은 현재 범위에서 제외했습니다.
+- 기존 Word 문서 7종은 v1 기획·설계 기준을 보존합니다. 이후 구현한 v2 검수·제작·3D 스튜디오의 기준은 운영 안내와 최신 API/SQL입니다.
 
 공식 데이터 정보원: [공공데이터포털 선관위 선거 결과 파일](https://www.data.go.kr/data/15025527/fileData.do)
 
@@ -156,4 +178,4 @@ outputs/               # 최신 시험 결과와 기존 자료 보관함
 .github/               # 자동 시험과 PR 양식
 ```
 
-기존 [초기 기획서](docs/project-plan.md), [초기 기능정의서](docs/functional-spec.md), [초기 설계서](docs/system-design.md)는 초기에 검토한 참고 자료입니다. 현재 확정된 선거 범위와 시스템 구조는 위 최신 산출물 7종을 기준으로 확인합니다.
+기존 [초기 기획서](docs/project-plan.md), [초기 기능정의서](docs/functional-spec.md), [초기 설계서](docs/system-design.md)는 참고 자료입니다. 현재 구현 상태는 [v2 운영 안내](docs/platform-guide.md), API와 SQL을 기준으로 확인합니다.

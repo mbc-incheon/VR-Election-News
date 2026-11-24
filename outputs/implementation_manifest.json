@@ -1,16 +1,22 @@
 {
-  "captured_at": "2026-11-24T11:55:19.205307+09:00",
+  "captured_at": "2026-11-24T14:30:20.079236+09:00",
   "repository": "https://github.com/mbc-incheon/VR-Election-News",
+  "release_version": "2.0.0",
   "imported_from": {
     "repository": "https://github.com/mbc-incheon/election-analysis-project-01",
     "commit": "00ac79dc6ec77d6bd4c1e883e152fd78f2e3ab91"
   },
-  "repository_base_commit": "2aca627051bedae4b948420c6440adf5bd76e652",
+  "repository_base_commit": "790af3d28fad1c713814067957bf6c6396ac74f3",
   "note": "Base commit is the parent context before this manifest is committed; exact publication commit is in Git history.",
   "runtime": {
     "python": "3.12.10"
   },
   "files": [
+    {
+      "path": ".dockerignore",
+      "bytes": 72,
+      "sha256": "26209631a02b2c49f7b5566fb60b9696cf6193ad42a2597db66308aa591cfa44"
+    },
     {
       "path": ".gitattributes",
       "bytes": 210,
@@ -23,8 +29,8 @@
     },
     {
       "path": ".github/workflows/tests.yml",
-      "bytes": 865,
-      "sha256": "70db7e2d7e275bd8f5f9c545f6654aaf76191d6241304ea5af4c8d041108e168"
+      "bytes": 1043,
+      "sha256": "fdc2ac81a43d09e0bd793ae069a653d56c9f6f148ee0be7fddbbb8d72ad6d4e2"
     },
     {
       "path": ".gitignore",
@@ -32,9 +38,19 @@
       "sha256": "a32235ad40b22362ca2e85c6816bfffeac514428449651819024fd7a011fa438"
     },
     {
+      "path": "Dockerfile",
+      "bytes": 567,
+      "sha256": "4f156fcd722e0ff1c055a200fc1dcd0b6121f6afa576a92ddf0f8a0c2df6fde7"
+    },
+    {
       "path": "README.md",
-      "bytes": 12327,
-      "sha256": "81d246c17fa75c675a55313255bafd8e47c6758153a575da3838714eaa27d38e"
+      "bytes": 14901,
+      "sha256": "53921caef15c97bcb48fde93167ad4025491b1398e6c516ccb5114ebbade8b22"
+    },
+    {
+      "path": "compose.yaml",
+      "bytes": 608,
+      "sha256": "db20aff3b2d81f31122e010642a9f5d82578bf65a5a6a3582a08e4d049d9663d"
     },
     {
       "path": "data/clean/incheon_final_results.csv",
@@ -102,14 +118,19 @@
       "sha256": "df456edf73b1786abcda2429115db9e466fd4f676425e1b5459e925d66aa903d"
     },
     {
+      "path": "db/004_workflow.sql",
+      "bytes": 634,
+      "sha256": "7ab79310ccbc9b23f2b8adc601f161c2cad7556e58142a99a6567406e4953b20"
+    },
+    {
       "path": "db/README.md",
-      "bytes": 2329,
-      "sha256": "9f509f8e64a8343ff1dd3dc08afce97f7c668e374956d3ebb58374e662d8a3ab"
+      "bytes": 2555,
+      "sha256": "f72f3885ec746ecc1f92fd737266105aa701bd889e200e02cddf96047a5a85bc"
     },
     {
       "path": "docs/collaboration.md",
-      "bytes": 3658,
-      "sha256": "7e073fe085c403b08d98a8c0fdd375ef7d4b5541dc893282cb98897fe45024f2"
+      "bytes": 4124,
+      "sha256": "438e342ea555186a5ec74276e441b3304f3f553c806f78412ac5e6e5a13b200f"
     },
     {
       "path": "docs/deliverables/01_기획서.docx",
@@ -178,8 +199,13 @@
     },
     {
       "path": "docs/implementation-results.md",
-      "bytes": 4656,
-      "sha256": "db127b9a9bbd842514a4f95f9f609c33ee35e4bbf106c88152fefbb71412b7a4"
+      "bytes": 5708,
+      "sha256": "74d73a5ab1655060f0f8b48d37e17e94acbe74405c60a5ae9cdb8e8d3235050e"
+    },
+    {
+      "path": "docs/platform-guide.md",
+      "bytes": 10626,
+      "sha256": "276bb1b034079e12eaf389d6bbc15e07ea68d851f5821e1407c8a5e5735b5208"
     },
     {
       "path": "docs/project-plan.md",
@@ -193,8 +219,8 @@
     },
     {
       "path": "election-data-server/.env.example",
-      "bytes": 138,
-      "sha256": "73ea208a3fb7130eb3cf903bf034df51b8065aad5f5a34117da2c41090f7285f"
+      "bytes": 140,
+      "sha256": "66696dbc1e925e7f6cc9bcbb0526176a965d21f27922b2c16ea1d65bf3bc31d9"
     },
     {
       "path": "election-data-server/.gitignore",
@@ -208,8 +234,8 @@
     },
     {
       "path": "election-data-server/app.py",
-      "bytes": 6395,
-      "sha256": "2d4221670f2835b4f8ca589c7475713ad1d7696929fb027089dbff5c85ba126d"
+      "bytes": 7148,
+      "sha256": "e9afd5313c2aa87d0351cc3dddedfb35a38544adf5745270ade4aebdedf6fc0b"
     },
     {
       "path": "election-data-server/requirements.txt",
@@ -228,18 +254,18 @@
     },
     {
       "path": "election-news-server/README.md",
-      "bytes": 1586,
-      "sha256": "ef64ef228f1b21dee0c60eac50a04a56bdea3fe8f9dac38be33b4108f6282abb"
+      "bytes": 1593,
+      "sha256": "4caa4be9c9875b49d86c591ad64734eb5be9508b6795b5e7ad86c0589e7c3790"
     },
     {
       "path": "election-news-server/app.py",
-      "bytes": 7653,
-      "sha256": "ec123248513d00e98d9181888f71329e3ad758841b152d2e53e840ca7050f201"
+      "bytes": 15677,
+      "sha256": "0e35fa0e1297efa550044a20953f01bb0cd84b031357ea4c3a99c4e7a412c26e"
     },
     {
       "path": "election-news-server/core.py",
-      "bytes": 11722,
-      "sha256": "f5151b41fa8959acb6e8c805f5b48b6b039a0d071a3cf1c37fd68dcde35cc925"
+      "bytes": 14745,
+      "sha256": "985cbfeda038a276c8bbb9e6e2a855a6fc1c4a3d915a25c4c6f6232bd5b06d29"
     },
     {
       "path": "election-news-server/dashboard.css",
@@ -248,13 +274,13 @@
     },
     {
       "path": "election-news-server/dashboard.js",
-      "bytes": 9802,
-      "sha256": "029cbe82e857707458d7c8c046591041e4de3e5771b8f67028b52a208e9dc71a"
+      "bytes": 10472,
+      "sha256": "4850ea03060d87102302e97e85fc5a1b4dcacc1fad43c1e44ecce148d9c80adb"
     },
     {
       "path": "election-news-server/dashboard.template.html",
-      "bytes": 7742,
-      "sha256": "8c2791d164a73f941b08da32ac579a69295b8bb53b06753ae03165774cb3dc49"
+      "bytes": 9006,
+      "sha256": "5b89dc60a3e99ae5e498ac1274e970fbb429090288023eccfe98be52e731c319"
     },
     {
       "path": "election-news-server/fixtures/fallback_snapshot.json",
@@ -263,13 +289,23 @@
     },
     {
       "path": "election-news-server/index.html",
-      "bytes": 28631,
-      "sha256": "a2d3cdf9e66164196e8483ee41fc03ddb5466461a10a433e901ff120066a9a8f"
+      "bytes": 30569,
+      "sha256": "1a669a30fd59e808a746dea6099070f8781a0224f986fa90dcb1f56c135b61ca"
     },
     {
       "path": "election-news-server/init_users.py",
       "bytes": 840,
       "sha256": "421f9617bab2455d1a7d33c308ce0f97064ad2559f3790c4cec5cae56ee03e24"
+    },
+    {
+      "path": "election-news-server/platform_schema.sql",
+      "bytes": 634,
+      "sha256": "7ab79310ccbc9b23f2b8adc601f161c2cad7556e58142a99a6567406e4953b20"
+    },
+    {
+      "path": "election-news-server/production.py",
+      "bytes": 9705,
+      "sha256": "62b821685e6d6af66280aedc67b965995360608ff2692dab00626eecfc0b8cbf"
     },
     {
       "path": "election-news-server/reference_data/incheon_final_results.json",
@@ -285,6 +321,66 @@
       "path": "election-news-server/schema.sql",
       "bytes": 937,
       "sha256": "6a0705ea25fba33d181411d82a5da89976d8cef57efcb9f9549913a212d58153"
+    },
+    {
+      "path": "election-news-server/static/studio.css",
+      "bytes": 3305,
+      "sha256": "39a4454c03461dfe64b00f1c111f68866b2c75432eef432654679bd43410f062"
+    },
+    {
+      "path": "election-news-server/static/studio.html",
+      "bytes": 2419,
+      "sha256": "6b4c539b2200cdf63aaa14213ef40f07fe79bc0ae3d221882d60642418bcb611"
+    },
+    {
+      "path": "election-news-server/static/studio.js",
+      "bytes": 10362,
+      "sha256": "0087734905dbe5e42f94b69dd0b36de9aa386b580701a37f01c9754f9cee28c5"
+    },
+    {
+      "path": "election-news-server/static/vendor/OrbitControls.js",
+      "bytes": 38703,
+      "sha256": "b97879c748170baadeb3fb84cea1ffdf4674e283dc06042f34e2acb95a76042c"
+    },
+    {
+      "path": "election-news-server/static/vendor/README.md",
+      "bytes": 531,
+      "sha256": "51c7b2f22e431875b786439c7bd4604bfb8d585b8b5e39ca68db9f827530d728"
+    },
+    {
+      "path": "election-news-server/static/vendor/THREE-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601"
+    },
+    {
+      "path": "election-news-server/static/vendor/three.core.js",
+      "bytes": 1403455,
+      "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20"
+    },
+    {
+      "path": "election-news-server/static/vendor/three.module.js",
+      "bytes": 603113,
+      "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a"
+    },
+    {
+      "path": "election-news-server/static/workbench.css",
+      "bytes": 3714,
+      "sha256": "8c5b8b2a03ec211503d819d1e0e4e2af7eea4f635d395df7c9edef6d4593dfe5"
+    },
+    {
+      "path": "election-news-server/static/workbench.js",
+      "bytes": 15130,
+      "sha256": "4d951b804a6e76039f442029c33aafaa6511a9812c5730e36c3225e8e9e0b4c1"
+    },
+    {
+      "path": "election-news-server/workflow.py",
+      "bytes": 6935,
+      "sha256": "aa3730c07fd28e23c0909cc07aace8a6b4134e384a20bc804dd657d7ed5798a4"
+    },
+    {
+      "path": "election_common.py",
+      "bytes": 3135,
+      "sha256": "e2a1228fcdc96881432225dd4d3a03d6e466935a993b56a271192133814fe11e"
     },
     {
       "path": "fixtures/fallback_snapshot.json",
@@ -399,7 +495,7 @@
     {
       "path": "outputs/integration_results.json",
       "bytes": 1440,
-      "sha256": "70bcab6f0a1cd105b3f9731190efa19d90fc2a54b193ef592f7039906b8a52a2"
+      "sha256": "0fc1e9a92dbd90cc9cc6e1b79e39375ee13a9b14714c38c42d8ee43076d93892"
     },
     {
       "path": "outputs/openapi_data.json",
@@ -408,8 +504,43 @@
     },
     {
       "path": "outputs/openapi_news.json",
-      "bytes": 18220,
-      "sha256": "13030dafb9919fa1cc66252729ce861e6beee3f8830ab9c074906177c4cb065a"
+      "bytes": 38654,
+      "sha256": "9c35b7ab9febecefc0db5fd079debf7db171a83637d2d29f8f929960a22e6a8b"
+    },
+    {
+      "path": "outputs/platform_integration_results.json",
+      "bytes": 2210,
+      "sha256": "0962023d8a49a0b9f3d28e9802a24ec63d8e921cfb50dcbf8fdc0f0400e233a6"
+    },
+    {
+      "path": "outputs/production_sample/README.txt",
+      "bytes": 289,
+      "sha256": "65d97b87c9f403a96fb3d9fc07b12193b737dd28208ad248b40cfde5af03440a"
+    },
+    {
+      "path": "outputs/production_sample/manifest.json",
+      "bytes": 1447,
+      "sha256": "ee6e9ee6dcb259aab1bc7193c1e40e2386fb5d0779811ee114e2d415299880e4"
+    },
+    {
+      "path": "outputs/production_sample/news-package.zip",
+      "bytes": 459207,
+      "sha256": "d5c3c9ef98a66f40a4f3728119f86c6f0d0733b30f51586216cffbd79fda2d4e"
+    },
+    {
+      "path": "outputs/production_sample/news.mp4",
+      "bytes": 249915,
+      "sha256": "6127f8854ba034e19dd19ec1463e8a54ab90e1111892e56036490bf8a96deb1d"
+    },
+    {
+      "path": "outputs/production_sample/script.txt",
+      "bytes": 634,
+      "sha256": "2fff03571370051d02cfb673489083b51d902c409726451056fea8d99eb37200"
+    },
+    {
+      "path": "outputs/production_sample/subtitles.srt",
+      "bytes": 782,
+      "sha256": "1ba962d16dcd3796525b08b1674852c39fef5b3748a976fdc97e6afc2449dbd9"
     },
     {
       "path": "outputs/screenshots/dashboard-desktop.jpg",
@@ -422,34 +553,54 @@
       "sha256": "c53b7d349d0627fa0d5ca544b5aa281ff3f1be2a783a3f6d51f3e3f2a3b4f14d"
     },
     {
+      "path": "outputs/screenshots/production-v2.jpg",
+      "bytes": 264352,
+      "sha256": "86ec0583ced1fff102f8155131860a167126e4c5716e359e97e9b5195f7940b4"
+    },
+    {
+      "path": "outputs/screenshots/studio-mobile-v2.jpg",
+      "bytes": 59323,
+      "sha256": "5ef2f8b787e9a71d6faa0b75ade674befbf4d37376057ed5de7bc6caa32729f0"
+    },
+    {
+      "path": "outputs/screenshots/studio-v2.jpg",
+      "bytes": 74454,
+      "sha256": "5b63b531e3b0854493dcd503230b9240418bb41ce5042d350527f7e3a629676b"
+    },
+    {
+      "path": "outputs/screenshots/workstation-v2.jpg",
+      "bytes": 187510,
+      "sha256": "847f90ecb41e13bc259a4b0cb00aeb78a2e829c849d5511c7d6be7d68594ba78"
+    },
+    {
       "path": "outputs/test_approved_bundle.json",
-      "bytes": 3916,
-      "sha256": "19ee4d49c840de6cbef3940769b9542eedf7f5ca290042d6e31fcb1a1ee145f2"
+      "bytes": 3910,
+      "sha256": "7cfaa13fbb68fe816915ee27713d28af9ab7e73cf2758b310d26de3fb3c29f2a"
     },
     {
       "path": "outputs/test_audit_log.json",
-      "bytes": 11710,
-      "sha256": "f998e2987b595d2f7edf083f39ed17e872e33fb4403ffed6a5d7f2a552963a8c"
+      "bytes": 14148,
+      "sha256": "2d644d4e5e4d5bbfcc580aa620c01bb689efb83be7509d40dac715def202c755"
     },
     {
       "path": "outputs/test_blocked_article.json",
-      "bytes": 2733,
-      "sha256": "f5a096d2410d1c75b005de23e9d796b07f07bdcf3628d1d009f87ef7b2aa94b9"
+      "bytes": 2729,
+      "sha256": "58dfa423c0d47bd5f64b731fe24b520ffdc85d4e7fdb54b97b8935724c594177"
     },
     {
       "path": "outputs/ui_logic_results.json",
       "bytes": 823,
-      "sha256": "a77a3045d5fae7abc018f88cd0885b417e76bf6581eae80a411d64d519254b3b"
+      "sha256": "2a5f85555de8ec821a31f3dfb4ec7f9298cab8ca313906894f640394e064585f"
     },
     {
       "path": "outputs/unit_results.xml",
-      "bytes": 2713,
-      "sha256": "c79188ee74600d0f0d64d5cce64adca76e22b4b9ee55460baad5e777aab749c9"
+      "bytes": 4367,
+      "sha256": "9bd317aa9be674f6433504bae4c50c9eaafb3b71939c3d5150bc54df11e39321"
     },
     {
       "path": "requirements.txt",
-      "bytes": 78,
-      "sha256": "e17679af85de2ef08e2f16978fe843b3a7ee5cad4458220a74d456585ed48278"
+      "bytes": 128,
+      "sha256": "f7c748bf07874fa752a582ac8e5b5c22cdde9f6e274bbc7fbde7cf7e8bdc341e"
     },
     {
       "path": "scripts/build_dashboard.py",
@@ -458,8 +609,8 @@
     },
     {
       "path": "scripts/build_implementation_manifest.py",
-      "bytes": 2314,
-      "sha256": "c735ab9f850ec0e730eea886009454c6e39ddb187ba7eeb743bd6c539511fad2"
+      "bytes": 2347,
+      "sha256": "3c1dc696cfba2131f6558006b74b02b399d8fd5df34452c405ae0a155658287a"
     },
     {
       "path": "scripts/campaign_probe.py",
@@ -493,8 +644,8 @@
     },
     {
       "path": "scripts/init_db.py",
-      "bytes": 1950,
-      "sha256": "7ff8ffde3ad69f158bdd970c4779b88577f31962b8a286c4aa1ae379193e2479"
+      "bytes": 2116,
+      "sha256": "f03d9db7715616f1049e776d838ddc61a474fe18f0d4f5b70b83f0bc570639b0"
     },
     {
       "path": "scripts/init_users.py",
@@ -512,6 +663,16 @@
       "sha256": "d0e5da690e53829a9e49c7aedee0de8baf3154b69c4ce3e42e2c20397a1eb728"
     },
     {
+      "path": "scripts/platform_integration.py",
+      "bytes": 6551,
+      "sha256": "86075f312182ef5a7850c330555584dfab4b190c3de8148c3475103057c2dea8"
+    },
+    {
+      "path": "setup.ps1",
+      "bytes": 538,
+      "sha256": "5daee2ffe57c3525ad4926c9cbb67ab3a1ef55e9c9e98cd94c636aa2aba01408"
+    },
+    {
       "path": "start.ps1",
       "bytes": 831,
       "sha256": "31a2d732f7f760a790743beba63623bceb1bf1fa79742078bdf9adfe25aecc24"
@@ -525,6 +686,11 @@
       "path": "tests/test_flow.py",
       "bytes": 4532,
       "sha256": "5b7acd7e2a0f7a5dceffc4b84c504fd07b09517482f2d769a9a5dc8c8c811d86"
+    },
+    {
+      "path": "tests/test_platform.py",
+      "bytes": 11658,
+      "sha256": "dbc6058146f1a3b25e8a8bc6f64eb0413337f02750fb94aead54265ea346542e"
     },
     {
       "path": "tests/test_sql.py",
