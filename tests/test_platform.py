@@ -232,7 +232,7 @@ def test_admin_login_accounts_logout_and_role_boundaries(client):
     assert c.get('/admin').status_code==200
     assert c.get('/api/me').json()['role']=='admin'
     listed=c.get('/api/admin/users').json()
-    assert all(set(u)=={'name','role'} for u in listed)
+    assert all({'name','role','active','display_name'}<=set(u) and 'token_hash' not in u and 'token' not in u for u in listed)
     assert c.post('/api/admin/users',json=dict(name='new-reporter',role='writer')).status_code==403
     issued=c.post('/api/admin/users',headers=origin,json=dict(name='new-reporter',role='writer'))
     assert issued.status_code==200,issued.text
@@ -278,3 +278,66 @@ def test_admin_bootstrap_preserves_existing_users(tmp_path):
     before=(root/'users.json').read_bytes()
     assert subprocess.run(command,capture_output=True).returncode!=0
     assert (root/'users.json').read_bytes()==before
+
+def test_staff_accounts_session_lifecycle_and_secret_redaction(client):
+    c,module=client
+    origin={'Origin':'http://testserver'}
+    users=module.admin_auth.users();users.append(dict(name='admin',role='admin',token_hash=hashlib.sha256(b'TEST-admin').hexdigest()));module.admin_auth.write(users)
+    admin_headers={'Authorization':'Bearer TEST-admin'}
+    assert c.get('/login').status_code==200
+    created=c.post('/api/admin/users',headers=admin_headers,json=dict(name='reporter01',role='writer',display_name='TEST 취재 담당')).json()
+    token=created['token']
+    assert c.post('/api/session/login',json=dict(name='reporter01',token=token)).status_code==403
+    login=c.post('/api/session/login',headers=origin,json=dict(name='reporter01',token=token))
+    assert login.status_code==200 and login.json()['role']=='writer'
+    assert c.get('/api/me').json()['name']=='reporter01'
+    assert c.get('/api/admin/users').status_code==403
+    # Both cookie and direct-token access are revoked by account suspension.
+    changed=c.post('/api/admin/users/reporter01/profile',headers=admin_headers,json=dict(display_name='TEST 담당자 변경',active=False))
+    assert changed.status_code==200
+    assert c.get('/api/me').status_code==401
+    assert c.get('/api/me',headers={'Authorization':'Bearer '+token}).status_code==401
+    assert c.post('/api/session/login',headers=origin,json=dict(name='reporter01',token=token)).status_code==401
+    assert c.post('/api/admin/users/reporter01/token',headers=admin_headers,json={}).status_code==409
+    assert c.post('/api/admin/users/reporter01/profile',headers=admin_headers,json=dict(display_name='TEST 담당자 변경',active=True)).status_code==200
+    assert c.post('/api/session/login',headers=origin,json=dict(name='reporter01',token=token)).status_code==200
+    rotated=c.post('/api/admin/users/reporter01/token',headers=admin_headers,json={}).json()['token']
+    assert rotated!=token
+    assert c.get('/api/me').status_code==401
+    assert c.get('/api/me',headers={'Authorization':'Bearer '+token}).status_code==401
+    assert c.post('/api/session/login',headers=origin,json=dict(name='reporter01',token=rotated)).status_code==200
+    session=c.cookies.get('staff_session')
+    assert c.post('/api/session/logout',headers=origin,json={}).status_code==200
+    assert c.get('/api/me',headers={'Cookie':'staff_session='+session}).status_code==401
+    assert c.post('/api/admin/users/admin/profile',headers=admin_headers,json=dict(display_name='no',active=False)).status_code==403
+    assert c.post('/api/admin/users/admin/token',headers=admin_headers,json={}).status_code==403
+    assert c.post('/api/admin/users/missing/token',headers=admin_headers,json={}).status_code==404
+    history=c.get('/api/admin/history',headers=admin_headers).json()
+    assert {'account_created','account_updated','account_token_rotated','staff_login','session_logout'}<={x['kind'] for x in history}
+    assert all(secret not in json.dumps(history) for secret in (token,rotated,session))
+
+
+def test_issued_roles_complete_draft_review_approval_without_shared_token(client):
+    c,module=client
+    origin={'Origin':'http://testserver'}
+    writer=module.admin_auth.create('TEST-reporter','writer','TEST 취재 담당')
+    editor=module.admin_auth.create('TEST-desk','editor','TEST 편집 담당')
+    module.room.receive(json.loads((ROOT/'election-news-server/fixtures/fallback_snapshot.json').read_text(encoding='utf-8')))
+    assert c.post('/api/session/login',headers=origin,json=dict(name=writer['name'],token=writer['token'])).status_code==200
+    draft=c.post('/api/articles',headers=origin,json=dict(region='계양구을',mode='demo'))
+    assert draft.status_code==200,draft.text
+    article=draft.json()
+    assert article['author']==writer['name']
+    validated=c.post('/api/articles/'+article['id']+'/validate',headers=origin,json={})
+    assert validated.status_code==200
+    assert validated.json()['validation']['rule']=='PASS',validated.text
+    approval=dict(reason='TEST 자동 검증: 실제 편집 승인 아님',evidence_checked=True,ai_unavailable_ack=True)
+    assert c.post('/api/articles/'+article['id']+'/approve',headers=origin,json=approval).status_code==403
+    assert c.post('/api/session/logout',headers=origin,json={}).status_code==200
+    assert c.post('/api/session/login',headers=origin,json=dict(name=editor['name'],token=editor['token'])).status_code==200
+    assert c.post('/api/articles',headers=origin,json=dict(region='계양구을',mode='demo')).status_code==403
+    approved=c.post('/api/articles/'+article['id']+'/approve',headers=origin,json=approval)
+    assert approved.status_code==200,approved.text
+    assert approved.json()['status']=='APPROVED'
+    assert c.get('/api/articles/'+article['id']+'/export').status_code==200
+    assert c.post('/api/articles/'+article['id']+'/validate',json={}).status_code==403

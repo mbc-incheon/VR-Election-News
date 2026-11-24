@@ -10,7 +10,7 @@ label{font-weight:700}input:not([type=checkbox]),select{height:36px;min-width:0;
 </style><script src="/static/workbench.js" defer></script></head><body>
 <header><h1>VR 선거보도 시스템</h1><div class="editorial"><strong>표심 다음의 질문, 인천의 공약을 읽다</strong><span>2024 제22대 총선 · 인천 지역구</span></div><nav aria-label="주요 메뉴"><a href="#results">개표 현황</a><a href="#pledges">공약 근거</a><a href="#writing">기사 작성</a><a href="#review">검증·승인</a><a href="#reference">공식 자료실</a><a href="#production">뉴스 제작</a></nav></header>
 <main>
-<div class="workbar"><label for="dataMode">작업 자료</label><select id="dataMode"><option value="official">2024년 공식 결과 · 인천 14개 지역구</option><option value="demo">시뮬레이션 · 가상 후보</option></select><span id="dataReviewBadge" class="pill warn">자료 검수 상태 확인 중</span><a class="studio-link" href="/studio" target="_blank" rel="noopener">3D 가상 스튜디오 ↗</a><button id="openDocuments" class="secondary">공약 문서 등록</button><button id="openReviews" class="secondary">자료·문서 검수</button><button id="editArticle" class="secondary">기사 수정</button><button id="openAudit" class="secondary">감사 이력</button></div><div class="account-line"><a href="/admin/login" class="studio-link">관리자 로그인</a><span id="accountStatus">작성자 또는 편집자의 토큰을 입력한 뒤 계정을 확인하세요.</span><button id="identify" class="secondary">계정 확인</button></div>
+<div class="workbar"><label for="dataMode">작업 자료</label><select id="dataMode"><option value="official">2024년 공식 결과 · 인천 14개 지역구</option><option value="demo">시뮬레이션 · 가상 후보</option></select><span id="dataReviewBadge" class="pill warn">자료 검수 상태 확인 중</span><a class="studio-link" href="/studio" target="_blank" rel="noopener">3D 가상 스튜디오 ↗</a><button id="openDocuments" class="secondary">공약 문서 등록</button><button id="openReviews" class="secondary">자료·문서 검수</button><button id="editArticle" class="secondary">기사 수정</button><button id="openAudit" class="secondary">감사 이력</button></div><div class="account-line"><a href="/login" class="studio-link">담당자 로그인</a><button id="signOut" class="secondary" hidden>로그아웃</button><a href="/admin/login" class="studio-link">관리자 로그인</a><span id="accountStatus">작성자 또는 편집자의 토큰을 입력한 뒤 계정을 확인하세요.</span><button id="identify" class="secondary">계정 확인</button></div>
 <section class="panel" aria-labelledby="status-title"><div class="status-strip"><div class="status-title"><span class="number">01</span><strong id="status-title">공통 상태 정보</strong></div><div class="status-data"><span id="mode" class="mode">데이터 연결 대기</span><span id="connection" class="pill">연결 대기</span><span class="time"><b>자료 기준</b><span id="baseline">미제공</span></span><span class="time"><b>수집시각</b><span id="collected">미제공</span></span><span class="time"><b>화면 갱신</b><span id="updated">대기</span></span><span id="modeNote" class="mode-note">과거 선거 재현 · 현재 속보 아님</span></div></div></section>
 <p id="error" class="error" role="alert"></p>
 <section id="results" class="panel" aria-labelledby="results-title"><div class="panel-head"><span class="number">02</span><h2 id="results-title">지역별 개표 현황</h2><div class="region-control"><label for="region">지역(선거구)</label><select id="region" aria-label="지역 선택"><option value="">자료 대기</option></select></div></div><div class="body scroll"><table><colgroup><col style="width:17%"><col style="width:13%"><col style="width:34%"><col style="width:11%"><col style="width:13%"><col style="width:12%"></colgroup><thead><tr><th scope="col">후보</th><th scope="col">득표수</th><th scope="col">득표율</th><th scope="col">개표율</th><th scope="col">기준시각</th><th scope="col">출처</th></tr></thead><tbody id="rows"><tr><td colspan="6" class="empty">데이터 연결을 기다리고 있습니다.</td></tr></tbody></table></div></section>
@@ -71,7 +71,7 @@ $('draft').onclick=async()=>{
  button.disabled=true;button.textContent='초안 생성 중…';notice.className='message';notice.textContent='작성자 연결과 선택 지역의 자료를 확인하고 있습니다…';
  try{
   if(!$('region').value)throw Error('02 영역에서 지역을 먼저 선택해 주세요.');
-  if(!$('token').value.trim()){
+  if(!$('token').value.trim()&&!await api('/api/me').catch(()=>null)){
    const capabilities=await api('/api/capabilities');
    if(capabilities.local_writer_available)await api('/api/session/local-writer',{});
    else throw Error('담당자 토큰을 입력한 뒤 기사 초안 생성을 눌러 주세요.');
@@ -83,7 +83,7 @@ $('draft').onclick=async()=>{
   const pledgeCount=article.sentences.filter(s=>s.kind==='pledge').length;
   notice.textContent='초안을 생성했습니다. 아래 05 영역에서 본문과 근거를 확인하고 규칙 검증을 진행하세요.'+(pledgeCount?'':' 등록된 공약 근거가 없어 개표 결과만 작성했습니다. 공약 자료 등록·검수 후 새 초안을 생성하세요.');
  }catch(e){notice.className='message is-error';notice.textContent=e.message}
- finally{button.disabled=false;button.textContent='▤ 기사 초안 생성'}
+ finally{button.disabled=typeof loggedUser!=='undefined'&&loggedUser&&loggedUser.role!=='writer';button.textContent='▤ 기사 초안 생성'}
 };
 $('list').onclick=action(async()=>{const articles=await api('/api/articles');$('articles').innerHTML='';if(!articles.length){$('articles').textContent='작성된 기사가 없습니다.';return}articles.forEach(a=>{const button=document.createElement('button');button.className='secondary';button.textContent=a.title+' · '+(statuses[a.status]||a.status);button.onclick=action(async()=>show(await api('/api/articles/'+a.id)));$('articles').appendChild(button)})});
 $('validate').onclick=action(async()=>show(await api(`/api/articles/${current.id}/validate`,{})));

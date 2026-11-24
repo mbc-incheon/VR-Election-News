@@ -39,7 +39,7 @@ def local_writer_allowed(request):
 def identity(request:Request,authorization:str=Header(default='')):
     token=authorization[6:].strip() if authorization.startswith('Bearer') else authorization.strip()
     if not token:
-        admin=admin_auth.session(request.cookies.get('admin_session',''))
+        admin=admin_auth.session(request.cookies.get('staff_session','')) or admin_auth.session(request.cookies.get('admin_session',''))
         if admin:
             if request.method not in ('GET','HEAD','OPTIONS'):same_origin(request)
             return admin
@@ -47,9 +47,9 @@ def identity(request:Request,authorization:str=Header(default='')):
             and secrets.compare_digest(request.cookies.get('local_writer',''),LOCAL_WRITER_SESSION)):
         return dict(name='local-writer',role='writer')
     p=ROOT/'users.json'
-    users=json.loads(p.read_text()) if p.exists() else []
+    users=json.loads(p.read_text(encoding='utf-8-sig')) if p.exists() else []
     hashed=hashlib.sha256(token.encode()).hexdigest()
-    user=next((u for u in users if secrets.compare_digest(u['token_hash'],hashed)),None)
+    user=next((u for u in users if u.get('active',True) and secrets.compare_digest(u['token_hash'],hashed)),None)
     if not user:raise HTTPException(401,'로컬 사용자 토큰이 필요합니다')
     return user
 
@@ -108,7 +108,7 @@ async def response_headers(request,call_next):
     response.headers['X-Content-Type-Options']='nosniff'
     response.headers['Referrer-Policy']='no-referrer'
     response.headers['X-Frame-Options']='DENY'
-    if request.url.path.startswith(('/admin','/api/admin')):response.headers['Cache-Control']='no-store'
+    if request.url.path.startswith(('/admin','/api/admin','/login','/api/session')):response.headers['Cache-Control']='no-store'
     return response
 @app.get('/')
 def home():return FileResponse(Path(__file__).with_name('index.html'))
@@ -124,7 +124,7 @@ def admin_login_page():return FileResponse(Path(__file__).with_name('static')/'a
 
 @app.get('/admin')
 def admin_page(request:Request):
-    if not admin_auth.session(request.cookies.get('admin_session','')):return RedirectResponse('/admin/login',status_code=303)
+    if (admin_auth.session(request.cookies.get('admin_session','')) or {}).get('role')!='admin':return RedirectResponse('/admin/login',status_code=303)
     return FileResponse(Path(__file__).with_name('static')/'admin.html')
 
 class AdminLogin(BaseModel):
@@ -138,6 +138,8 @@ def admin_login(req:AdminLogin,request:Request):
     room.audit('admin_login',req.name,{})
     response=JSONResponse(dict(name=req.name,role='admin'))
     response.set_cookie('admin_session',secret,max_age=28800,httponly=True,samesite='strict',secure=request.url.scheme=='https')
+    admin_auth.logout(request.cookies.get('staff_session',''))
+    response.delete_cookie('staff_session')
     response.delete_cookie('local_writer')
     response.headers['Cache-Control']='no-store'
     return response
@@ -153,18 +155,72 @@ def admin_logout(request:Request):
 @app.get('/api/admin/users')
 def admin_users(user=Depends(identity)):
     role(user,'admin')
-    return [dict(name=u['name'],role=u['role']) for u in admin_auth.users()]
+    return admin_auth.listing()
 
 class NewUser(BaseModel):
     name:str=Field(min_length=2,max_length=40)
     role:Literal['writer','editor']
+    display_name:str=Field(default='',max_length=80)
 
 @app.post('/api/admin/users')
 def admin_create_user(req:NewUser,user=Depends(identity)):
     role(user,'admin')
-    created=admin_auth.create(req.name,req.role)
+    created=admin_auth.create(req.name,req.role,req.display_name.strip() or req.name)
     room.audit('account_created',user['name'],dict(name=req.name,role=req.role))
     return JSONResponse(created,headers={'Cache-Control':'no-store'})
+
+
+class UserProfile(BaseModel):
+    display_name:str=Field(min_length=1,max_length=80)
+    active:bool
+
+@app.post('/api/admin/users/{name}/profile')
+def update_account(name:str,req:UserProfile,user=Depends(identity)):
+    role(user,'admin')
+    if not req.display_name.strip():raise HTTPException(422,'담당자 이름을 입력하세요.')
+    result=admin_auth.profile(name,req.display_name.strip(),req.active)
+    room.audit('account_updated',user['name'],dict(name=name,display_name=result['display_name'],active=req.active))
+    return result
+
+@app.post('/api/admin/users/{name}/token')
+def rotate_account_token(name:str,user=Depends(identity)):
+    role(user,'admin')
+    result=admin_auth.rotate(name)
+    room.audit('account_token_rotated',user['name'],dict(name=name))
+    return JSONResponse(result,headers={'Cache-Control':'no-store'})
+
+@app.get('/api/admin/history')
+def account_history(user=Depends(identity)):
+    role(user,'admin')
+    rows=room.db.execute('SELECT payload FROM audit ORDER BY rowid DESC').fetchall()
+    kinds={'admin_login','staff_login','account_created','account_updated','account_token_rotated','session_logout'}
+    return [json.loads(row[0]) for row in rows if json.loads(row[0]).get('kind') in kinds][:100]
+
+@app.get('/login')
+def staff_login_page():return FileResponse(Path(__file__).with_name('static')/'staff-login.html')
+
+@app.post('/api/session/login')
+def staff_login(req:AdminLogin,request:Request):
+    same_origin(request)
+    secret=admin_auth.login(req.name,req.token,request.client.host if request.client else 'unknown',roles=('writer','editor'))
+    staff=admin_auth.session(secret)
+    for cookie in ('admin_session','staff_session'):admin_auth.logout(request.cookies.get(cookie,''))
+    response=JSONResponse(staff)
+    response.set_cookie('staff_session',secret,max_age=28800,httponly=True,samesite='strict',secure=request.url.scheme=='https')
+    response.delete_cookie('admin_session');response.delete_cookie('local_writer')
+    response.headers['Cache-Control']='no-store'
+    room.audit('staff_login',req.name,dict(role=staff['role']))
+    return response
+
+@app.post('/api/session/logout')
+def staff_logout(request:Request):
+    same_origin(request)
+    user=admin_auth.session(request.cookies.get('staff_session','')) or admin_auth.session(request.cookies.get('admin_session',''))
+    for cookie in ('staff_session','admin_session'):admin_auth.logout(request.cookies.get(cookie,''))
+    response=JSONResponse(dict(ok=True))
+    for cookie in ('staff_session','admin_session','local_writer'):response.delete_cookie(cookie)
+    if user:room.audit('session_logout',user['name'],{})
+    return response
 
 @app.post('/api/session/local-writer')
 def local_writer_session(request:Request):

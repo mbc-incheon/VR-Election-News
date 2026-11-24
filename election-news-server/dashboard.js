@@ -46,7 +46,7 @@ $('draft').onclick=async()=>{
  button.disabled=true;button.textContent='초안 생성 중…';notice.className='message';notice.textContent='작성자 연결과 선택 지역의 자료를 확인하고 있습니다…';
  try{
   if(!$('region').value)throw Error('02 영역에서 지역을 먼저 선택해 주세요.');
-  if(!$('token').value.trim()){
+  if(!$('token').value.trim()&&!await api('/api/me').catch(()=>null)){
    const capabilities=await api('/api/capabilities');
    if(capabilities.local_writer_available)await api('/api/session/local-writer',{});
    else throw Error('담당자 토큰을 입력한 뒤 기사 초안 생성을 눌러 주세요.');
@@ -58,7 +58,7 @@ $('draft').onclick=async()=>{
   const pledgeCount=article.sentences.filter(s=>s.kind==='pledge').length;
   notice.textContent='초안을 생성했습니다. 아래 05 영역에서 본문과 근거를 확인하고 규칙 검증을 진행하세요.'+(pledgeCount?'':' 등록된 공약 근거가 없어 개표 결과만 작성했습니다. 공약 자료 등록·검수 후 새 초안을 생성하세요.');
  }catch(e){notice.className='message is-error';notice.textContent=e.message}
- finally{button.disabled=false;button.textContent='▤ 기사 초안 생성'}
+ finally{button.disabled=typeof loggedUser!=='undefined'&&loggedUser&&loggedUser.role!=='writer';button.textContent='▤ 기사 초안 생성'}
 };
 $('list').onclick=action(async()=>{const articles=await api('/api/articles');$('articles').innerHTML='';if(!articles.length){$('articles').textContent='작성된 기사가 없습니다.';return}articles.forEach(a=>{const button=document.createElement('button');button.className='secondary';button.textContent=a.title+' · '+(statuses[a.status]||a.status);button.onclick=action(async()=>show(await api('/api/articles/'+a.id)));$('articles').appendChild(button)})});
 $('validate').onclick=action(async()=>show(await api(`/api/articles/${current.id}/validate`,{})));
