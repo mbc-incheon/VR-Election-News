@@ -14,14 +14,16 @@ from pathlib import Path
 import httpx
 import websockets
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, WebSocket, WebSocketDisconnect
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
 from core import Newsroom, now
 from production import Production,korean_font
+from admin_auth import AdminAuth
 
 ROOT=Path(os.environ.get('NEWS_DIR','runtime/news'))
 room=Newsroom(ROOT)
+admin_auth=AdminAuth(ROOT)
 production=Production(room)
 Mode=Literal['official','demo']
 connection=dict(state='CONNECTING',error=None,last_received_at=None,mode='unavailable')
@@ -36,6 +38,11 @@ def local_writer_allowed(request):
 
 def identity(request:Request,authorization:str=Header(default='')):
     token=authorization[6:].strip() if authorization.startswith('Bearer') else authorization.strip()
+    if not token:
+        admin=admin_auth.session(request.cookies.get('admin_session',''))
+        if admin:
+            if request.method not in ('GET','HEAD','OPTIONS'):same_origin(request)
+            return admin
     if (not token and local_writer_allowed(request)
             and secrets.compare_digest(request.cookies.get('local_writer',''),LOCAL_WRITER_SESSION)):
         return dict(name='local-writer',role='writer')
@@ -101,11 +108,64 @@ async def response_headers(request,call_next):
     response.headers['X-Content-Type-Options']='nosniff'
     response.headers['Referrer-Policy']='no-referrer'
     response.headers['X-Frame-Options']='DENY'
+    if request.url.path.startswith(('/admin','/api/admin')):response.headers['Cache-Control']='no-store'
     return response
 @app.get('/')
 def home():return FileResponse(Path(__file__).with_name('index.html'))
 @app.get('/studio')
 def studio():return FileResponse(Path(__file__).with_name('static')/'studio.html')
+
+def same_origin(request):
+    if request.headers.get('origin')!=str(request.base_url).rstrip('/'):
+        raise HTTPException(403,'현재 업무 화면에서 다시 요청해 주세요.')
+
+@app.get('/admin/login')
+def admin_login_page():return FileResponse(Path(__file__).with_name('static')/'admin-login.html')
+
+@app.get('/admin')
+def admin_page(request:Request):
+    if not admin_auth.session(request.cookies.get('admin_session','')):return RedirectResponse('/admin/login',status_code=303)
+    return FileResponse(Path(__file__).with_name('static')/'admin.html')
+
+class AdminLogin(BaseModel):
+    name:str=Field(min_length=2,max_length=40)
+    token:str=Field(min_length=1,max_length=256)
+
+@app.post('/api/admin/login')
+def admin_login(req:AdminLogin,request:Request):
+    same_origin(request)
+    secret=admin_auth.login(req.name,req.token,request.client.host if request.client else 'unknown')
+    room.audit('admin_login',req.name,{})
+    response=JSONResponse(dict(name=req.name,role='admin'))
+    response.set_cookie('admin_session',secret,max_age=28800,httponly=True,samesite='strict',secure=request.url.scheme=='https')
+    response.delete_cookie('local_writer')
+    response.headers['Cache-Control']='no-store'
+    return response
+
+@app.post('/api/admin/logout')
+def admin_logout(request:Request):
+    same_origin(request)
+    admin_auth.logout(request.cookies.get('admin_session',''))
+    response=JSONResponse(dict(ok=True))
+    response.delete_cookie('admin_session')
+    return response
+
+@app.get('/api/admin/users')
+def admin_users(user=Depends(identity)):
+    role(user,'admin')
+    return [dict(name=u['name'],role=u['role']) for u in admin_auth.users()]
+
+class NewUser(BaseModel):
+    name:str=Field(min_length=2,max_length=40)
+    role:Literal['writer','editor']
+
+@app.post('/api/admin/users')
+def admin_create_user(req:NewUser,user=Depends(identity)):
+    role(user,'admin')
+    created=admin_auth.create(req.name,req.role)
+    room.audit('account_created',user['name'],dict(name=req.name,role=req.role))
+    return JSONResponse(created,headers={'Cache-Control':'no-store'})
+
 @app.post('/api/session/local-writer')
 def local_writer_session(request:Request):
     if not local_writer_allowed(request):raise HTTPException(403,'이 PC의 로컬 실행에서만 작성자 연결을 사용할 수 있습니다.')

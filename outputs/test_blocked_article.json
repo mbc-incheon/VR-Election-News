@@ -4,27 +4,27 @@
     "verdict": "UNAVAILABLE"
   },
   "author": "TEST-writer",
-  "created_at": "2026-11-24T14:27:18.974064+09:00",
-  "id": "0ec90323ef475ba1",
+  "created_at": "2026-11-24T15:39:08.796364+09:00",
+  "id": "2acecdb7d46c0b85",
   "mode": "demo",
-  "parent_id": "9376c2d8f6030800",
+  "parent_id": "76c0a7be996de4b4",
   "region_name": "계양구을",
   "revision": 2,
   "sentences": [
     {
       "kind": "result",
       "row_ids": [
-        "DEMO-9-0-0"
+        "DEMO-6-0-0"
       ],
-      "text": "계양구을 2024-04-10T20:00:00+09:00 기준 가상후보 A의 득표수는 9,510표, 득표율은 51.97%다.",
+      "text": "계양구을 2024-04-10T21:00:00+09:00 기준 가상후보 A의 득표수는 19,020표, 득표율은 51.97%다.",
       "values": {
-        "baseline_at": "2024-04-10T20:00:00+09:00",
+        "baseline_at": "2024-04-10T21:00:00+09:00",
         "candidate_id": "DEMO-0-0",
         "candidate_name": "가상후보 A",
-        "count_rate": 30,
+        "count_rate": 60,
         "region_name": "부산",
         "vote_share": 51.97,
-        "votes": 9510
+        "votes": 19020
       }
     },
     {
@@ -42,17 +42,17 @@
     {
       "kind": "result",
       "row_ids": [
-        "DEMO-9-0-1"
+        "DEMO-6-0-1"
       ],
-      "text": "계양구을 2024-04-10T20:00:00+09:00 기준 가상후보 B의 득표수는 8,790표, 득표율은 48.03%다.",
+      "text": "계양구을 2024-04-10T21:00:00+09:00 기준 가상후보 B의 득표수는 17,580표, 득표율은 48.03%다.",
       "values": {
-        "baseline_at": "2024-04-10T20:00:00+09:00",
+        "baseline_at": "2024-04-10T21:00:00+09:00",
         "candidate_id": "DEMO-0-1",
         "candidate_name": "가상후보 B",
-        "count_rate": 30,
+        "count_rate": 60,
         "region_name": "계양구을",
         "vote_share": 48.03,
-        "votes": 8790
+        "votes": 17580
       }
     },
     {
@@ -68,7 +68,7 @@
       "text": "가상후보 B의 공약 자료에는 다음 내용이 제시돼 있다: 주거 분야에서 공공임대 상담을 확대하겠다는 가상 공약이다. 추진 일정과 재원은 명시하지 않았다."
     }
   ],
-  "snapshot_id": "61abec6f1eff2c173b02204ed21f4e806865c9e7fa11f7aa9b4bf2bcee7a7b75",
+  "snapshot_id": "c220404d35e05795c0418689d6bce54b890cdcb25907c0087f13fe1e622e17a4",
   "status": "REVIEW_REQUIRED",
   "title": "계양구을 개표와 공약 확인",
   "validation": {
@@ -78,6 +78,6 @@
     ],
     "ai": "UNAVAILABLE",
     "disagreement": false,
-    "at": "2026-11-24T14:27:19.146306+09:00"
+    "at": "2026-11-24T15:39:08.941413+09:00"
   }
 }

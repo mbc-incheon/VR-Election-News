@@ -25,7 +25,7 @@ PC 중심 v2에서는 실제 Three.js 가상 스튜디오, 공식 원본 행 대
 
 | 시험 | 통과 | 증빙 |
 | --- | --- | --- |
-| 단위 및 SQL 및 화면 빌드 | **44/44** | [unit_results.xml](../outputs/unit_results.xml) |
+| 단위 및 SQL 및 화면 빌드 | **47/47** | [unit_results.xml](../outputs/unit_results.xml) |
 | 실제 서버 통합 | **13/13** | [integration_results.json](../outputs/integration_results.json) |
 | PC 스튜디오·영상·자료 검수 통합 | **24/24** | [platform_integration_results.json](../outputs/platform_integration_results.json) |
 | 화면 승인 제어 로직 | **7/7** | [ui_logic_results.json](../outputs/ui_logic_results.json) |
@@ -50,3 +50,5 @@ SQL 스크립트로 만든 예제 DB는 snapshot 1건·chunk 6건·article 1건�
 [README](../README.md)의 실행/시험 절차와 [DB 안내](../db/README.md)를 따릅니다. [Git 커밋 기록](https://github.com/mbc-incheon/VR-Election-News/commits/main/)과 [협업 절차](collaboration.md)에서 버전과 검토 기준을 확인합니다. 실제 PR·역할 담당자·승인자 기록이 없는 부분은 임의 작성하지 않습니다.
 
 초기 통합본은 `election-analysis-project-01`에서 검증해 이관했습니다. 위 결과는 첨부 디자인을 실제 화면에 적용한 `VR-Election-News` 변경본에서 갱신했습니다. 자동 시험 상태는 Actions에서 확인합니다.
+
+관리자 로그인·로그아웃, 담당자 발급·중복 방지, 인증 실패 제한, 세션 폐기, 관리자 기사 작성 차단, 기존 계정을 보존하는 관리자 추가를 자동 검증했습니다. 실제 브라우저에서 업무 화면의 관리자 메뉴 연결과 로그인 화면 표시를 확인했습니다. [관리자 화면 캡처](../outputs/screenshots/admin-login.jpg).

@@ -210,3 +210,71 @@ def test_local_writer_session_origin_scope_and_permissions(client,monkeypatch):
         assert local.get('/api/me',headers={'Authorization':'Bearer invalid'}).status_code==401
     with TestClient(module.app,base_url='http://127.0.0.1',client=('203.0.113.3',50000)) as remote:
         assert remote.post('/api/session/local-writer',headers=origin).status_code==403
+
+def test_admin_login_accounts_logout_and_role_boundaries(client):
+    c,module=client
+    import hashlib,json
+    users=json.loads((module.ROOT/'users.json').read_text())
+    users.append(dict(name='admin',role='admin',token_hash=hashlib.sha256(b'TEST-admin-secret').hexdigest()))
+    (module.ROOT/'users.json').write_text(json.dumps(users))
+    origin={'Origin':'http://testserver'}
+    assert c.get('/admin',follow_redirects=False).status_code==303
+    assert c.get('/admin/login').status_code==200
+    assert c.get('/api/admin/users').status_code==401
+    assert c.get('/api/admin/users',headers=auth()).status_code==403
+    assert c.post('/api/admin/login',json=dict(name='admin',token='TEST-admin-secret')).status_code==403
+    assert c.post('/api/admin/login',headers=origin,json=dict(name='writer',token='TEST-writer')).status_code==401
+    login=c.post('/api/admin/login',headers=origin,json=dict(name='admin',token='TEST-admin-secret'))
+    assert login.status_code==200
+    assert 'HttpOnly' in login.headers['set-cookie']
+    assert 'SameSite=strict' in login.headers['set-cookie']
+    secret=c.cookies.get('admin_session')
+    assert c.get('/admin').status_code==200
+    assert c.get('/api/me').json()['role']=='admin'
+    listed=c.get('/api/admin/users').json()
+    assert all(set(u)=={'name','role'} for u in listed)
+    assert c.post('/api/admin/users',json=dict(name='new-reporter',role='writer')).status_code==403
+    issued=c.post('/api/admin/users',headers=origin,json=dict(name='new-reporter',role='writer'))
+    assert issued.status_code==200,issued.text
+    token=issued.json()['token']
+    assert c.get('/api/me',headers={'Authorization':'Bearer '+token}).json()==dict(name='new-reporter',role='writer')
+    assert token not in (module.ROOT/'users.json').read_text()
+    assert c.post('/api/admin/users',headers=origin,json=dict(name='new-reporter',role='editor')).status_code==409
+    assert c.post('/api/admin/users',headers=origin,json=dict(name='bad<script>',role='writer')).status_code==422
+    assert c.post('/api/admin/users',headers=origin,json=dict(name='anotheradmin',role='admin')).status_code==422
+    assert c.post('/api/articles',headers=origin,json=dict(region='계양구갑',mode='official')).status_code==403
+    assert c.post('/api/admin/logout',headers=origin,json={}).status_code==200
+    assert c.get('/api/admin/users',headers={'Cookie':'admin_session='+secret}).status_code==401
+    assert token not in str(module.room.db.execute('SELECT payload FROM audit').fetchall())
+
+
+def test_admin_throttle_and_session_revocation(client):
+    c,module=client
+    from admin_auth import AdminAuth
+    from fastapi import HTTPException
+    manager=AdminAuth(module.ROOT)
+    users=manager.users();users.append(dict(name='admin',role='admin',token_hash=hashlib.sha256(b'TEST-admin').hexdigest()));manager.write(users)
+    for _ in range(5):
+        with pytest.raises(HTTPException) as error:manager.login('admin','wrong','TEST-peer')
+        assert error.value.status_code==401
+    with pytest.raises(HTTPException) as error:manager.login('admin','TEST-admin','TEST-peer')
+    assert error.value.status_code==429
+    secret=manager.login('admin','TEST-admin','other-peer')
+    assert manager.session(secret)['role']=='admin'
+    users[-1]['token_hash']=hashlib.sha256(b'rotated').hexdigest();manager.write(users)
+    assert manager.session(secret) is None
+
+
+def test_admin_bootstrap_preserves_existing_users(tmp_path):
+    import subprocess
+    root=tmp_path/'accounts';root.mkdir();existing=[dict(name='writer',role='writer',token_hash='TEST-preserved')]
+    (root/'users.json').write_text(json.dumps(existing))
+    command=[sys.executable,str(ROOT/'scripts/init_users.py'),'--root',str(root),'--add-admin']
+    first=subprocess.run(command,capture_output=True,text=True)
+    assert first.returncode==0,first.stderr
+    users=json.loads((root/'users.json').read_text())
+    assert users[0]==existing[0]
+    assert users[1]['role']=='admin'
+    before=(root/'users.json').read_bytes()
+    assert subprocess.run(command,capture_output=True).returncode!=0
+    assert (root/'users.json').read_bytes()==before

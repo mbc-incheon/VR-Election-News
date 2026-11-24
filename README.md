@@ -36,7 +36,7 @@ PC에서 조작하는 **실제 3D 가상 스튜디오**와 자료 검수부터 F
 | 데이터 송신 서버 | [election-data-server](election-data-server) | 공식 입력 검사·원본/원장·이벤트 이력·WebSocket 송신 |
 | 보도 서버와 화면 | [election-news-server](election-news-server) | 대시보드·근거 검색·초안·검증·독립 승인·JSON 내보내기 |
 | DB 스크립트 | [db](db/README.md) | CREATE TABLE·INSERT·무결성/조회 SQL·초기화 도구 |
-| 검증 결과 | [구현 결과서](docs/implementation-results.md) | 단위/API/영상 44개·서버 통합 13개·전체 제작 통합 24개·화면 로직 7개 |
+| 검증 결과 | [구현 결과서](docs/implementation-results.md) | 단위/API/영상 47개·서버 통합 13개·전체 제작 통합 24개·화면 로직 7개 |
 | 형상관리와 협업 | [실제 기록과 협업 절차](docs/collaboration.md) | 커밋 이력·출처·PR 양식·자동 시험 설정 |
 | 기존 발표와 영상 | [2026-11-20 자료 보관함](outputs/archive/20261120) | PPT·20분 검토 영상·대본·자막·기존 보고서 |
 
@@ -179,3 +179,9 @@ outputs/               # 최신 시험 결과와 기존 자료 보관함
 ```
 
 기존 [초기 기획서](docs/project-plan.md), [초기 기능정의서](docs/functional-spec.md), [초기 설계서](docs/system-design.md)는 참고 자료입니다. 현재 구현 상태는 [v2 운영 안내](docs/platform-guide.md), API와 SQL을 기준으로 확인합니다.
+
+### 관리자 로그인과 담당자 발급
+
+업무 화면 상단의 **관리자 로그인** 또는 `/admin/login`에서 관리자 아이디와 토큰으로 로그인합니다. 로그인 후 `/admin`에서 작성자·편집자 계정을 발급할 수 있습니다. 새 토큰은 한 번만 표시되며 기존 토큰·해시는 화면에 노출하지 않습니다.
+
+최초 설치는 작성자·편집자·관리자 토큰을 발급합니다. 기존 설치에 관리자만 추가하려면 프로젝트 폴더에서 `.\.venv\Scripts\python.exe scripts\init_users.py --add-admin`을 실행하세요. 기존 계정이 있으면 보존하며, 관리자 아이디는 `admin`입니다. 실제 토큰은 GitHub에 저장하지 않습니다. 관리자는 기사 최종 승인 권한을 갖지 않습니다.
