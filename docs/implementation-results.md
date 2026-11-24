@@ -21,13 +21,13 @@
 
 | 시험 | 통과 | 증빙 |
 | --- | --- | --- |
-| 단위 및 SQL | **26/26** | [unit_results.xml](../outputs/unit_results.xml) |
+| 단위 및 SQL 및 화면 빌드 | **27/27** | [unit_results.xml](../outputs/unit_results.xml) |
 | 실제 서버 통합 | **13/13** | [integration_results.json](../outputs/integration_results.json) |
-| 화면 승인 제어 로직 | **5/5** | [ui_logic_results.json](../outputs/ui_logic_results.json) |
+| 화면 승인 제어 로직 | **7/7** | [ui_logic_results.json](../outputs/ui_logic_results.json) |
 
 통합 시험은 정상 기사 생성·검증·시험 editor 승인·내보내기와 지역 오류 주입 후 승인/내보내기 409 차단, 토큰 없는 요청 401, writer 승인 시도 403, 송신 중단 후 오류와 대체 자료 표시를 재현했습니다. `TEST-*` 계정의 자동 승인은 실제 편집 승인으로 제출하지 않습니다.
 
-화면 시험은 실제 HTML의 JavaScript를 Node VM과 DOM 대역에서 실행했습니다. 렌더링된 브라우저 전 구간의 시각 검수나 접근성 인증은 아닙니다. 디자인 PNG와 실행 화면은 구분합니다.
+화면 로직 시험은 실제 HTML의 JavaScript를 Node VM과 DOM 대역에서 실행했습니다. 별도로 실제 브라우저에서 1448×1086 PC와 390×844 모바일 배치, 지역·후보 변경과 근거 갱신, 초안 생성·규칙 검증, 승인/내보내기 비활성, 공식 자료실 열기를 확인했습니다. 두 화면 모두 문서 전체의 가로 넘침이 없었고, 모바일 수치 표는 내부 스크롤을 사용합니다. [PC 캡처](../outputs/screenshots/dashboard-desktop.jpg)와 [모바일 캡처](../outputs/screenshots/dashboard-mobile.jpg)는 실제 실행 화면이며 디자인 PNG와 구분합니다. 접근성 인증이나 모든 브라우저 호환성을 보장하는 시험은 아닙니다.
 
 SQL 스크립트로 만든 예제 DB는 snapshot 1건·chunk 6건·article 1건·approval 0건·audit 8건입니다. 예제 기사는 실제 검증 로직에서 PENDING_HUMAN이 되지만 승인 전 내보내기는 거부됩니다. 외래키와 감사 해시 연결, 감사 기록 수정 거부도 확인했습니다.
 
@@ -42,4 +42,4 @@ SQL 스크립트로 만든 예제 DB는 snapshot 1건·chunk 6건·article 1건�
 
 [README](../README.md)의 실행/시험 절차와 [DB 안내](../db/README.md)를 따릅니다. [Git 커밋 기록](https://github.com/mbc-incheon/VR-Election-News/commits/main/)과 [협업 절차](collaboration.md)에서 버전과 검토 기준을 확인합니다. 실제 PR·역할 담당자·승인자 기록이 없는 부분은 임의 작성하지 않습니다.
 
-이 검증 결과는 `election-analysis-project-01`의 통합본에서 실행한 기록입니다. 사용자 지정으로 동일한 실행 소스·SQL·시험 코드를 `VR-Election-News`에 이관했으며, 새 저장소의 자동 시험 상태는 Actions에서 별도로 확인합니다.
+초기 통합본은 `election-analysis-project-01`에서 검증해 이관했습니다. 위 결과는 첨부 디자인을 실제 화면에 적용한 `VR-Election-News` 변경본에서 갱신했습니다. 자동 시험 상태는 Actions에서 확인합니다.

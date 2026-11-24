@@ -4,10 +4,10 @@
     "verdict": "UNAVAILABLE"
   },
   "author": "TEST-writer",
-  "created_at": "2026-11-24T10:38:15.232411+09:00",
-  "id": "9cbaa70019364232",
+  "created_at": "2026-11-24T11:54:51.498109+09:00",
+  "id": "42ff4a22439f75f0",
   "mode": "demo",
-  "parent_id": "c7c1e140c8a5efc0",
+  "parent_id": "e6de69c79c319bdd",
   "region_name": "계양구을",
   "revision": 2,
   "sentences": [
@@ -68,7 +68,7 @@
       "text": "가상후보 B의 공약 자료에는 다음 내용이 제시돼 있다: 주거 분야에서 공공임대 상담을 확대하겠다는 가상 공약이다. 추진 일정과 재원은 명시하지 않았다."
     }
   ],
-  "snapshot_id": "ceadc47e6f4a1386db6110b2bdc1b96aa34f6e0e7b2dd46a4c59fdf9591600a2",
+  "snapshot_id": "9e21300ef5b5e3f415a0012b2684e4b8239f83d61572da0abdaa1e770c30cb3b",
   "status": "REVIEW_REQUIRED",
   "title": "계양구을 개표와 공약 확인",
   "validation": {
@@ -78,6 +78,6 @@
     ],
     "ai": "UNAVAILABLE",
     "disagreement": false,
-    "at": "2026-11-24T10:38:15.375264+09:00"
+    "at": "2026-11-24T11:54:51.631783+09:00"
   }
 }

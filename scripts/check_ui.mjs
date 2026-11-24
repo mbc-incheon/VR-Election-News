@@ -39,6 +39,18 @@ check('Changing user token clears confirmations', `
 check('Unavailable values are never printed as zero or null', `
   assert.equal(showValue(null,'%'),'미제공'); assert.equal(showValue(0,'%'),'0%');
 `);
+check('Review badges show actual validation and AI disagreement', `
+  show({...a,id:'UI-3',status:'REVIEW_REQUIRED',validation:{rule:'FAIL',errors:['S1:VOTES_MISMATCH'],disagreement:true}});
+  assert.equal($('ruleBadge').textContent,'검토 필요');
+  assert.equal($('aiBadge').textContent,'규칙·AI 판정 불일치');
+  assert.equal($('checkErrors').hidden,false);
+  assert.equal($('approve').disabled,true);
+`);
+check('Unsafe evidence URLs never become clickable sources', `
+  assert.equal(safeSource('javascript:alert(1)'),null);
+  assert.equal(safeSource('demo://fixtures/pledges'),null);
+  assert.equal(safeSource('https://www.data.go.kr/'),'https://www.data.go.kr/');
+`);
 fs.mkdirSync(path.join(root,'outputs'),{recursive:true});
 fs.writeFileSync(path.join(root,'outputs/ui_logic_results.json'),JSON.stringify({at:new Date().toISOString(),method:'Node VM with DOM stubs; no rendered browser',total:checks.length,passed:checks.length,checks},null,2));
 console.log(`${checks.length} UI logic checks passed`);

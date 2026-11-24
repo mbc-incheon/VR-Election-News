@@ -15,7 +15,7 @@
 | 데이터 송신 서버 | [election-data-server](election-data-server) | 공식 입력 검사·원본/원장·이벤트 이력·WebSocket 송신 |
 | 보도 서버와 화면 | [election-news-server](election-news-server) | 대시보드·근거 검색·초안·검증·독립 승인·JSON 내보내기 |
 | DB 스크립트 | [db](db/README.md) | CREATE TABLE·INSERT·무결성/조회 SQL·초기화 도구 |
-| 검증 결과 | [구현 결과서](docs/implementation-results.md) | 단위/DB 26개·통합 13개·화면 제어 로직 5개 통과 |
+| 검증 결과 | [구현 결과서](docs/implementation-results.md) | 단위/DB/화면 빌드 27개·통합 13개·화면 제어 로직 7개 통과 |
 | 형상관리와 협업 | [실제 기록과 협업 절차](docs/collaboration.md) | 커밋 이력·출처·PR 양식·자동 시험 설정 |
 | 기존 발표와 영상 | [2026-11-20 자료 보관함](outputs/archive/20261120) | PPT·20분 검토 영상·대본·자막·기존 보고서 |
 
@@ -74,11 +74,19 @@ WBS의 56시간은 작업 배분 계획이며 팀원별 실제 투입 시간은 
 
 ## 화면 구성과 메뉴
 
+첨부 디자인을 기준으로 **01~07 번호 영역, 남색 상단 메뉴, 후보별 득표율 막대, 근거 검색·기사 작성의 두 열 배치, 기사·팩트체크 카드와 승인 도구 모음**을 실제 화면에 적용했습니다. 이미지를 배경으로 붙인 화면이 아니라 API와 WebSocket에 연결된 HTML 화면입니다.
+
+![실제 실행 화면](outputs/screenshots/dashboard-desktop.jpg)
+
+[모바일 실행 화면](outputs/screenshots/dashboard-mobile.jpg)에서는 한 열 배치와 표 내부 가로 스크롤을 사용합니다. 두 캡처는 TEST 작성자와 시뮬레이션 자료로 확인한 화면입니다. 실제 편집 승인을 수행하지 않았습니다.
+
 공통 상태 → 지역별 개표 현황 → 공약 근거 검색 → 기사 작성 → 검증과 승인 → 공식 자료실 → 뉴스 제작 안내 순서로 구성합니다. 현재 기본 화면은 하나의 웹 페이지 안에 기능 구역을 배치한 구조입니다.
 
 ![VR 선거보도 시스템 화면 배치도](docs/images/ui_wireframe.png)
 
 화면설계서에 포함한 [디자인 초안](docs/images/VR_선거보도_시스템_화면디자인_초안_v1.png)과 [주요 화면 구성 이미지 초안](docs/images/VR_선거보도_시스템_주요화면구성_이미지초안_v1.png)도 확인할 수 있습니다. 이미지는 디자인 자료이며 실행 화면의 캡처가 아닙니다.
+
+화면 수정은 `election-news-server/dashboard.template.html`, `dashboard.css`, `dashboard.js`에서 진행하고 `python scripts/build_dashboard.py`로 서버가 제공하는 `index.html`을 갱신합니다. 빌드 결과도 저장소에 포함되어 첫 실행에 별도 프런트엔드 설치가 필요하지 않습니다.
 
 ## 데이터베이스 구조
 

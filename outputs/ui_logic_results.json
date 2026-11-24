@@ -1,8 +1,8 @@
 {
-  "at": "2026-11-24T01:37:57.595Z",
+  "at": "2026-11-24T02:54:37.773Z",
   "method": "Node VM with DOM stubs; no rendered browser",
-  "total": 5,
-  "passed": 5,
+  "total": 7,
+  "passed": 7,
   "checks": [
     {
       "name": "New article requires explicit manual review",
@@ -22,6 +22,14 @@
     },
     {
       "name": "Unavailable values are never printed as zero or null",
+      "passed": true
+    },
+    {
+      "name": "Review badges show actual validation and AI disagreement",
+      "passed": true
+    },
+    {
+      "name": "Unsafe evidence URLs never become clickable sources",
       "passed": true
     }
   ]
