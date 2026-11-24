@@ -13,8 +13,8 @@ from pathlib import Path
 
 import httpx
 import websockets
-from fastapi import Depends, FastAPI, Header, HTTPException, WebSocket, WebSocketDisconnect
-from fastapi.responses import FileResponse
+from fastapi import Depends, FastAPI, Header, HTTPException, Request, WebSocket, WebSocketDisconnect
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
 from core import Newsroom, now
@@ -27,10 +27,20 @@ Mode=Literal['official','demo']
 connection=dict(state='CONNECTING',error=None,last_received_at=None,mode='unavailable')
 UPSTREAM=os.environ.get('UPSTREAM_URL','http://127.0.0.1:8101')
 
-def identity(authorization:str=Header(default='')):
+LOCAL_WRITER_SESSION=secrets.token_urlsafe(32)
+def local_writer_allowed(request):
+    from urllib.parse import urlsplit
+    return (os.environ.get('LOCAL_WRITER_ACCESS','0')=='1'
+            and request.client is not None and request.client.host in ('127.0.0.1','::1')
+            and urlsplit(str(request.base_url)).hostname in ('127.0.0.1','localhost','::1'))
+
+def identity(request:Request,authorization:str=Header(default='')):
+    token=authorization[6:].strip() if authorization.startswith('Bearer') else authorization.strip()
+    if (not token and local_writer_allowed(request)
+            and secrets.compare_digest(request.cookies.get('local_writer',''),LOCAL_WRITER_SESSION)):
+        return dict(name='local-writer',role='writer')
     p=ROOT/'users.json'
     users=json.loads(p.read_text()) if p.exists() else []
-    token=authorization.removeprefix('Bearer ')
     hashed=hashlib.sha256(token.encode()).hexdigest()
     user=next((u for u in users if secrets.compare_digest(u['token_hash'],hashed)),None)
     if not user:raise HTTPException(401,'로컬 사용자 토큰이 필요합니다')
@@ -96,10 +106,20 @@ async def response_headers(request,call_next):
 def home():return FileResponse(Path(__file__).with_name('index.html'))
 @app.get('/studio')
 def studio():return FileResponse(Path(__file__).with_name('static')/'studio.html')
+@app.post('/api/session/local-writer')
+def local_writer_session(request:Request):
+    if not local_writer_allowed(request):raise HTTPException(403,'이 PC의 로컬 실행에서만 작성자 연결을 사용할 수 있습니다.')
+    if request.headers.get('origin')!=str(request.base_url).rstrip('/'):
+        raise HTTPException(403,'업무 화면에서 작성자 연결을 요청해 주세요.')
+    response=JSONResponse(dict(name='local-writer',role='writer'))
+    response.set_cookie('local_writer',LOCAL_WRITER_SESSION,httponly=True,samesite='strict',max_age=28800)
+    room.audit('local_writer_login','local-writer',dict(role='writer'))
+    return response
+
 @app.get('/api/me')
 def me(user=Depends(identity)):return dict(name=user['name'],role=user['role'])
 @app.get('/api/capabilities')
-def capabilities():return dict(studio='PC_3D',video=bool(korean_font()),ai='UNAVAILABLE',version='2.0.0',official_regions=14)
+def capabilities(request:Request):return dict(local_writer_available=local_writer_allowed(request),studio='PC_3D',video=bool(korean_font()),ai='UNAVAILABLE',version='2.0.0',official_regions=14)
 @app.get('/health')
 def health():return dict(status='ok',connection=connection,ai='UNAVAILABLE')
 @app.get('/api/snapshot')

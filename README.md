@@ -36,7 +36,7 @@ PC에서 조작하는 **실제 3D 가상 스튜디오**와 자료 검수부터 F
 | 데이터 송신 서버 | [election-data-server](election-data-server) | 공식 입력 검사·원본/원장·이벤트 이력·WebSocket 송신 |
 | 보도 서버와 화면 | [election-news-server](election-news-server) | 대시보드·근거 검색·초안·검증·독립 승인·JSON 내보내기 |
 | DB 스크립트 | [db](db/README.md) | CREATE TABLE·INSERT·무결성/조회 SQL·초기화 도구 |
-| 검증 결과 | [구현 결과서](docs/implementation-results.md) | 단위/API/영상 43개·서버 통합 13개·전체 제작 통합 24개·화면 로직 7개 |
+| 검증 결과 | [구현 결과서](docs/implementation-results.md) | 단위/API/영상 44개·서버 통합 13개·전체 제작 통합 24개·화면 로직 7개 |
 | 형상관리와 협업 | [실제 기록과 협업 절차](docs/collaboration.md) | 커밋 이력·출처·PR 양식·자동 시험 설정 |
 | 기존 발표와 영상 | [2026-11-20 자료 보관함](outputs/archive/20261120) | PPT·20분 검토 영상·대본·자막·기존 보고서 |
 

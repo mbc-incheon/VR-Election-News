@@ -37,6 +37,22 @@
         }
       }
     },
+    "/api/session/local-writer": {
+      "post": {
+        "summary": "Local Writer Session",
+        "operationId": "local_writer_session_api_session_local_writer_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/me": {
       "get": {
         "summary": "Me",

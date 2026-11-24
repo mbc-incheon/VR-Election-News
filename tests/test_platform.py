@@ -184,3 +184,29 @@ def test_real_fhd_video_and_approval_recheck(tmp_path):
         room.retire(article['sentences'][1]['evidence_ids'][0],'TEST-editor')
         with pytest.raises(ValueError):producer.file(job['id'],'news.mp4')
     finally:producer.pool.shutdown();room.db.close()
+
+def test_local_writer_session_origin_scope_and_permissions(client,monkeypatch):
+    monkeypatch.delenv('LOCAL_WRITER_ACCESS',raising=False)
+    c,module=client
+    from fastapi.testclient import TestClient
+    with TestClient(module.app,base_url='http://127.0.0.1',client=('127.0.0.1',50000)) as local:
+        origin={'Origin':'http://127.0.0.1'}
+        assert local.post('/api/session/local-writer',headers=origin).status_code==403
+        monkeypatch.setenv('LOCAL_WRITER_ACCESS','1')
+        assert local.get('/api/capabilities').json()['local_writer_available'] is True
+        assert local.post('/api/session/local-writer',headers={'Origin':'https://untrusted.example'}).status_code==403
+        assert local.post('/api/session/local-writer').status_code==403
+        response=local.post('/api/session/local-writer',headers=origin)
+        assert response.status_code==200
+        assert 'HttpOnly' in response.headers['set-cookie']
+        assert local.get('/api/me').json()==dict(name='local-writer',role='writer')
+        assert local.get('/api/me',headers={'Authorization':'Bearer'}).status_code==200
+        row=local.get('/api/snapshot?mode=official').json()['rows'][0]
+        draft=local.post('/api/articles',json=dict(region=row['region_name'],mode='official'))
+        assert draft.status_code==200,draft.text
+        assert draft.json()['author']=='local-writer'
+        assert draft.json()['status']=='DRAFT'
+        assert local.post('/api/articles/'+draft.json()['id']+'/approve',json=dict(reason='TEST no editor privilege',evidence_checked=True,ai_unavailable_ack=True)).status_code==403
+        assert local.get('/api/me',headers={'Authorization':'Bearer invalid'}).status_code==401
+    with TestClient(module.app,base_url='http://127.0.0.1',client=('203.0.113.3',50000)) as remote:
+        assert remote.post('/api/session/local-writer',headers=origin).status_code==403

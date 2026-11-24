@@ -6,7 +6,7 @@ const showValue=(v,suffix='')=>v===null||v===undefined?'미제공':esc(v)+suffix
 const statuses={DRAFT:'초안',PENDING_HUMAN:'승인 대기',REVIEW_REQUIRED:'검토 필요',APPROVED:'승인 완료'};
 function timeText(value,clockOnly=false){if(!value)return '미제공';const d=new Date(value);if(Number.isNaN(d.getTime()))return String(value);return new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',...(clockOnly?{}:{year:'numeric',month:'2-digit',day:'2-digit'}),hour:'2-digit',minute:'2-digit',hour12:false}).format(d)}
 function safeSource(value){try{const u=new URL(value);return ['http:','https:'].includes(u.protocol)?esc(u.href):null}catch{return null}}
-async function api(url,body){const r=await fetch(url,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+$('token').value},body:body===undefined?undefined:JSON.stringify(body)});const v=await r.json();if(!r.ok)throw Error(typeof v.detail==='string'?v.detail:JSON.stringify(v.detail||v));return v}
+async function api(url,body){const r=await fetch(url,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json',...($('token').value.trim()?{Authorization:'Bearer '+$('token').value.trim()}:{})},body:body===undefined?undefined:JSON.stringify(body)});const v=await r.json();if(!r.ok)throw Error(typeof v.detail==='string'?v.detail:JSON.stringify(v.detail||v));return v}
 function table(){
  const selected=$('candidate').value,region=$('region').value,rows=(snap.rows||[]).filter(r=>r.region_name===region);
  $('rows').innerHTML=rows.length?rows.map((r,i)=>{const share=Number(r.vote_share),url=safeSource(r.source_url);return `<tr><td class="candidate-name"><span class="candidate-mark ${i%2?'alternate':''}"></span>${esc(r.candidate_name)}</td><td>${showValue(r.votes==null?null:Number(r.votes).toLocaleString('ko-KR'),'표')}</td><td><div class="vote-share"><span class="share-value">${showValue(r.vote_share==null?null:share.toFixed(2),'%')}</span><div class="bar" aria-hidden="true"><span style="width:${Number.isFinite(share)?Math.max(0,Math.min(100,share)):0}%"></span></div></div></td><td>${showValue(r.count_rate,'%')}</td><td class="table-time" title="${esc(r.baseline_at||'미제공')}">${esc(timeText(r.baseline_at,true))}</td><td class="table-source">${r.is_demo?'시뮬레이션':url?`<a href="${url}" target="_blank" rel="noopener noreferrer">공식 원문</a>`:'출처 미제공'}</td></tr>`}).join(''):'<tr><td colspan="6" class="empty">선택한 지역의 자료가 없습니다.</td></tr>';
@@ -41,7 +41,25 @@ async function loadEvidence(){
 $('region').onchange=table;$('candidate').onchange=action(loadEvidence);$('search').onclick=action(loadEvidence);$('query').addEventListener('keydown',e=>{if(e.key==='Enter')$('search').click()});
 $('official').onclick=action(async()=>{if(!$('officialRows').hidden){$('officialRows').hidden=true;$('official').setAttribute('aria-expanded','false');return}const v=await api('/api/official-results');$('officialRows').innerHTML='<p>'+esc(v.label)+'</p><div class="scroll"><table><thead><tr><th>지역구</th><th>후보</th><th>정당</th><th>집계 득표수</th><th>계산 득표율</th></tr></thead><tbody>'+v.rows.map(r=>`<tr><td>${esc(r.region_name)}</td><td>${esc(r.candidate_name)}</td><td>${esc(r.party)}</td><td>${Number(r.votes).toLocaleString('ko-KR')}</td><td>${Number(r.vote_share).toFixed(2)}%</td></tr>`).join('')+'</tbody></table></div>';$('officialRows').hidden=false;$('official').setAttribute('aria-expanded','true')});
 $('productionToggle').onclick=()=>{const open=$('productionInfo').hidden;$('productionInfo').hidden=!open;$('productionToggle').setAttribute('aria-expanded',String(open))};
-$('draft').onclick=action(async()=>{if(!$('region').value)throw Error('지역을 먼저 선택해 주세요.');show(await api('/api/articles',{region:$('region').value,mode:selectedMode()}))});
+$('draft').onclick=async()=>{
+ const button=$('draft'),notice=$('draftMessage');
+ button.disabled=true;button.textContent='초안 생성 중…';notice.className='message';notice.textContent='작성자 연결과 선택 지역의 자료를 확인하고 있습니다…';
+ try{
+  if(!$('region').value)throw Error('02 영역에서 지역을 먼저 선택해 주세요.');
+  if(!$('token').value.trim()){
+   const capabilities=await api('/api/capabilities');
+   if(capabilities.local_writer_available)await api('/api/session/local-writer',{});
+   else throw Error('담당자 토큰을 입력한 뒤 기사 초안 생성을 눌러 주세요.');
+  }
+  const user=await api('/api/me');
+  if(user.role!=='writer')throw Error('기사 초안은 작성자 계정으로 생성합니다. 작성자 토큰을 입력해 주세요.');
+  if(typeof wbIdentity==='function')await wbIdentity();
+  const article=await api('/api/articles',{region:$('region').value,mode:selectedMode()});show(article);
+  const pledgeCount=article.sentences.filter(s=>s.kind==='pledge').length;
+  notice.textContent='초안을 생성했습니다. 아래 05 영역에서 본문과 근거를 확인하고 규칙 검증을 진행하세요.'+(pledgeCount?'':' 등록된 공약 근거가 없어 개표 결과만 작성했습니다. 공약 자료 등록·검수 후 새 초안을 생성하세요.');
+ }catch(e){notice.className='message is-error';notice.textContent=e.message}
+ finally{button.disabled=false;button.textContent='▤ 기사 초안 생성'}
+};
 $('list').onclick=action(async()=>{const articles=await api('/api/articles');$('articles').innerHTML='';if(!articles.length){$('articles').textContent='작성된 기사가 없습니다.';return}articles.forEach(a=>{const button=document.createElement('button');button.className='secondary';button.textContent=a.title+' · '+(statuses[a.status]||a.status);button.onclick=action(async()=>show(await api('/api/articles/'+a.id)));$('articles').appendChild(button)})});
 $('validate').onclick=action(async()=>show(await api(`/api/articles/${current.id}/validate`,{})));
 $('approve').onclick=action(async()=>show(await api(`/api/articles/${current.id}/approve`,{reason:$('reason').value,evidence_checked:$('checked').checked,ai_unavailable_ack:$('aiAck').checked})));
