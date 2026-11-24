@@ -11,24 +11,24 @@ from pathlib import Path
 
 PROJECT=Path(__file__).resolve().parents[1]
 
-def account(root):
-    path=Path(root)/'news/users.json'
+def account(root,accounts_path=None):
+    path=Path(accounts_path) if accounts_path else Path(root)/'news/users.json'
     if not path.exists():raise ValueError('계정 파일이 없습니다. 먼저 setup.ps1로 시스템을 설치하세요.')
     users=json.loads(path.read_text(encoding='utf-8-sig'))
     admin=next((u for u in users if u.get('name')=='admin' and u.get('role')=='admin'),None)
     if not admin:raise ValueError('관리자 계정이 없습니다. scripts/init_users.py --add-admin으로 먼저 발급하세요.')
     return path,users,admin
 
-def token_file_valid(root):
-    _,_,admin=account(root)
+def token_file_valid(root,accounts_path=None):
+    _,_,admin=account(root,accounts_path)
     path=Path(root)/'admin-access.txt'
     if not path.exists():return False
     match=re.search(r'^admin:[ \t]*(\S+)',path.read_text(encoding='utf-8-sig'),re.MULTILINE)
     return bool(match and secrets.compare_digest(hashlib.sha256(match.group(1).encode()).hexdigest(),admin['token_hash']))
 
-def reset_token(root):
+def reset_token(root,accounts_path=None):
     root=Path(root)
-    path,users,admin=account(root)
+    path,users,admin=account(root,accounts_path)
     token=secrets.token_urlsafe(32)
     admin['token_hash']=hashlib.sha256(token.encode()).hexdigest()
     admin['token_rotated_at']=datetime.now(timezone.utc).isoformat()
@@ -48,7 +48,7 @@ def reset_token(root):
             raise
     finally:
         user_temp.unlink(missing_ok=True);access_temp.unlink(missing_ok=True)
-    if not token_file_valid(root):raise ValueError('발급 결과 확인에 실패했습니다. 다시 실행하세요.')
+    if not token_file_valid(root,accounts_path):raise ValueError('발급 결과 확인에 실패했습니다. 다시 실행하세요.')
     return access
 
 def open_file(path):

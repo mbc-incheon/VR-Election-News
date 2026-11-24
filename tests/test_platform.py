@@ -389,3 +389,57 @@ def test_pledge_context_shows_actual_document_review_and_demo_separation(client)
     context=c.get('/api/pledge-context',params=dict(region=demo['region_name'],candidate=demo['candidate_id'],mode='demo')).json()
     assert context['directory'] is None
     assert context['registered_documents']>0
+
+
+def test_admin_web_recovery_proof_origin_local_scope_and_session_revocation(client,monkeypatch):
+    c,module=client
+    from fastapi.testclient import TestClient
+    monkeypatch.setenv('LOCAL_WRITER_ACCESS','1')
+    users=module.admin_auth.users();users.append(dict(name='admin',role='admin',token_hash=hashlib.sha256(b'TEST-old-admin').hexdigest()));module.admin_auth.write(users)
+    module.admin_recovery.ensure()
+    before=module.admin_auth.users()[:2]
+    local=TestClient(module.app,base_url='http://127.0.0.1',client=('127.0.0.1',50000))
+    origin={'Origin':'http://127.0.0.1'}
+    body=dict(name='admin',method='current_token',verification='TEST-old-admin',confirmed=True)
+    assert local.get('/api/admin/recovery/status').json()['available'] is True
+    assert local.post('/api/admin/recovery/reset',json=body).status_code==403
+    assert local.post('/api/admin/recovery/reset',headers={'Origin':'https://other.example'},json=body).status_code==403
+    assert local.post('/api/admin/recovery/reset',headers=origin,json=dict(body,confirmed=False)).status_code==422
+    assert local.post('/api/admin/recovery/reset',headers=origin,json=dict(body,verification='wrong')).status_code==401
+    assert local.post('/api/admin/login',headers=origin,json=dict(name='admin',token='TEST-old-admin')).status_code==200
+    old_session=local.cookies.get('admin_session')
+    response=local.post('/api/admin/recovery/reset',headers=origin,json=body)
+    assert response.status_code==200,response.text
+    token=response.json()['token']
+    assert response.headers['cache-control']=='no-store'
+    assert module.admin_auth.users()[:2]==before
+    assert module.admin_auth.session(old_session) is None
+    assert c.get('/api/me',headers={'Authorization':'Bearer TEST-old-admin'}).status_code==401
+    assert local.post('/api/admin/login',headers=origin,json=dict(name='admin',token=token)).status_code==200
+    assert token in (module.ROOT/'admin-access.txt').read_text(encoding='utf-8-sig')
+    assert token not in str(module.room.db.execute('SELECT payload FROM audit').fetchall())
+    remote=TestClient(module.app,base_url='http://127.0.0.1',client=('203.0.113.5',50000))
+    assert remote.post('/api/admin/recovery/reset',headers=origin,json=dict(body,verification=token)).status_code==403
+    monkeypatch.setenv('LOCAL_WRITER_ACCESS','0')
+    assert local.post('/api/admin/recovery/reset',headers=origin,json=dict(body,verification=token)).status_code==403
+    local.close();remote.close()
+
+
+def test_admin_web_recovery_code_is_rotated_and_attempts_throttled(client,monkeypatch):
+    c,module=client
+    import re
+    monkeypatch.setenv('LOCAL_WRITER_ACCESS','1')
+    users=module.admin_auth.users();users.append(dict(name='admin',role='admin',token_hash=hashlib.sha256(b'TEST-old-admin').hexdigest()));module.admin_auth.write(users)
+    module.admin_recovery.ensure()
+    code=re.search(r'^recovery: (\S+)',module.admin_recovery.guide.read_text(encoding='utf-8-sig'),re.MULTILINE).group(1)
+    result=module.admin_recovery.reset('admin',code,'recovery_code','TEST-peer')
+    assert result['token']!='TEST-old-admin'
+    from fastapi import HTTPException
+    with pytest.raises(HTTPException) as error:module.admin_recovery.reset('admin',code,'recovery_code','TEST-new-peer')
+    assert error.value.status_code==401
+    for _ in range(5):
+        with pytest.raises(HTTPException) as error:module.admin_recovery.reset('admin','wrong','recovery_code','TEST-brute')
+        assert error.value.status_code==401
+    with pytest.raises(HTTPException) as error:module.admin_recovery.reset('admin',result['token'],'current_token','TEST-brute')
+    assert error.value.status_code==429
+    assert code not in module.admin_recovery.secret_path.read_text(encoding='utf-8')

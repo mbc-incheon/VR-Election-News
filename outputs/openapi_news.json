@@ -105,6 +105,58 @@
         }
       }
     },
+    "/api/admin/recovery/status": {
+      "get": {
+        "summary": "Admin Recovery Status",
+        "operationId": "admin_recovery_status_api_admin_recovery_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/recovery/reset": {
+      "post": {
+        "summary": "Admin Recovery Reset",
+        "operationId": "admin_recovery_reset_api_admin_recovery_reset_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminReset"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/logout": {
       "post": {
         "summary": "Admin Logout",
@@ -1750,6 +1802,42 @@
           "token"
         ],
         "title": "AdminLogin"
+      },
+      "AdminReset": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 2,
+            "title": "Name"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "current_token",
+              "recovery_code"
+            ],
+            "title": "Method"
+          },
+          "verification": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Verification"
+          },
+          "confirmed": {
+            "type": "boolean",
+            "title": "Confirmed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "method",
+          "verification",
+          "confirmed"
+        ],
+        "title": "AdminReset"
       },
       "Approval": {
         "properties": {

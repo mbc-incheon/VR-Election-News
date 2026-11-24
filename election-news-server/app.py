@@ -20,10 +20,12 @@ from pydantic import BaseModel, Field, field_validator
 from core import Newsroom, now
 from production import Production,korean_font
 from admin_auth import AdminAuth
+from admin_recovery import AdminRecovery
 
 ROOT=Path(os.environ.get('NEWS_DIR','runtime/news'))
 room=Newsroom(ROOT)
 admin_auth=AdminAuth(ROOT)
+admin_recovery=AdminRecovery(admin_auth)
 production=Production(room)
 Mode=Literal['official','demo']
 connection=dict(state='CONNECTING',error=None,last_received_at=None,mode='unavailable')
@@ -91,6 +93,7 @@ async def receive_loop():
 
 @asynccontextmanager
 async def lifespan(app):
+    if os.environ.get('LOCAL_WRITER_ACCESS','0')=='1':admin_recovery.ensure()
     production.recover_interrupted()
     repo=Path(__file__).resolve().parents[1]
     room.import_official_archive(repo/'data/clean/incheon_final_results.json',repo/'data/official_csv_ledger.json',repo/'data/official_raw/NEC_NA22_20240410.csv')
@@ -144,6 +147,27 @@ def admin_login(req:AdminLogin,request:Request):
     response.headers['Cache-Control']='no-store'
     return response
 
+@app.get('/api/admin/recovery/status')
+def admin_recovery_status(request:Request):
+    return dict(available=local_writer_allowed(request))
+
+class AdminReset(BaseModel):
+    name:str=Field(min_length=2,max_length=40)
+    method:Literal['current_token','recovery_code']
+    verification:str=Field(min_length=1,max_length=256)
+    confirmed:bool
+
+@app.post('/api/admin/recovery/reset')
+def admin_recovery_reset(req:AdminReset,request:Request):
+    if not local_writer_allowed(request):raise HTTPException(403,'관리자 복구는 시스템을 실행한 PC에서만 사용할 수 있습니다.')
+    same_origin(request)
+    if not req.confirmed:raise HTTPException(422,'기존 관리자 토큰과 세션 만료를 확인해 주세요.')
+    result=admin_recovery.reset(req.name,req.verification,req.method,request.client.host)
+    room.audit('admin_token_recovered',req.name,dict(method=req.method))
+    response=JSONResponse(result,headers={'Cache-Control':'no-store'})
+    response.delete_cookie('admin_session')
+    return response
+
 @app.post('/api/admin/logout')
 def admin_logout(request:Request):
     same_origin(request)
@@ -193,7 +217,7 @@ def rotate_account_token(name:str,user=Depends(identity)):
 def account_history(user=Depends(identity)):
     role(user,'admin')
     rows=room.db.execute('SELECT payload FROM audit ORDER BY rowid DESC').fetchall()
-    kinds={'admin_login','staff_login','account_created','account_updated','account_token_rotated','session_logout'}
+    kinds={'admin_login','staff_login','account_created','account_updated','account_token_rotated','session_logout','admin_token_recovered'}
     return [json.loads(row[0]) for row in rows if json.loads(row[0]).get('kind') in kinds][:100]
 
 @app.get('/login')
