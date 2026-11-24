@@ -1,12 +1,12 @@
 {
-  "captured_at": "2026-11-24T16:25:58.104530+09:00",
+  "captured_at": "2026-11-24T16:54:35.457252+09:00",
   "repository": "https://github.com/mbc-incheon/VR-Election-News",
   "release_version": "2.0.0",
   "imported_from": {
     "repository": "https://github.com/mbc-incheon/election-analysis-project-01",
     "commit": "00ac79dc6ec77d6bd4c1e883e152fd78f2e3ab91"
   },
-  "repository_base_commit": "328db3055572506066ae682866302c2a5ca9f9e5",
+  "repository_base_commit": "79120b0f2f58270b83fd818dd386f945b32e9a7a",
   "note": "Base commit is the parent context before this manifest is committed; exact publication commit is in Git history.",
   "runtime": {
     "python": "3.12.10"
@@ -44,8 +44,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 17041,
-      "sha256": "f8d4b6e9d3b241afb9f4a753e95335792746ccb5057a681c70669690d41287ac"
+      "bytes": 17628,
+      "sha256": "c15f2f70d5b27863ad36963f34b13545b8539e353ca122d76df9d1fb761f9bda"
     },
     {
       "path": "compose.yaml",
@@ -229,8 +229,8 @@
     },
     {
       "path": "docs/platform-guide.md",
-      "bytes": 16436,
-      "sha256": "f063d45781fb9201be95ce5a60c134b106951c70ea980a4b7be64d54b7bb487f"
+      "bytes": 16984,
+      "sha256": "14de0ee7a3a81cad9dcdb131e2adf8e5706b6855a2d067b200519f2e3dd5eb5a"
     },
     {
       "path": "docs/project-plan.md",
@@ -743,6 +743,11 @@
       "sha256": "2cbcd01c7c166b03d72786a0172939f1692ab34ad99bd8b54fec669570cc6770"
     },
     {
+      "path": "scripts/manage_admin_token.py",
+      "bytes": 4936,
+      "sha256": "5c361a659f3aad6034d09ad8e438ac868cc070ee605d7270a2e08b26fcb787d8"
+    },
+    {
       "path": "scripts/normalize_official.py",
       "bytes": 4084,
       "sha256": "d0e5da690e53829a9e49c7aedee0de8baf3154b69c4ce3e42e2c20397a1eb728"
@@ -763,6 +768,11 @@
       "sha256": "daeb3f6fa83d3d73cb03d27eca78a217fa384f8bc45108e462c03be00a59b997"
     },
     {
+      "path": "tests/test_admin_recovery.py",
+      "bytes": 2705,
+      "sha256": "ae2466ddee56e6164aade8652af32f340c3025ae8659ea40af28c58540f9e569"
+    },
+    {
       "path": "tests/test_dashboard_build.py",
       "bytes": 355,
       "sha256": "de2856a7c146cc2a7885991b1a58a04a65d7b285bc4e9ff25c0001989c40cc2e"
@@ -781,6 +791,11 @@
       "path": "tests/test_sql.py",
       "bytes": 2341,
       "sha256": "2eabcc6a9a64106e220bbd7ce8f7685266eafc87ee5787f10771eece8c77d6c6"
+    },
+    {
+      "path": "관리자_토큰_관리.cmd",
+      "bytes": 281,
+      "sha256": "2e12f1c689e3e33cd9317fb8918af93f8d58917df01db707c4a4842de81d179a"
     }
   ],
   "editorial_approval": "NOT_CREATED_BY_THIS_MANIFEST",
