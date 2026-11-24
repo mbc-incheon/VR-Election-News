@@ -206,6 +206,7 @@ def test_local_writer_session_origin_scope_and_permissions(client,monkeypatch):
         assert draft.status_code==200,draft.text
         assert draft.json()['author']=='local-writer'
         assert draft.json()['status']=='DRAFT'
+        assert any(a['id']==draft.json()['id'] for a in local.get('/api/articles').json())
         assert local.post('/api/articles/'+draft.json()['id']+'/approve',json=dict(reason='TEST no editor privilege',evidence_checked=True,ai_unavailable_ack=True)).status_code==403
         assert local.get('/api/me',headers={'Authorization':'Bearer invalid'}).status_code==401
     with TestClient(module.app,base_url='http://127.0.0.1',client=('203.0.113.3',50000)) as remote:

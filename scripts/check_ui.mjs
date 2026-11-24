@@ -10,7 +10,7 @@ const html=fs.readFileSync(path.join(root,'election-news-server/index.html'),'ut
 const script=html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const elements=new Map();
 const element=id=>{
-  if(!elements.has(id)) elements.set(id,{value:'',checked:false,disabled:false,options:[],listeners:{},style:{},addEventListener(event,fn){this.listeners[event]=fn;},appendChild(){}});
+  if(!elements.has(id)) elements.set(id,{value:'',checked:false,disabled:false,options:[],listeners:{},style:{},addEventListener(event,fn){this.listeners[event]=fn;},children:[],appendChild(child){this.children.push(child)}});
   return elements.get(id);
 };
 const sandbox={document:{getElementById:element,createElement:()=>({})},location:{protocol:'http:',host:'127.0.0.1:8102'},WebSocket:class{},setTimeout(){},URLSearchParams,URL,Blob,console};
@@ -32,8 +32,8 @@ check('Rule failure cannot enable approval', `
 check('Switching article clears confirmations', `
   show({...a,id:'UI-2'}); assert.equal($('checked').checked,false); assert.equal($('aiAck').checked,false); assert.equal($('reason').value,'');
 `);
-check('Changing user token clears confirmations', `
-  $('checked').checked=true; $('aiAck').checked=true; $('reason').value='근거 직접 확인'; $('token').listeners.input();
+check('Changing account clears review confirmations', `
+  $('checked').checked=true; $('aiAck').checked=true; $('reason').value='근거 직접 확인'; resetReviewConfirmation();
   assert.equal($('checked').checked,false); assert.equal($('approve').disabled,true);
 `);
 check('Unavailable values are never printed as zero or null', `
@@ -75,6 +75,23 @@ check('Promotional material browsing needs no new document registration', `
  assert.ok(existingView.includes('독립 검수 필요'));
  assert.ok(!existingView.includes('선관위 홍보물 찾아보기'));
 `);
+assert.ok(!html.includes('id="token"'));
+assert.ok(!script.includes("$('token')"));
+const calls=[];let connected=false;
+sandbox.fetch=async(url,options)=>{
+ calls.push({url,options});
+ const writer={name:'local-writer',role:'writer'};
+ const draft={id:'UI-SESSION-DRAFT',title:'TEST 생성 기사',author:'local-writer',mode:'official',sentences:[],status:'DRAFT',ai_review:{verdict:'UNAVAILABLE'}};
+ if(url==='/api/me')return {ok:connected,status:connected?200:401,json:async()=>connected?writer:{detail:'login required'}};
+ if(url==='/api/capabilities')return {ok:true,json:async()=>({local_writer_available:true})};
+ if(url==='/api/session/local-writer'){connected=true;return {ok:true,json:async()=>writer}};
+ if(url==='/api/articles')return {ok:true,json:async()=>options.method==='POST'?draft:[draft,{...draft,id:'UI-DEMO',mode:'demo'}]};
+ throw Error('Unexpected URL '+url);
+};
+await vm.runInContext(`(async()=>{$('region').value='계양구갑';$('dataMode').value='official';await $('draft').onclick();assert.equal(current.id,'UI-SESSION-DRAFT');assert.equal($('draft').disabled,false);await $('list').onclick();assert.equal($('articles').children.length,1);assert.ok($('draftMessage').textContent.includes('기사 1건'));})()`,sandbox);
+assert.ok(calls.some(call=>call.url==='/api/session/local-writer'));
+assert.ok(calls.every(call=>call.options.credentials==='same-origin'&&!('Authorization' in call.options.headers)));
+checks.push({name:'Token-free buttons establish writer session, create and list scoped articles',passed:true});
 fs.mkdirSync(path.join(root,'outputs'),{recursive:true});
 fs.writeFileSync(path.join(root,'outputs/ui_logic_results.json'),JSON.stringify({at:new Date().toISOString(),method:'Node VM with DOM stubs; no rendered browser',total:checks.length,passed:checks.length,checks},null,2));
 console.log(`${checks.length} UI logic checks passed`);

@@ -1,8 +1,8 @@
 {
-  "at": "2026-11-24T08:42:00.397Z",
+  "at": "2026-11-24T08:53:02.044Z",
   "method": "Node VM with DOM stubs; no rendered browser",
-  "total": 9,
-  "passed": 9,
+  "total": 10,
+  "passed": 10,
   "checks": [
     {
       "name": "New article requires explicit manual review",
@@ -17,7 +17,7 @@
       "passed": true
     },
     {
-      "name": "Changing user token clears confirmations",
+      "name": "Changing account clears review confirmations",
       "passed": true
     },
     {
@@ -38,6 +38,10 @@
     },
     {
       "name": "Promotional material browsing needs no new document registration",
+      "passed": true
+    },
+    {
+      "name": "Token-free buttons establish writer session, create and list scoped articles",
       "passed": true
     }
   ]

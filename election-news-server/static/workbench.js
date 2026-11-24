@@ -1,17 +1,16 @@
-/* Editorial workstation. Tokens stay in memory; no approvals are preselected. */
+/* Editorial workstation uses the authenticated session; approvals are never preselected. */
 let loggedUser=null,jobTimer=null,pdfDigest=null;
 const wbDialog=document.getElementById('workspaceDialog');
 const wbError=e=>{const text=e?.message||String(e);if(wbDialog.open)$('dialogMessage').textContent=text;else{$('message').className='message is-error';$('message').textContent=text}};
 const wbAction=fn=>async()=>{try{await fn()}catch(e){wbError(e)}};
 function wbOpen(title,body){$('dialogTitle').textContent=title;$('dialogBody').innerHTML=body;$('dialogMessage').textContent='';if(!wbDialog.open)wbDialog.showModal()}
-async function wbIdentity(){loggedUser=await api('/api/me');$('accountStatus').textContent=loggedUser.name+' · '+(loggedUser.role==='admin'?'시스템 관리자':loggedUser.role==='editor'?'독립 편집 담당자':'기사·자료 작성 담당자');$('signOut').hidden=false;
- $('draft').disabled=loggedUser.role!=='writer';$('openDocuments').disabled=loggedUser.role!=='writer';$('editArticle').disabled=loggedUser.role!=='writer';$('openReviews').disabled=loggedUser.role==='admin';
+async function wbIdentity(){const previous=loggedUser;loggedUser=await api('/api/me');if(previous?.name!==loggedUser.name||previous?.role!==loggedUser.role)resetReviewConfirmation();$('accountStatus').textContent=loggedUser.name+' · '+(loggedUser.role==='admin'?'시스템 관리자':loggedUser.role==='editor'?'독립 편집 담당자':'기사·자료 작성 담당자');$('signOut').hidden=false;
+ $('draft').disabled=articleBusy||loggedUser.role!=='writer';$('openDocuments').disabled=loggedUser.role!=='writer';$('editArticle').disabled=loggedUser.role!=='writer';$('openReviews').disabled=loggedUser.role==='admin';
  syncApproval();return loggedUser}
-async function wbDownload(url,name){const r=await fetch(url,{headers:{Authorization:'Bearer '+$('token').value}});if(!r.ok){const e=await r.json();throw Error(e.detail||'다운로드 실패')}const blob=await r.blob(),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
+async function wbDownload(url,name){const r=await fetch(url,{credentials:'same-origin'});if(!r.ok){const e=await r.json();throw Error(e.detail||'다운로드 실패')}const blob=await r.blob(),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
 function wbBase64(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.onerror=reject;reader.readAsDataURL(file)})}
 $('closeDialog').onclick=()=>wbDialog.close();$('identify').onclick=wbAction(wbIdentity);
-$('token').addEventListener('input',()=>{loggedUser=null;$('accountStatus').textContent='토큰이 변경되었습니다. 계정을 다시 확인해 주세요.';syncApproval()});
-$('dataMode').onchange=()=>{current=null;selectionKey='';$('checked').checked=false;$('aiAck').checked=false;$('reason').value='';$('selectedTitle').textContent='기사를 생성하거나 선택하세요';$('selectedAuthor').textContent='작성자 —';$('selectedStatus').textContent='대기';$('article').innerHTML='<p class="empty">선택한 자료로 새 기사를 작성하거나 목록에서 선택하세요.</p>';$('validate').disabled=true;$('export').disabled=true;$('ruleBadge').textContent='검증 전';$('ruleBadge').className='pill';syncApproval();document.querySelector('.studio-link').href='/studio?mode='+selectedMode();connect()};
+$('dataMode').onchange=()=>{$('articles').innerHTML='';$('draftMessage').textContent='선택한 작업 자료로 기사를 생성하거나 목록을 불러오세요.';current=null;selectionKey='';$('checked').checked=false;$('aiAck').checked=false;$('reason').value='';$('selectedTitle').textContent='기사를 생성하거나 선택하세요';$('selectedAuthor').textContent='작성자 —';$('selectedStatus').textContent='대기';$('article').innerHTML='<p class="empty">선택한 자료로 새 기사를 작성하거나 목록에서 선택하세요.</p>';$('validate').disabled=true;$('export').disabled=true;$('ruleBadge').textContent='검증 전';$('ruleBadge').className='pill';syncApproval();document.querySelector('.studio-link').href='/studio?mode='+selectedMode();connect()};
 
 $('openDocuments').onclick=wbAction(async()=>{
  await wbIdentity();if(loggedUser.role!=='writer')throw Error('문서 등록은 작성자 계정을 사용하세요. 편집자는 독립 검수를 담당합니다.');pdfDigest=null;
@@ -51,5 +50,5 @@ async function wbProduction(){
 }
 const wbOldProduction=$('productionToggle').onclick;$('productionToggle').onclick=wbAction(async()=>{wbOldProduction();if(!$('productionInfo').hidden)await wbProduction()});
 
-$('signOut').onclick=wbAction(async()=>{await api('/api/session/logout',{});$('token').value='';loggedUser=null;location.href='/login'});
-if(!$('token').value.trim())wbIdentity().catch(()=>{});
+$('signOut').onclick=wbAction(async()=>{await api('/api/session/logout',{});loggedUser=null;location.href='/login'});
+wbIdentity().catch(()=>{});
