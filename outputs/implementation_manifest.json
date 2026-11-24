@@ -1,12 +1,12 @@
 {
-  "captured_at": "2026-11-24T15:53:10.063691+09:00",
+  "captured_at": "2026-11-24T16:25:58.104530+09:00",
   "repository": "https://github.com/mbc-incheon/VR-Election-News",
   "release_version": "2.0.0",
   "imported_from": {
     "repository": "https://github.com/mbc-incheon/election-analysis-project-01",
     "commit": "00ac79dc6ec77d6bd4c1e883e152fd78f2e3ab91"
   },
-  "repository_base_commit": "0c5e03c2856b1ff9eb10920885bd075af1716422",
+  "repository_base_commit": "328db3055572506066ae682866302c2a5ca9f9e5",
   "note": "Base commit is the parent context before this manifest is committed; exact publication commit is in Git history.",
   "runtime": {
     "python": "3.12.10"
@@ -44,13 +44,28 @@
     },
     {
       "path": "README.md",
-      "bytes": 16093,
-      "sha256": "3df523996c2ed55ef0870651c622d75f8a62695827bc83e981dde9f188311fe9"
+      "bytes": 17041,
+      "sha256": "f8d4b6e9d3b241afb9f4a753e95335792746ccb5057a681c70669690d41287ac"
     },
     {
       "path": "compose.yaml",
       "bytes": 608,
       "sha256": "db20aff3b2d81f31122e010642a9f5d82578bf65a5a6a3582a08e4d049d9663d"
+    },
+    {
+      "path": "data/campaign_body_collection_status.json",
+      "bytes": 436,
+      "sha256": "396c15bf69ef41117ee7fadaf9cd3b78d6d15c68dfa27397d397111689eaba09"
+    },
+    {
+      "path": "data/campaign_directory_ledger.json",
+      "bytes": 576,
+      "sha256": "f3ec74e7e13adeb61ba27336691e56e56cc0bc7a003843f145d0ec22eb1a332c"
+    },
+    {
+      "path": "data/clean/campaign_directory.json",
+      "bytes": 38945,
+      "sha256": "c804b542f11b0fbeed13a958a04d2a95342bfc58e5e632956f090453c9bd2af8"
     },
     {
       "path": "data/clean/incheon_final_results.csv",
@@ -78,6 +93,11 @@
       "sha256": "94b511d90147c13bd991820e8ab055501358c083fb8cce6b8f3b47181e23ffc1"
     },
     {
+      "path": "data/official_raw/NANET-CAMPAIGN-INDEX-ef2c09c15d4a83a2.html",
+      "bytes": 245594,
+      "sha256": "ef2c09c15d4a83a21d1e1b8a5e836bc58f45dcf410b40eda5284679489224990"
+    },
+    {
       "path": "data/official_raw/NANET-IC-CAMPAIGN_f29a082fff16a27b.html",
       "bytes": 245594,
       "sha256": "f29a082fff16a27b90128805ead99971595b116e6ccc350362d7f0889246cafc"
@@ -86,6 +106,11 @@
       "path": "data/official_raw/NEC-CAMPAIGN-LIBRARY_9abe2bdd08882473.html",
       "bytes": 24049,
       "sha256": "9abe2bdd08882473c663cc4510ae9f89739328d11d735598f27571aaa77f61ae"
+    },
+    {
+      "path": "data/official_raw/NEC-CAMPAIGN-SEARCH-af5bbcab15bdfe0f.html",
+      "bytes": 868,
+      "sha256": "af5bbcab15bdfe0fe9f78554d2faff349ae28c03e993724f6bf258c4af9b6135"
     },
     {
       "path": "data/official_raw/NEC-RESULT-CATALOG_4df35d016e9886ed.html",
@@ -129,8 +154,8 @@
     },
     {
       "path": "docs/collaboration.md",
-      "bytes": 5220,
-      "sha256": "7f749f10d821f4cb0d28d29e6f50f2d9d43838b139d93789c442ee0b71ecba47"
+      "bytes": 5620,
+      "sha256": "4bf4ce009da7eed04f8d013ce342db73a7ec721e3467ac1814da965f2e16a449"
     },
     {
       "path": "docs/deliverables/01_기획서.docx",
@@ -200,12 +225,12 @@
     {
       "path": "docs/implementation-results.md",
       "bytes": 6109,
-      "sha256": "c0798f69fc9cc272ae5b590a42f9041420f908b51288ccec83f42b5e9dd1387f"
+      "sha256": "d066887dacf265df7c4e61f2978b91790dbbbff4a1528f3594b8aa8b63b15b26"
     },
     {
       "path": "docs/platform-guide.md",
-      "bytes": 14727,
-      "sha256": "b645ba03f4b35e219882fa27cdc2a1a76c794cc04254bbd8d7a02537f89a353b"
+      "bytes": 16436,
+      "sha256": "f063d45781fb9201be95ce5a60c134b106951c70ea980a4b7be64d54b7bb487f"
     },
     {
       "path": "docs/project-plan.md",
@@ -264,8 +289,8 @@
     },
     {
       "path": "election-news-server/app.py",
-      "bytes": 22986,
-      "sha256": "7eb350fd0bc2334fe779fe6a224ee162d4aafa6d300d80fb1a45fb6b299f6936"
+      "bytes": 23216,
+      "sha256": "1d2985c6b85b99b4df68483fd6bc762e40eb4810d19d9758238184bcfedcfcc9"
     },
     {
       "path": "election-news-server/core.py",
@@ -279,13 +304,13 @@
     },
     {
       "path": "election-news-server/dashboard.js",
-      "bytes": 12004,
-      "sha256": "3344aefbaa6893e9af7aabb598831dbc4f78647e2c9e1873a935ba78646dc06d"
+      "bytes": 15007,
+      "sha256": "4ee598258a7abd725d50b86df7e1b931639342fbf1df635bc91f3b66f58ae518"
     },
     {
       "path": "election-news-server/dashboard.template.html",
-      "bytes": 9407,
-      "sha256": "bbcc849186c52e9bc870b692cadd7b00f63cc51784cda8ed25c046a92006f7b6"
+      "bytes": 9701,
+      "sha256": "1a8c67f480d9f73f68fab689d5bc5cd145949ca9109c2095972757484848749c"
     },
     {
       "path": "election-news-server/fixtures/fallback_snapshot.json",
@@ -294,8 +319,8 @@
     },
     {
       "path": "election-news-server/index.html",
-      "bytes": 32436,
-      "sha256": "a5041d6738d8197b1fee7f10177fce0b89b35fec38c52165b913a5404fd3cda8"
+      "bytes": 35733,
+      "sha256": "a6f3c151f1cbf00bcafdbead1474f2442191d44ec9e8f411819a4811b00527d2"
     },
     {
       "path": "election-news-server/init_users.py",
@@ -399,18 +424,18 @@
     },
     {
       "path": "election-news-server/static/workbench.css",
-      "bytes": 3714,
-      "sha256": "8c5b8b2a03ec211503d819d1e0e4e2af7eea4f635d395df7c9edef6d4593dfe5"
+      "bytes": 4510,
+      "sha256": "940d1419c9b4dd6569cb791f533da0a25a579567aa28a9e7f1d5ffac424c5d76"
     },
     {
       "path": "election-news-server/static/workbench.js",
-      "bytes": 15664,
-      "sha256": "5270515fa081ae1911588fff9d571934a773e522d5475e2f518b81941b87ce3e"
+      "bytes": 15712,
+      "sha256": "ec748fd044fb4ecce9c6f785f1fde075cd32e6356916dc4be26ddb2ed1f36677"
     },
     {
       "path": "election-news-server/workflow.py",
-      "bytes": 6935,
-      "sha256": "aa3730c07fd28e23c0909cc07aace8a6b4134e384a20bc804dd657d7ed5798a4"
+      "bytes": 9138,
+      "sha256": "ee049e830b1b75ef4eeb37a6ab00ed1dbdb429eaae56f40efb2ccff7d07b3827"
     },
     {
       "path": "election_common.py",
@@ -539,8 +564,8 @@
     },
     {
       "path": "outputs/openapi_news.json",
-      "bytes": 50679,
-      "sha256": "f835bf47fe8377916e694b556a6deeeb819d2959dc93e971a1181d862e3e317b"
+      "bytes": 52226,
+      "sha256": "6828720aa7e7b1ef91bfdb0b2f47567a7202b909e03cb13f1d0ff470d4b9296f"
     },
     {
       "path": "outputs/platform_integration_results.json",
@@ -603,6 +628,11 @@
       "sha256": "032395a09714f716d97219fce7468d6a1854c0c2aab8a94e2140b1066320c99b"
     },
     {
+      "path": "outputs/screenshots/pledge-evidence.jpg",
+      "bytes": 192635,
+      "sha256": "17f290621ec3d3ea11c5daf700310ce013a1ba948cd238d940e7d5501f91a9b8"
+    },
+    {
       "path": "outputs/screenshots/production-v2.jpg",
       "bytes": 264352,
       "sha256": "86ec0583ced1fff102f8155131860a167126e4c5716e359e97e9b5195f7940b4"
@@ -639,13 +669,13 @@
     },
     {
       "path": "outputs/ui_logic_results.json",
-      "bytes": 823,
-      "sha256": "b7feb8a5b0e36f255046b4fcf56be8035afb9b60db0229d112a6adce25844126"
+      "bytes": 939,
+      "sha256": "5f5089fb0df9177348364a70d58a32e56ac706fcb6f20c71b63a60a697eb4da6"
     },
     {
       "path": "outputs/unit_results.xml",
-      "bytes": 5077,
-      "sha256": "ef4c6c4e1589346acd807eabe9cf2d35b88c00ff6e580ce59449186327127b24"
+      "bytes": 5344,
+      "sha256": "e2cd861531b31712509629fcbd0793bdde51efed1fcb9c553ade72c2a8f0d01d"
     },
     {
       "path": "requirements.txt",
@@ -669,8 +699,13 @@
     },
     {
       "path": "scripts/check_ui.mjs",
-      "bytes": 3553,
-      "sha256": "51fefb96bd3586288fb0d8042a45ab7acb1913245d3a08f9042f7d61a82f7542"
+      "bytes": 4726,
+      "sha256": "09dc932dc8c83f2bd8ca79979f4c3740b7e585d7127f3be269313a44db2ea795"
+    },
+    {
+      "path": "scripts/collect_campaign_directory.py",
+      "bytes": 3548,
+      "sha256": "15932a8a167c70683f6634e04e7501ba1fc6f5b8acdd0e7f84d0844ba20f4a19"
     },
     {
       "path": "scripts/collect_sources.py",
@@ -739,8 +774,8 @@
     },
     {
       "path": "tests/test_platform.py",
-      "bytes": 22941,
-      "sha256": "db5362d82929327215da5d0abb05da6f37a37076be16e5a0cda40ec2b0ef4467"
+      "bytes": 26119,
+      "sha256": "28cceb2cb4833bb99b9fa3f6c54599904d8992ca8fcfc1b61b6b7073efbac89f"
     },
     {
       "path": "tests/test_sql.py",

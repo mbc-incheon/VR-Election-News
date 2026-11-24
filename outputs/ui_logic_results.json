@@ -1,8 +1,8 @@
 {
-  "at": "2026-11-24T06:51:54.557Z",
+  "at": "2026-11-24T07:25:02.874Z",
   "method": "Node VM with DOM stubs; no rendered browser",
-  "total": 7,
-  "passed": 7,
+  "total": 8,
+  "passed": 8,
   "checks": [
     {
       "name": "New article requires explicit manual review",
@@ -30,6 +30,10 @@
     },
     {
       "name": "Unsafe evidence URLs never become clickable sources",
+      "passed": true
+    },
+    {
+      "name": "Official catalogue locations never masquerade as pledge evidence",
       "passed": true
     }
   ]

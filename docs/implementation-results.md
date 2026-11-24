@@ -25,10 +25,10 @@ PC 중심 v2에서는 실제 Three.js 가상 스튜디오, 공식 원본 행 대
 
 | 시험 | 통과 | 증빙 |
 | --- | --- | --- |
-| 단위 및 SQL 및 화면 빌드 | **49/49** | [unit_results.xml](../outputs/unit_results.xml) |
+| 단위 및 SQL 및 화면 빌드 | **51/51** | [unit_results.xml](../outputs/unit_results.xml) |
 | 실제 서버 통합 | **13/13** | [integration_results.json](../outputs/integration_results.json) |
 | PC 스튜디오·영상·자료 검수 통합 | **24/24** | [platform_integration_results.json](../outputs/platform_integration_results.json) |
-| 화면 승인 제어 로직 | **7/7** | [ui_logic_results.json](../outputs/ui_logic_results.json) |
+| 화면 승인 제어 로직 | **8/8** | [ui_logic_results.json](../outputs/ui_logic_results.json) |
 
 통합 시험은 정상 기사 생성·검증·시험 editor 승인·내보내기와 지역 오류 주입 후 승인/내보내기 409 차단, 토큰 없는 요청 401, writer 승인 시도 403, 송신 중단 후 오류와 대체 자료 표시를 재현했습니다. `TEST-*` 계정의 자동 승인은 실제 편집 승인으로 제출하지 않습니다.
 

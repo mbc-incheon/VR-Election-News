@@ -341,3 +341,51 @@ def test_issued_roles_complete_draft_review_approval_without_shared_token(client
     assert approved.json()['status']=='APPROVED'
     assert c.get('/api/articles/'+article['id']+'/export').status_code==200
     assert c.post('/api/articles/'+article['id']+'/validate',json={}).status_code==403
+
+
+def test_campaign_directory_verified_candidate_scope_and_no_fake_evidence(client):
+    c,module=client
+    from scripts.collect_campaign_directory import build_directory
+    rows=json.loads((ROOT/'data/clean/incheon_final_results.json').read_text(encoding='utf-8'))
+    directory=json.loads((ROOT/'data/clean/campaign_directory.json').read_text(encoding='utf-8'))
+    ledger=json.loads((ROOT/'data/campaign_directory_ledger.json').read_text(encoding='utf-8'))
+    raw=(ROOT/'data/official_raw'/ledger['source_file']).read_bytes()
+    assert hashlib.sha256(raw).hexdigest()==ledger['sha256']
+    assert directory==build_directory(raw,rows,ledger['collected_at'])
+    assert len(directory)==38 and len({r['region_name'] for r in directory})==14
+    for entry in directory:
+        response=c.get('/api/pledge-context',params=dict(region=entry['region_name'],candidate=entry['candidate_id'],mode='official'))
+        assert response.status_code==200,response.text
+        context=response.json()
+        assert context['directory']['candidate_name']==entry['candidate_name']
+        assert context['directory']['catalog_start_page']>0
+        assert context['registered_documents']==0
+        assert context['directory']['usable_as_pledge_evidence'] is False
+        assert context['catalogue_is_pledge_evidence'] is False
+        assert c.get('/api/search',params=dict(region=entry['region_name'],candidate=entry['candidate_id'],mode='official',q='')).json()==[]
+    first=directory[0]
+    assert c.get('/api/pledge-context',params=dict(region='wrong',candidate=first['candidate_id'],mode='official')).status_code==422
+    article=module.room.draft(first['region_name'],'TEST-writer','official')
+    assert all(s['kind']=='result' for s in article['sentences'])
+    assert 'NO_PLEDGE_EVIDENCE' in module.room.validate(article)['validation']['errors']
+
+
+def test_pledge_context_shows_actual_document_review_and_demo_separation(client):
+    c,module=client
+    row,ids=add_test_pledge(module.room)
+    params=dict(region=row['region_name'],candidate=row['candidate_id'],mode='official')
+    context=c.get('/api/pledge-context',params=params).json()
+    assert context['registered_documents']==1 and context['active_chunks']==len(ids)
+    assert context['approved_documents']==0
+    assert set(context['document_states'].values())=={'REVIEW_REQUIRED'}
+    assert len(c.get('/api/search',params=dict(**params,q='')).json())==len(ids)
+    approve_inputs(module.room)
+    assert c.get('/api/pledge-context',params=params).json()['approved_documents']==1
+    module.room.retire(ids[0],'TEST-editor')
+    assert c.get('/api/pledge-context',params=params).json()['active_chunks']==0
+    fallback=json.loads((ROOT/'election-news-server/fixtures/fallback_snapshot.json').read_text(encoding='utf-8'))
+    module.room.receive(fallback)
+    demo=fallback['rows'][0]
+    context=c.get('/api/pledge-context',params=dict(region=demo['region_name'],candidate=demo['candidate_id'],mode='demo')).json()
+    assert context['directory'] is None
+    assert context['registered_documents']>0

@@ -106,3 +106,25 @@ class WorkflowMixin:
         bundles=[self.export(aid) for aid in article_ids]
         if len({b['article']['mode'] for b in bundles})!=1:raise ValueError('do not mix official and simulation in one news package')
         return bundles
+
+    def pledge_context(self,region,candidate,mode):
+        with self.lock:
+            snapshot=self.latest(mode)
+            row=next((r for r in snapshot['rows'] if r['region_name']==region and r['candidate_id']==candidate),None)
+            if not row:raise ValueError('선택한 지역과 후보의 자료를 찾을 수 없습니다.')
+            docs=[d for d in self.documents() if (d['election_id'],d['region_name'],d['candidate_id'],d['is_demo'])==(row['election_id'],region,candidate,mode=='demo')]
+            states={d['document_id']:('DEMO' if mode=='demo' else self.review_state('document',d['document_id'])['status']) for d in docs}
+            entry=None
+            if mode=='official':
+                root=Path(__file__).resolve().parents[1]
+                ledger=json.loads((root/'data/campaign_directory_ledger.json').read_text(encoding='utf-8'))
+                raw=(root/'data/official_raw'/ledger['source_file']).read_bytes()
+                if hashlib.sha256(raw).hexdigest()!=ledger['sha256']:raise ValueError('공식 공보 목차 원본 해시가 일치하지 않습니다.')
+                entries=json.loads((root/'data/clean/campaign_directory.json').read_text(encoding='utf-8'))
+                from scripts.collect_campaign_directory import build_directory
+                preserved_rows=json.loads((root/'data/clean/incheon_final_results.json').read_text(encoding='utf-8'))
+                if entries!=build_directory(raw,preserved_rows,ledger['collected_at']):raise ValueError('공보 목차 정제본이 보존된 원문과 일치하지 않습니다.')
+                entry=next((e for e in entries if (e['candidate_id'],e['region_name'])==(candidate,region)),None)
+            return dict(candidate_id=candidate,candidate_name=row['candidate_name'],region_name=region,mode=mode,
+                registered_documents=len(docs),active_chunks=sum(len(d['chunks']) for d in docs),approved_documents=sum(v=='APPROVED' for v in states.values()),document_states=states,
+                directory=entry,catalogue_is_pledge_evidence=False)

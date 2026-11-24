@@ -51,6 +51,17 @@ check('Unsafe evidence URLs never become clickable sources', `
   assert.equal(safeSource('demo://fixtures/pledges'),null);
   assert.equal(safeSource('https://www.data.go.kr/'),'https://www.data.go.kr/');
 `);
+check('Official catalogue locations never masquerade as pledge evidence', `
+  const context={region_name:'계양구갑',candidate_name:'TEST',registered_documents:0,active_chunks:0,approved_documents:0,document_states:{},directory:{title:'TEST 공보',publication_year:2024,publisher:'선관위',catalog_provider:'국회도서관',source_url:'https://dl.nanet.go.kr/detail/TEST',original_portal_url:'https://library.nec.go.kr/',policy_url:'https://policy.nec.go.kr/',source_id:'TEST-INDEX',location:'목차 193쪽'}};
+  const result=renderEvidence([],context,'교통 주거');
+  assert.ok(result.includes('공약 내용의 증거가 아닙니다'));
+  assert.ok(result.includes('아직 등록되지 않았습니다'));
+  assert.ok(result.includes('목차 193쪽'));
+  assert.ok(!result.includes('근거 ID <b>TEST-INDEX'));
+  const demoCard=renderEvidence([{title:'<script>unsafe</script>',text:'TEST',id:'TEST-CHUNK',document_id:'doc',is_demo:true}],{...context,directory:null},'');
+  assert.ok(!demoCard.includes('<script>unsafe</script>'));
+  assert.ok(demoCard.includes('시뮬레이션 문서'));
+`);
 fs.mkdirSync(path.join(root,'outputs'),{recursive:true});
 fs.writeFileSync(path.join(root,'outputs/ui_logic_results.json'),JSON.stringify({at:new Date().toISOString(),method:'Node VM with DOM stubs; no rendered browser',total:checks.length,passed:checks.length,checks},null,2));
 console.log(`${checks.length} UI logic checks passed`);

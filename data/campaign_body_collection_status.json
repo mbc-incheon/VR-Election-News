@@ -1,0 +1,11 @@
+{
+  "checked_at": "2026-11-24T16:20:21.039077+09:00",
+  "url": "https://library.nec.go.kr/neweps/3/1/paperSearch.do",
+  "response_status": 200,
+  "response_bytes": 868,
+  "file_name": "NEC-CAMPAIGN-SEARCH-af5bbcab15bdfe0f.html",
+  "sha256": "af5bbcab15bdfe0fe9f78554d2faff349ae28c03e993724f6bf258c4af9b6135",
+  "status": "CAUTION_PAGE_NO_CANDIDATE_BODY",
+  "usable_as_pledge_evidence": false,
+  "body_documents_collected": 0
+}

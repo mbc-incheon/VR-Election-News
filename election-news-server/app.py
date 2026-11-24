@@ -261,6 +261,11 @@ async def ws(websocket:WebSocket,mode:Mode|None=None):
 @app.get('/api/search')
 def search(q:str,region:str,candidate:str,mode:Mode|None=None):return room.search(q,region,candidate,demo=room.latest(mode).get('mode')=='demo')
 
+@app.get('/api/pledge-context')
+def pledge_context(region:str,candidate:str,mode:Mode='official'):
+    try:return room.pledge_context(region,candidate,mode)
+    except ValueError as error:raise HTTPException(422,str(error))
+
 class Draft(BaseModel):
     region:str=Field(min_length=1,max_length=80)
     mode:Mode|None=None

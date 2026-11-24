@@ -1,0 +1,13 @@
+{
+  "source_url": "https://dl.nanet.go.kr/detail/NONB12025000019286",
+  "collected_at": "2026-11-24T16:20:21.039077+09:00",
+  "response_status": 200,
+  "final_url": "https://dl.nanet.go.kr/detail/NONB12025000019286",
+  "content_type": "text/html; charset=UTF-8",
+  "source_file": "NANET-CAMPAIGN-INDEX-ef2c09c15d4a83a2.html",
+  "sha256": "ef2c09c15d4a83a21d1e1b8a5e836bc58f45dcf410b40eda5284679489224990",
+  "candidates": 38,
+  "districts": 14,
+  "scope": "Official catalogue metadata only; no pledge body or human approval",
+  "usable_as_pledge_evidence": false
+}
