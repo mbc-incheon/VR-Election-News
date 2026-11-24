@@ -1,8 +1,8 @@
 {
-  "at": "2026-11-24T08:22:01.505Z",
+  "at": "2026-11-24T08:42:00.397Z",
   "method": "Node VM with DOM stubs; no rendered browser",
-  "total": 8,
-  "passed": 8,
+  "total": 9,
+  "passed": 9,
   "checks": [
     {
       "name": "New article requires explicit manual review",
@@ -34,6 +34,10 @@
     },
     {
       "name": "Official catalogue locations never masquerade as pledge evidence",
+      "passed": true
+    },
+    {
+      "name": "Promotional material browsing needs no new document registration",
       "passed": true
     }
   ]

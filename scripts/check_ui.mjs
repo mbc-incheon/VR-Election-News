@@ -55,12 +55,25 @@ check('Official catalogue locations never masquerade as pledge evidence', `
   const context={region_name:'계양구갑',candidate_name:'TEST',registered_documents:0,active_chunks:0,approved_documents:0,document_states:{},directory:{title:'TEST 공보',publication_year:2024,publisher:'선관위',catalog_provider:'국회도서관',source_url:'https://dl.nanet.go.kr/detail/TEST',original_portal_url:'https://library.nec.go.kr/',policy_url:'https://policy.nec.go.kr/',source_id:'TEST-INDEX',location:'목차 193쪽'}};
   const result=renderEvidence([],context,'교통 주거');
   assert.ok(result.includes('공약 내용의 증거가 아닙니다'));
-  assert.ok(result.includes('아직 등록되지 않았습니다'));
+  assert.ok(result.includes('현재 보유 자료에는 이 후보의 공약 본문이 없습니다'));
   assert.ok(result.includes('목차 193쪽'));
   assert.ok(!result.includes('근거 ID <b>TEST-INDEX'));
   const demoCard=renderEvidence([{title:'<script>unsafe</script>',text:'TEST',id:'TEST-CHUNK',document_id:'doc',is_demo:true}],{...context,directory:null},'');
   assert.ok(!demoCard.includes('<script>unsafe</script>'));
   assert.ok(demoCard.includes('시뮬레이션 문서'));
+`);
+check('Promotional material browsing needs no new document registration', `
+ const materialContext={region_name:'계양구갑',candidate_name:'TEST',registered_documents:1,active_chunks:1,approved_documents:0,document_states:{doc:'REVIEW_REQUIRED'},directory:{title:'TEST 홍보물',publication_year:2024,publisher:'선관위',catalog_provider:'국회도서관',source_url:'https://dl.nanet.go.kr/detail/TEST',original_portal_url:'https://library.nec.go.kr/',policy_url:'https://policy.nec.go.kr/',source_id:'TEST-INDEX',location:'목차 193쪽',catalog_start_page:193}};
+ const materials=[{title:'TEST 기존 자료',text:'TEST 기존 본문',id:'TEST-REF',document_id:'doc',is_demo:false,url:'https://library.nec.go.kr/'}];
+ const publicView=renderEvidence(materials,materialContext,'교통','publications');
+ assert.ok(publicView.includes('선관위 홍보물 찾아보기'));
+ assert.ok(publicView.includes('193쪽'));
+ assert.ok(!publicView.includes('TEST 기존 본문'));
+ assert.ok(!publicView.includes('공약 원문 등록'));
+ const existingView=renderEvidence(materials,materialContext,'교통','existing');
+ assert.ok(existingView.includes('TEST 기존 본문'));
+ assert.ok(existingView.includes('독립 검수 필요'));
+ assert.ok(!existingView.includes('선관위 홍보물 찾아보기'));
 `);
 fs.mkdirSync(path.join(root,'outputs'),{recursive:true});
 fs.writeFileSync(path.join(root,'outputs/ui_logic_results.json'),JSON.stringify({at:new Date().toISOString(),method:'Node VM with DOM stubs; no rendered browser',total:checks.length,passed:checks.length,checks},null,2));

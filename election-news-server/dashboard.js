@@ -33,34 +33,28 @@ function show(a){
 function syncApproval(){const v=current?.validation,allowed=typeof loggedUser==='undefined'||loggedUser?.role==='editor';$('approve').disabled=!(allowed&&current?.status==='PENDING_HUMAN'&&v?.rule==='PASS'&&!v?.disagreement&&$('checked').checked&&$('aiAck').checked&&$('reason').value.trim().length>=5)}
 ['checked','aiAck','reason'].forEach(id=>$(id).addEventListener('input',syncApproval));$('token').addEventListener('input',()=>{$('checked').checked=false;$('aiAck').checked=false;syncApproval()});
 const action=f=>async()=>{try{await f();$('message').className='message';$('message').textContent='처리했습니다.'}catch(e){$('message').className='message is-error';$('message').textContent=e.message}};
-function renderEvidence(hits,context,query){
- const source=context.directory;
- const stats=`<div class="evidence-summary"><strong>${esc(context.region_name)} · ${esc(context.candidate_name)}</strong><span>등록 문서 ${context.registered_documents}건 · 근거 문단 ${context.active_chunks}건 · 독립 검수 완료 ${context.approved_documents}건</span></div>`;
- const directory=source?`<div class="source-directory"><span class="pill warn">공식 목차 확인 · 공약 본문 미수집</span><h3>${esc(source.title)}</h3><p>${esc(source.location)} · 발행연도 ${source.publication_year}년 · 발행기관 ${esc(source.publisher)} · 소장기관 ${esc(source.catalog_provider)}</p><p class="source-links"><a href="${safeSource(source.source_url)}" target="_blank" rel="noopener noreferrer">국회도서관 공보 목차 ↗</a> <a href="${safeSource(source.original_portal_url)}" target="_blank" rel="noopener noreferrer">선관위 선거공보 찾기 ↗</a> <a href="${safeSource(source.policy_url)}" target="_blank" rel="noopener noreferrer">정책·공약마당 ↗</a></p><p class="evidence-meta">자료 ID ${esc(source.source_id)} · 수집 ${esc(timeText(source.collected_at))} · 게시일 미제공</p><p class="evidence-disclosure">공보 위치 정보이며 공약 내용의 증거가 아닙니다. 원문 본문을 등록하고 독립 검수를 진행하세요.</p></div>`:'';
- const cards=hits.map(c=>{const url=safeSource(c.url),state=context.document_states[c.document_id],status=c.is_demo?'가상 자료':state==='APPROVED'?'독립 검수 완료':state==='REJECTED'?'반려·승인 철회':'독립 검수 필요';return `<div class="evidence-card"><span class="pill ${!c.is_demo&&state==='APPROVED'?'good':'warn'}">${status}</span>${!c.is_demo&&url?`<a class="evidence-link" href="${url}" target="_blank" rel="noopener noreferrer">원문 확인 ↗</a>`:''}<h3>▤ ${esc(c.title)}</h3><p>${esc(c.text)}</p><div class="evidence-meta">근거 ID <b>${esc(c.id)}</b>　|　발행기관 ${esc(c.publisher)}　|　게시일 ${esc(c.published_at)}　|　원문 위치 ${esc(c.location)}</div>${c.is_demo?'<div class="evidence-disclosure">시뮬레이션 문서 · 실제 후보 공약이 아닙니다</div>':''}</div>`}).join('');
- const empty=!hits.length?`<p class="empty">${context.registered_documents?`“${esc(query)}”에 맞는 본문이 없습니다. 전체 근거 보기를 누르거나 검색어를 바꿔 주세요.`:'이 후보의 공약 본문은 아직 등록되지 않았습니다. 공약 원문 등록에서 출처·게시일·본문을 추가하세요.'}</p>`:'';
- return stats+directory+`<p class="evidence-result-count">${query?'검색 결과':'전체 근거'} ${hits.length}개 문단${hits.length===5?' · 최대 5개 표시':''}</p>`+cards+empty;
+function renderEvidence(hits,context,query,view='all'){
+ const source=context.directory,showPublications=view!=='existing',showExisting=view!=='publications';
+ const stats=`<div class="evidence-summary"><strong>${esc(context.region_name)} · ${esc(context.candidate_name)}</strong><span>공식 공보 위치 ${source?1:0}건 · 기존 보유 문서 ${context.registered_documents}건 · 검색 가능한 본문 ${context.active_chunks}개 문단</span></div>`;
+ const directory=showPublications&&source?`<div class="source-directory"><span class="pill">선거공보·홍보물 확인</span><h3>${esc(source.title)}</h3><p>${esc(source.location)} · 발행연도 ${source.publication_year}년 · 발행기관 ${esc(source.publisher)} · 소장기관 ${esc(source.catalog_provider)}</p><p class="source-links"><a href="${safeSource(source.source_url)}" target="_blank" rel="noopener noreferrer">국회도서관 공보 자료 열기 ↗</a><a href="${safeSource(source.original_portal_url)}" target="_blank" rel="noopener noreferrer">선관위 홍보물 찾아보기 ↗</a><a href="${safeSource(source.policy_url)}" target="_blank" rel="noopener noreferrer">정책·공약마당 확인 ↗</a></p><div class="material-instructions"><strong>자료 확인 순서</strong><p>2024년 제22대 총선 → 인천 → ${esc(context.region_name)} → ${esc(context.candidate_name)} → 선거공보·홍보물</p><p>국회도서관 자료에서는 목차의 ${source.catalog_start_page}쪽부터 해당 후보를 확인하세요. 쪽수는 합본 목차 기준입니다.</p>${query?`<p>보도 질문: “${esc(query)}” · 자료를 연 뒤 해당 내용을 찾아 출처·쪽수·발행 시점을 대조하세요.</p>`:''}</div><p class="evidence-meta">자료 ID ${esc(source.source_id)} · 수집 ${esc(timeText(source.collected_at))} · 게시일 미제공</p><p class="evidence-disclosure">공보 위치 정보이며 공약 내용의 증거가 아닙니다. 외부 자료 열람만으로 기사 근거와 승인 상태가 변경되지는 않습니다.</p></div>`:'';
+ const cards=showExisting?hits.map(c=>{const url=safeSource(c.url),state=context.document_states[c.document_id],status=c.is_demo?'가상 자료':state==='APPROVED'?'독립 검수 완료':state==='REJECTED'?'반려·승인 철회':'독립 검수 필요';return `<div class="evidence-card"><span class="pill ${!c.is_demo&&state==='APPROVED'?'good':'warn'}">${status}</span>${!c.is_demo&&url?`<a class="evidence-link" href="${url}" target="_blank" rel="noopener noreferrer">기존 자료 출처 열기 ↗</a>`:''}<h3>▤ ${esc(c.title)}</h3><p>${esc(c.text)}</p><div class="evidence-meta">근거 ID <b>${esc(c.id)}</b>　|　발행기관 ${esc(c.publisher)}　|　게시일 ${esc(c.published_at)}　|　원문 위치 ${esc(c.location)}</div>${c.is_demo?'<div class="evidence-disclosure">시뮬레이션 문서 · 실제 후보 공약이 아닙니다</div>':''}</div>`}).join(''):'';
+ const empty=showExisting&&!hits.length?`<p class="empty">${context.registered_documents?`“${esc(query)}”에 맞는 보유 자료의 문단이 없습니다. 기존 자료 전체 보기를 누르거나 검색어를 바꿔 주세요.`:'현재 보유 자료에는 이 후보의 공약 본문이 없습니다. 선거공보·홍보물 메뉴의 공식 자료를 열어 직접 확인하세요.'}</p>`:'';
+ const resultCount=showExisting?`<p class="evidence-result-count">${query?'보유 자료 검색 결과':'기존 보유 자료'} ${hits.length}개 문단${hits.length===5?' · 최대 5개 표시':''}</p>`:'';
+ const unavailable=showPublications&&!source?'<p class="empty">시뮬레이션 모드에서는 실제 후보의 홍보물을 연결하지 않습니다. 기존 보유 자료에서 가상 문단을 확인하세요.</p>':'';
+ return stats+directory+unavailable+resultCount+cards+empty;
 }
 async function loadEvidence(){
  const request=++searchRequest,q=$('query').value.trim(),region=$('region').value,candidate=$('candidate').value;if(!region||!candidate)return;
- $('evidence').textContent='공약 자료와 출처를 확인하고 있습니다…';
+ $('evidence').textContent='홍보물 위치와 기존 보유 자료를 확인하고 있습니다…';
  try{
   const params={region,candidate,mode:selectedMode()};
   const [hits,context]=await Promise.all([api('/api/search?'+new URLSearchParams({q,...params})),api('/api/pledge-context?'+new URLSearchParams(params))]);
   if(request!==searchRequest)return;
-  $('evidence').innerHTML=renderEvidence(hits,context,q);
+  $('evidence').innerHTML=renderEvidence(hits,context,q,$('evidenceView').value);
  }catch(error){if(request===searchRequest)$('evidence').textContent='공약 자료를 불러오지 못했습니다. '+error.message}
 }
 $('allEvidence').onclick=action(async()=>{$('query').value='';await loadEvidence()});
-$('registerEvidence').onclick=action(async()=>{
- let user=await api('/api/me').catch(()=>null);
- if(!user&&!$('token').value.trim()){
-  const cap=await api('/api/capabilities');
-  if(cap.local_writer_available){await api('/api/session/local-writer',{});user=await api('/api/me')}
- }
- if(user?.role!=='writer')throw Error('공약 원문 등록은 작성자 계정으로 로그인한 뒤 진행해 주세요.');
- await wbIdentity();$('openDocuments').click();
-});
+$('evidenceView').onchange=action(loadEvidence);
 $('region').onchange=table;$('candidate').onchange=action(loadEvidence);$('search').onclick=action(loadEvidence);$('query').addEventListener('keydown',e=>{if(e.key==='Enter')$('search').click()});
 $('official').onclick=action(async()=>{if(!$('officialRows').hidden){$('officialRows').hidden=true;$('official').setAttribute('aria-expanded','false');return}const v=await api('/api/official-results');$('officialRows').innerHTML='<p>'+esc(v.label)+'</p><div class="scroll"><table><thead><tr><th>지역구</th><th>후보</th><th>정당</th><th>집계 득표수</th><th>계산 득표율</th></tr></thead><tbody>'+v.rows.map(r=>`<tr><td>${esc(r.region_name)}</td><td>${esc(r.candidate_name)}</td><td>${esc(r.party)}</td><td>${Number(r.votes).toLocaleString('ko-KR')}</td><td>${Number(r.vote_share).toFixed(2)}%</td></tr>`).join('')+'</tbody></table></div>';$('officialRows').hidden=false;$('official').setAttribute('aria-expanded','true')});
 $('productionToggle').onclick=()=>{const open=$('productionInfo').hidden;$('productionInfo').hidden=!open;$('productionToggle').setAttribute('aria-expanded',String(open))};
@@ -79,7 +73,7 @@ $('draft').onclick=async()=>{
   if(typeof wbIdentity==='function')await wbIdentity();
   const article=await api('/api/articles',{region:$('region').value,mode:selectedMode()});show(article);
   const pledgeCount=article.sentences.filter(s=>s.kind==='pledge').length;
-  notice.textContent='초안을 생성했습니다. 아래 05 영역에서 본문과 근거를 확인하고 규칙 검증을 진행하세요.'+(pledgeCount?'':' 등록된 공약 근거가 없어 개표 결과만 작성했습니다. 공약 자료 등록·검수 후 새 초안을 생성하세요.');
+  notice.textContent='초안을 생성했습니다. 아래 05 영역에서 본문과 근거를 확인하고 규칙 검증을 진행하세요.'+(pledgeCount?'':' 등록된 공약 근거가 없어 개표 결과만 작성했습니다. 03에서 홍보물·기존 자료를 확인하세요. 기사에 공약 문장을 넣으려면 검증 가능한 본문 근거가 필요합니다.');
  }catch(e){notice.className='message is-error';notice.textContent=e.message}
  finally{button.disabled=typeof loggedUser!=='undefined'&&loggedUser&&loggedUser.role!=='writer';button.textContent='▤ 기사 초안 생성'}
 };

@@ -28,7 +28,7 @@ PC 중심 v2에서는 실제 Three.js 가상 스튜디오, 공식 원본 행 대
 | 단위 및 SQL 및 화면 빌드 | **56/56** | [unit_results.xml](../outputs/unit_results.xml) |
 | 실제 서버 통합 | **13/13** | [integration_results.json](../outputs/integration_results.json) |
 | PC 스튜디오·영상·자료 검수 통합 | **24/24** | [platform_integration_results.json](../outputs/platform_integration_results.json) |
-| 화면 승인 제어 로직 | **8/8** | [ui_logic_results.json](../outputs/ui_logic_results.json) |
+| 화면 승인 제어 로직 | **9/9** | [ui_logic_results.json](../outputs/ui_logic_results.json) |
 
 통합 시험은 정상 기사 생성·검증·시험 editor 승인·내보내기와 지역 오류 주입 후 승인/내보내기 409 차단, 토큰 없는 요청 401, writer 승인 시도 403, 송신 중단 후 오류와 대체 자료 표시를 재현했습니다. `TEST-*` 계정의 자동 승인은 실제 편집 승인으로 제출하지 않습니다.
 
@@ -52,3 +52,5 @@ SQL 스크립트로 만든 예제 DB는 snapshot 1건·chunk 6건·article 1건�
 초기 통합본은 `election-analysis-project-01`에서 검증해 이관했습니다. 위 결과는 첨부 디자인을 실제 화면에 적용한 `VR-Election-News` 변경본에서 갱신했습니다. 자동 시험 상태는 Actions에서 확인합니다.
 
 관리자 로그인·로그아웃, 담당자 발급·중복 방지, 인증 실패 제한, 세션 폐기, 관리자 기사 작성 차단, 기존 계정을 보존하는 관리자 추가를 자동 검증했습니다. 실제 브라우저에서 업무 화면의 관리자 메뉴 연결과 로그인 화면 표시를 확인했습니다. [관리자 화면 캡처](../outputs/screenshots/admin-login.jpg).
+
+03은 사용자 요청에 따라 홍보물·기존 자료 확인 중심으로 변경했습니다. 실제 브라우저에서 공식 홍보물 위치 안내와 기존 가상 자료 조회를 전환해 확인했습니다. 외부 열람을 신규 근거 등록이나 승인으로 처리하지 않습니다.
