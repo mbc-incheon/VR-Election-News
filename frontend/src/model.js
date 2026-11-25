@@ -13,3 +13,5 @@ export function replayPoint(rows,elapsedSeconds){
  return {seconds,minute:seconds/60,countRate:seconds/3600*100,total:candidates.reduce((sum,row)=>sum+row.votes,0),candidates};
 }
 export function oneHourSeries(rows){return Array.from({length:61},(_,minute)=>replayPoint(rows,minute*60)).filter(Boolean)}
+
+export function filterPastResults(rows,region='',query=''){const term=query.trim().toLocaleLowerCase('ko-KR');return rows.filter(row=>(!region||row.region_name===region)&&(!term||[row.candidate_name,row.party,row.region_name].some(value=>String(value??'').toLocaleLowerCase('ko-KR').includes(term)))).sort((a,b)=>a.region_name.localeCompare(b.region_name,'ko')||(b.votes??-1)-(a.votes??-1)||a.candidate_name.localeCompare(b.candidate_name,'ko'))}

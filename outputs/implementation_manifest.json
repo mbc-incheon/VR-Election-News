@@ -1,12 +1,12 @@
 {
-  "captured_at": "2026-11-25T11:51:07.799147+09:00",
+  "captured_at": "2026-11-25T11:57:40.172909+09:00",
   "repository": "https://github.com/mbc-incheon/VR-Election-News",
   "release_version": "2.0.0",
   "imported_from": {
     "repository": "https://github.com/mbc-incheon/election-analysis-project-01",
     "commit": "00ac79dc6ec77d6bd4c1e883e152fd78f2e3ab91"
   },
-  "repository_base_commit": "70cb896a6a9a7568d01afe2734be9a9370d26b02",
+  "repository_base_commit": "decabb17e508d58f20b93d1bd3c6fd5b4b204ebf",
   "note": "Base commit is the parent context before this manifest is committed; exact publication commit is in Git history.",
   "runtime": {
     "python": "3.12.10"
@@ -44,8 +44,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 21260,
-      "sha256": "216f36f76c0514257d5eef88c305ffda1bb56869aa8cf26abf201206787274ea"
+      "bytes": 21665,
+      "sha256": "5798293cd8d2aaff373cf86fdc489293037dce76a6405c69e4a55f1e8c186198"
     },
     {
       "path": "compose.yaml",
@@ -319,8 +319,8 @@
     },
     {
       "path": "election-news-server/dashboard.template.html",
-      "bytes": 10392,
-      "sha256": "2d00dfe15be068d361777321039572e6833a0776192a78004cebad7b2a56e991"
+      "bytes": 10815,
+      "sha256": "56057011de2e80c91972972785a5d491320200ccc80675b40e1719e8dda1f983"
     },
     {
       "path": "election-news-server/fixtures/fallback_snapshot.json",
@@ -329,8 +329,8 @@
     },
     {
       "path": "election-news-server/index.html",
-      "bytes": 39991,
-      "sha256": "78f84eb4340561c101687716d175aacc82216b46262666b70f49eb4f711e177f"
+      "bytes": 40414,
+      "sha256": "8e784506c0a4cc15faf119eb69a61bf0ddd46b8c424de796e586138c52ed5d64"
     },
     {
       "path": "election-news-server/init_users.py",
@@ -404,13 +404,13 @@
     },
     {
       "path": "election-news-server/static/react/newsroom.css",
-      "bytes": 3868,
-      "sha256": "108aadfa42312a4a1dc5220beb3ade8f77cda5d65464a758eb8205290e14c9fb"
+      "bytes": 4763,
+      "sha256": "e39f1255014adf487bcc18114f43346471175b2dd95acaf083216d97baff78df"
     },
     {
       "path": "election-news-server/static/react/newsroom.js",
-      "bytes": 307551,
-      "sha256": "87ac96d768a8858d99a3d3b1302faf0af0ca8ec8d17ac827a5cd083553adfd3a"
+      "bytes": 313570,
+      "sha256": "43ac0564441226ab89631762421d89a05f88c54f4e35ae5c75f0268a05336e2e"
     },
     {
       "path": "election-news-server/static/staff-login.html",
@@ -518,6 +518,11 @@
       "sha256": "ae2a28760cd06614f982f19a4d77cda28e63e971851626ea382eea69b77af88c"
     },
     {
+      "path": "frontend/src/components/PastResults.jsx",
+      "bytes": 3434,
+      "sha256": "1bfe7c67a82aa7a5a15e57765fcf1f685d1e527a8858e789efc0d7fba75692d4"
+    },
+    {
       "path": "frontend/src/components/TurnoutBar.jsx",
       "bytes": 1380,
       "sha256": "5470e5d16ebc38a1b862228295a1caa29f22f3f26779cd9ca13b70961ee54b3a"
@@ -529,23 +534,23 @@
     },
     {
       "path": "frontend/src/main.jsx",
-      "bytes": 2400,
-      "sha256": "1ac4d6a80d26cdc30558c487e45313c1688d87f99c5679690b49923193ca749b"
+      "bytes": 2587,
+      "sha256": "89735d3bbe01146c550a98fa3c63a889214c526f41b98ef1353be7610f414ef0"
     },
     {
       "path": "frontend/src/model.js",
-      "bytes": 1947,
-      "sha256": "f8170b20ba27f1273b95fd7da68baa5e1519bf375736fa4b0d6cdd13d6cfad11"
+      "bytes": 2397,
+      "sha256": "d3b71578e4f34cc04ed1a8a357a059ba0e68a9e0a38920a73c13a8fac89ee3e8"
     },
     {
       "path": "frontend/src/model.test.mjs",
-      "bytes": 3728,
-      "sha256": "3b7acf24880adc79b95c19e6f9f02592d6578cb51428b1a94b7f122e4edec1e2"
+      "bytes": 4451,
+      "sha256": "c2e4f069475999dc5d8b9e6b90057210197ec0c48a5295fdf4b5b1eef3e833a3"
     },
     {
       "path": "frontend/src/style.css",
-      "bytes": 3864,
-      "sha256": "1dd785ee3e907970f269f967c0b76688193a623b3f34c4e98de6ba92f36c962d"
+      "bytes": 4764,
+      "sha256": "15095eda0358f0847fbec6261759c3f14529eab4a638fe53c618ee4ac392d633"
     },
     {
       "path": "frontend/vite.config.js",
