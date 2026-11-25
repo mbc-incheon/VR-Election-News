@@ -4,3 +4,5 @@ export function filterElectionNews(items,{region='',candidate='',from='2024-04-0
 export function moreNewsUrl(region,candidate,from,to){const end=new Date(to+'T00:00:00Z');if(!Number.isFinite(end.valueOf()))return null;end.setUTCDate(end.getUTCDate()+1);const query=['인천',region,candidate,'총선','after:'+from,'before:'+end.toISOString().slice(0,10)].filter(Boolean).join(' ');return 'https://www.google.com/search?'+new URLSearchParams({q:query,tbm:'nws'})}
 
 export function newsRegionChoices(items){if(!items.length)return [];return [...new Set(items[0].regions)].filter(region=>items.every(item=>item.regions.includes(region))).sort((a,b)=>a.localeCompare(b,'ko'))}
+
+export function resolveNewsReview(items,region='',preferred=''){const regions=[...new Set(items.flatMap(item=>item.regions))].sort((a,b)=>a.localeCompare(b,'ko'));const destination=region||(regions.includes(preferred)?preferred:regions[0]||'');return {regions,destination,articles:items.filter(item=>item.regions.includes(destination))}}
