@@ -9253,23 +9253,39 @@ var ue = [
 	"#3f73ae",
 	"#967d43",
 	"#79659b"
-], de = (e) => String(Math.floor(e / 60)).padStart(2, "0") + ":" + String(Math.floor(e % 60)).padStart(2, "0");
-function fe({ rows: e }) {
-	let [t, n] = (0, _.useState)(0), [r, i] = (0, _.useState)(!1), [a, o] = (0, _.useState)(60), s = (0, _.useMemo)(() => S(e), [e]);
+], de = (e) => String(Math.floor(e / 60)).padStart(2, "0") + ":" + String(Math.floor(e % 60)).padStart(2, "0"), fe = [
+	{
+		candidate_id: "replay-a",
+		candidate_name: "가상후보 A",
+		votes: 45e3
+	},
+	{
+		candidate_id: "replay-b",
+		candidate_name: "가상후보 B",
+		votes: 35e3
+	},
+	{
+		candidate_id: "replay-c",
+		candidate_name: "가상후보 C",
+		votes: 2e4
+	}
+];
+function pe({ rows: e }) {
+	let [t, n] = (0, _.useState)("three"), r = t === "three" ? fe : e, [i, a] = (0, _.useState)(0), [o, s] = (0, _.useState)(!1), [c, l] = (0, _.useState)(60), u = (0, _.useMemo)(() => S(r), [r]);
 	(0, _.useEffect)(() => {
-		if (!r) return;
-		let e = performance.now(), o = t, s = setInterval(() => {
-			let t = Math.min(3600, o + (performance.now() - e) / 1e3 * a);
-			n(t), t >= 3600 && i(!1);
+		if (!o) return;
+		let e = performance.now(), t = i, n = setInterval(() => {
+			let n = Math.min(3600, t + (performance.now() - e) / 1e3 * c);
+			a(n), n >= 3600 && s(!1);
 		}, 250);
-		return () => clearInterval(s);
-	}, [r, a]);
-	let c = ie(e, t);
-	if (!c || !s.length) return /* @__PURE__ */ (0, C.jsx)("p", {
+		return () => clearInterval(n);
+	}, [o, c]);
+	let d = ie(r, i);
+	if (!d || !u.length) return /* @__PURE__ */ (0, C.jsx)("p", {
 		className: "empty",
 		children: "재현 그래프를 계산할 수 있는 최종 득표 자료가 없습니다."
 	});
-	let l = Math.max(1, ...e.map((e) => e.votes)), u = Math.max(1, Math.ceil(l / 1e4) * 1e4), d = (e) => 68 + e / 60 * 674, f = (e) => 242 - e / u * 222, p = (e, t) => e.map((e) => d(e.minute) + "," + f(e.candidates[t].votes)).join(" "), m = s.filter((e) => e.seconds < t).concat(c);
+	let f = Math.max(1, u[60].total), p = Math.max(1, Math.ceil(f / 1e4) * 1e4), m = (e) => 68 + e / 60 * 674, h = (e) => 242 - e / p * 222, g = (e, t) => e.map((e) => m(e.minute) + "," + h(e.candidates[t].votes)).join(" "), v = u.filter((e) => e.seconds < i).concat(d);
 	return /* @__PURE__ */ (0, C.jsxs)("section", {
 		className: "replay-panel",
 		"aria-label": "1시간 개표 재현 그래프",
@@ -9279,36 +9295,49 @@ function fe({ rows: e }) {
 				children: [/* @__PURE__ */ (0, C.jsxs)("div", { children: [/* @__PURE__ */ (0, C.jsx)("span", {
 					className: "react-eyebrow",
 					children: "60 MINUTE REPLAY"
-				}), /* @__PURE__ */ (0, C.jsx)("h3", { children: "과거 선거 · 1시간 개표 재현" })] }), /* @__PURE__ */ (0, C.jsx)("span", {
+				}), /* @__PURE__ */ (0, C.jsx)("h3", { children: t === "three" ? "후보 3명 · 1시간 누적 개표" : "과거 선거 · 1시간 개표 재현" })] }), /* @__PURE__ */ (0, C.jsx)("span", {
 					className: "replay-disclosure",
 					children: "계산된 재현값 · 실제 시간대별 기록 아님"
 				})]
 			}),
-			/* @__PURE__ */ (0, C.jsx)("p", {
+			/* @__PURE__ */ (0, C.jsxs)("p", {
 				className: "replay-description",
-				children: "공식 최종 득표수를 0~60분에 균등하게 나눈 선형 재현입니다. 실제 개표 순서·속도·선두 변동을 뜻하지 않습니다."
+				children: [t === "three" ? "가상후보 3명, 총 100,000표를 사용한 1시간 누적 개표 시뮬레이션입니다." : "선택 지역의 공식 최종 득표수를 0~60분에 균등하게 나눈 선형 재현입니다.", " 실제 개표 순서·속도·선두 변동을 뜻하지 않습니다."]
 			}),
 			/* @__PURE__ */ (0, C.jsxs)("div", {
 				className: "replay-controls",
 				children: [
+					/* @__PURE__ */ (0, C.jsxs)("label", { children: ["재현 자료 ", /* @__PURE__ */ (0, C.jsxs)("select", {
+						value: t,
+						onChange: (e) => {
+							s(!1), a(0), n(e.target.value);
+						},
+						children: [/* @__PURE__ */ (0, C.jsx)("option", {
+							value: "three",
+							children: "후보 3명 · 가상 수치"
+						}), /* @__PURE__ */ (0, C.jsx)("option", {
+							value: "official",
+							children: "선택 지역 공식 최종 집계"
+						})]
+					})] }),
 					/* @__PURE__ */ (0, C.jsx)("button", {
 						type: "button",
 						onClick: () => {
-							t >= 3600 && n(0), i(!r);
+							i >= 3600 && a(0), s(!o);
 						},
-						children: r ? "일시정지" : "재생"
+						children: o ? "일시정지" : "재생"
 					}),
 					/* @__PURE__ */ (0, C.jsx)("button", {
 						type: "button",
 						className: "secondary",
 						onClick: () => {
-							i(!1), n(0);
+							s(!1), a(0);
 						},
 						children: "처음으로"
 					}),
 					/* @__PURE__ */ (0, C.jsxs)("label", { children: ["재생 속도 ", /* @__PURE__ */ (0, C.jsxs)("select", {
-						value: a,
-						onChange: (e) => o(Number(e.target.value)),
+						value: c,
+						onChange: (e) => l(Number(e.target.value)),
 						children: [
 							/* @__PURE__ */ (0, C.jsx)("option", {
 								value: 1,
@@ -9328,9 +9357,9 @@ function fe({ rows: e }) {
 						"aria-live": "off",
 						children: [
 							"경과 ",
-							de(t),
+							de(i),
 							" / 60:00 · 재현 진행 ",
-							c.countRate.toFixed(1),
+							d.countRate.toFixed(1),
 							"%"
 						]
 					})
@@ -9341,9 +9370,9 @@ function fe({ rows: e }) {
 				children: /* @__PURE__ */ (0, C.jsxs)("svg", {
 					viewBox: "0 0 760 280",
 					role: "img",
-					"aria-label": "0분부터 60분까지 후보별 누적 득표 재현 그래프",
+					"aria-label": "0분부터 60분까지 전체 누적 개표 수와 후보별 누적 득표 그래프",
 					children: [
-						/* @__PURE__ */ (0, C.jsx)("title", { children: "최종 집계의 1시간 선형 재현" }),
+						/* @__PURE__ */ (0, C.jsx)("title", { children: "후보별 득표와 전체 누적 개표의 1시간 선형 재현" }),
 						/* @__PURE__ */ (0, C.jsx)("desc", { children: "실제 시간대별 개표 기록이 아닙니다. 후보별 최종 득표수에 경과 초를 곱해 3600으로 나눈 계산입니다." }),
 						[
 							0,
@@ -9354,14 +9383,14 @@ function fe({ rows: e }) {
 						].map((e) => /* @__PURE__ */ (0, C.jsxs)("g", { children: [/* @__PURE__ */ (0, C.jsx)("line", {
 							x1: 68,
 							x2: 742,
-							y1: f(u * e),
-							y2: f(u * e),
+							y1: h(p * e),
+							y2: h(p * e),
 							stroke: "#dae5ed"
 						}), /* @__PURE__ */ (0, C.jsx)("text", {
 							x: 59,
-							y: f(u * e) + 4,
+							y: h(p * e) + 4,
 							textAnchor: "end",
-							children: b(u * e)
+							children: b(p * e)
 						})] }, e)),
 						[
 							0,
@@ -9372,13 +9401,13 @@ function fe({ rows: e }) {
 							50,
 							60
 						].map((e) => /* @__PURE__ */ (0, C.jsxs)("g", { children: [/* @__PURE__ */ (0, C.jsx)("line", {
-							x1: d(e),
-							x2: d(e),
+							x1: m(e),
+							x2: m(e),
 							y1: 20,
 							y2: 242,
 							stroke: "#edf2f6"
 						}), /* @__PURE__ */ (0, C.jsxs)("text", {
-							x: d(e),
+							x: m(e),
 							y: 268,
 							textAnchor: "middle",
 							children: [e, "분"]
@@ -9386,11 +9415,11 @@ function fe({ rows: e }) {
 						/* @__PURE__ */ (0, C.jsx)("text", {
 							x: 68,
 							y: 13,
-							children: "누적 득표수(표)"
+							children: "누적 개표 수(표)"
 						}),
-						e.map((e, t) => /* @__PURE__ */ (0, C.jsxs)("g", { children: [
+						r.map((e, t) => /* @__PURE__ */ (0, C.jsxs)("g", { children: [
 							/* @__PURE__ */ (0, C.jsx)("polyline", {
-								points: p(s, t),
+								points: g(u, t),
 								fill: "none",
 								stroke: ue[t % 4],
 								strokeWidth: "2",
@@ -9398,21 +9427,40 @@ function fe({ rows: e }) {
 								opacity: ".28"
 							}),
 							/* @__PURE__ */ (0, C.jsx)("polyline", {
-								points: p(m, t),
+								points: g(v, t),
 								fill: "none",
 								stroke: ue[t % 4],
 								strokeWidth: "3"
 							}),
 							/* @__PURE__ */ (0, C.jsx)("circle", {
-								cx: d(c.minute),
-								cy: f(c.candidates[t].votes),
+								cx: m(d.minute),
+								cy: h(d.candidates[t].votes),
 								r: "4",
 								fill: ue[t % 4]
 							})
 						] }, e.candidate_id)),
+						/* @__PURE__ */ (0, C.jsx)("polyline", {
+							points: u.map((e) => m(e.minute) + "," + h(e.total)).join(" "),
+							fill: "none",
+							stroke: "#182f4d",
+							strokeDasharray: "5 5",
+							opacity: ".28"
+						}),
+						/* @__PURE__ */ (0, C.jsx)("polyline", {
+							points: v.map((e) => m(e.minute) + "," + h(e.total)).join(" "),
+							fill: "none",
+							stroke: "#182f4d",
+							strokeWidth: "4"
+						}),
+						/* @__PURE__ */ (0, C.jsx)("circle", {
+							cx: m(d.minute),
+							cy: h(d.total),
+							r: "5",
+							fill: "#182f4d"
+						}),
 						/* @__PURE__ */ (0, C.jsx)("line", {
-							x1: d(c.minute),
-							x2: d(c.minute),
+							x1: m(d.minute),
+							x2: m(d.minute),
 							y1: 20,
 							y2: 242,
 							stroke: "#536e83",
@@ -9428,20 +9476,29 @@ function fe({ rows: e }) {
 					min: "0",
 					max: "60",
 					step: "1",
-					value: t / 60,
+					value: i / 60,
 					"aria-label": "재현 경과 분",
 					onChange: (e) => {
-						i(!1), n(Number(e.target.value) * 60);
+						s(!1), a(Number(e.target.value) * 60);
 					}
 				})]
 			}),
-			/* @__PURE__ */ (0, C.jsx)("div", {
+			/* @__PURE__ */ (0, C.jsxs)("div", {
 				className: "replay-values",
-				children: c.candidates.map((e, t) => /* @__PURE__ */ (0, C.jsxs)("div", { children: [
+				children: [/* @__PURE__ */ (0, C.jsxs)("div", { children: [
+					/* @__PURE__ */ (0, C.jsx)("span", { style: { background: "#182f4d" } }),
+					/* @__PURE__ */ (0, C.jsx)("strong", { children: "전체 누적 개표 수" }),
+					/* @__PURE__ */ (0, C.jsxs)("b", { children: [
+						b(d.total),
+						"표 / ",
+						b(u[60].total),
+						"표"
+					] })
+				] }), d.candidates.map((e, t) => /* @__PURE__ */ (0, C.jsxs)("div", { children: [
 					/* @__PURE__ */ (0, C.jsx)("span", { style: { background: ue[t % 4] } }),
 					/* @__PURE__ */ (0, C.jsx)("strong", { children: e.candidate_name }),
 					/* @__PURE__ */ (0, C.jsxs)("b", { children: [b(e.votes), "표"] })
-				] }, e.candidate_id))
+				] }, e.candidate_id))]
 			}),
 			/* @__PURE__ */ (0, C.jsxs)("details", {
 				className: "replay-table",
@@ -9453,9 +9510,9 @@ function fe({ rows: e }) {
 						children: /* @__PURE__ */ (0, C.jsxs)("table", { children: [/* @__PURE__ */ (0, C.jsx)("thead", { children: /* @__PURE__ */ (0, C.jsxs)("tr", { children: [
 							/* @__PURE__ */ (0, C.jsx)("th", { children: "재현 시점" }),
 							/* @__PURE__ */ (0, C.jsx)("th", { children: "재현 진행" }),
-							e.map((e) => /* @__PURE__ */ (0, C.jsx)("th", { children: e.candidate_name }, e.candidate_id)),
-							/* @__PURE__ */ (0, C.jsx)("th", { children: "합계" })
-						] }) }), /* @__PURE__ */ (0, C.jsx)("tbody", { children: s.filter((e) => e.minute % 10 == 0).map((e) => /* @__PURE__ */ (0, C.jsxs)("tr", { children: [
+							r.map((e) => /* @__PURE__ */ (0, C.jsx)("th", { children: e.candidate_name }, e.candidate_id)),
+							/* @__PURE__ */ (0, C.jsx)("th", { children: "누적 개표 수" })
+						] }) }), /* @__PURE__ */ (0, C.jsx)("tbody", { children: u.filter((e) => e.minute % 10 == 0).map((e) => /* @__PURE__ */ (0, C.jsxs)("tr", { children: [
 							/* @__PURE__ */ (0, C.jsxs)("td", { children: [e.minute, "분"] }),
 							/* @__PURE__ */ (0, C.jsxs)("td", { children: [e.countRate.toFixed(1), "%"] }),
 							e.candidates.map((e) => /* @__PURE__ */ (0, C.jsxs)("td", { children: [b(e.votes), "표"] }, e.candidate_id)),
@@ -9468,7 +9525,7 @@ function fe({ rows: e }) {
 	});
 }
 // src/main.jsx
-var pe = (e, t) => window.dispatchEvent(new CustomEvent(e, { detail: t })), me = class extends _.Component {
+var me = (e, t) => window.dispatchEvent(new CustomEvent(e, { detail: t })), he = class extends _.Component {
 	constructor(e) {
 		super(e), this.state = { error: !1 };
 	}
@@ -9482,7 +9539,7 @@ var pe = (e, t) => window.dispatchEvent(new CustomEvent(e, { detail: t })), me =
 		}) : this.props.children;
 	}
 };
-function he() {
+function ge() {
 	let e = v(), t = e.snapshot || {}, n = ne(t, e.region);
 	return /* @__PURE__ */ (0, C.jsxs)("div", {
 		className: "react-results",
@@ -9497,11 +9554,11 @@ function he() {
 					candidate: t,
 					index: n,
 					selected: e.candidate === t.candidate_id,
-					onSelect: () => pe("newsroom:candidate", t.candidate_id)
+					onSelect: () => me("newsroom:candidate", t.candidate_id)
 				}, t.candidate_id))
 			}),
 			/* @__PURE__ */ (0, C.jsx)(ce, { summary: n }),
-			t.mode === "official" && t.stage === "FINAL_FILE_AGGREGATION" && /* @__PURE__ */ (0, C.jsx)(fe, { rows: n.rows }, t.mode + "|" + e.region),
+			t.mode === "official" && t.stage === "FINAL_FILE_AGGREGATION" && /* @__PURE__ */ (0, C.jsx)(pe, { rows: n.rows }, t.mode + "|" + e.region),
 			/* @__PURE__ */ (0, C.jsxs)("p", {
 				className: "react-data-note",
 				children: [t.mode === "demo" ? "가상 후보·가상 수치입니다." : "과거 선거의 공식 파일 집계이며 현재 선거 속보가 아닙니다.", " 후보 카드는 득표수 순으로 표시하며 당선 예측을 제공하지 않습니다."]
@@ -9512,15 +9569,15 @@ function he() {
 		})]
 	});
 }
-function ge() {
+function _e() {
 	let e = v();
 	return /* @__PURE__ */ (0, C.jsx)(le, {
 		articles: e.articles,
 		selected: e.current?.id,
-		onSelect: (e) => pe("newsroom:select-article", e)
+		onSelect: (e) => me("newsroom:select-article", e)
 	});
 }
-var _e = document.getElementById("react-election");
-_e && (0, g.createRoot)(_e).render(/* @__PURE__ */ (0, C.jsx)(me, { children: /* @__PURE__ */ (0, C.jsx)(he, {}) }));
-var ve = document.getElementById("articles");
-ve && ((0, g.createRoot)(ve).render(/* @__PURE__ */ (0, C.jsx)(me, { children: /* @__PURE__ */ (0, C.jsx)(ge, {}) })), window.newsroomReactLists = !0);
+var ve = document.getElementById("react-election");
+ve && (0, g.createRoot)(ve).render(/* @__PURE__ */ (0, C.jsx)(he, { children: /* @__PURE__ */ (0, C.jsx)(ge, {}) }));
+var ye = document.getElementById("articles");
+ye && ((0, g.createRoot)(ye).render(/* @__PURE__ */ (0, C.jsx)(he, { children: /* @__PURE__ */ (0, C.jsx)(_e, {}) })), window.newsroomReactLists = !0);
