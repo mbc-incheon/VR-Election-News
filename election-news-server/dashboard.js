@@ -95,7 +95,7 @@ function table(){
  const selected=$('candidate').value,region=selectedRegion(),rows=(snap.rows||[]).filter(r=>r.region_name===region);
  $('rows').innerHTML=rows.length?rows.map((r,i)=>{const share=Number(r.vote_share),url=safeSource(r.source_url);return `<tr><td class="candidate-name"><span class="candidate-mark ${i%2?'alternate':''}"></span>${esc(r.candidate_name)}</td><td>${showValue(r.votes==null?null:Number(r.votes).toLocaleString('ko-KR'),'표')}</td><td><div class="vote-share"><span class="share-value">${showValue(r.vote_share==null?null:share.toFixed(2),'%')}</span><div class="bar" aria-hidden="true"><span style="width:${Number.isFinite(share)?Math.max(0,Math.min(100,share)):0}%"></span></div></div></td><td>${displayArchive(snap)?'100% (표시값)':showValue(r.count_rate,'%')}</td><td class="table-time" title="${esc(displayArchive(snap)?'임의 기준시각: 2024.04.11 06:00 (한국시간)':r.baseline_at||'미제공')}">${displayArchive(snap)?'06:00 (임의)':esc(timeText(r.baseline_at,true))}</td><td class="table-source">${r.is_demo?'시뮬레이션':url?`<a href="${url}" target="_blank" rel="noopener noreferrer">공식 원문</a>`:'출처 미제공'}</td></tr>`}).join(''):'<tr><td colspan="6" class="empty">선택한 지역의 자료가 없습니다.</td></tr>';
  setSelectOptions($('candidate'),rows.map(r=>`<option value="${esc(r.candidate_id)}">${esc(r.candidate_name)}${r.is_demo?' · 가상 후보 '+r.candidate_number:''}</option>`).join(''));if(rows.some(r=>r.candidate_id===selected))$('candidate').value=selected;
- const draftSelected=$('draftCandidate').value;setSelectOptions($('draftCandidate'),'<option value="">지역 후보 전체</option>'+rows.map(row=>`<option value="${esc(row.candidate_id)}">${esc(row.candidate_name)}</option>`).join(''));if(rows.some(row=>row.candidate_id===draftSelected))$('draftCandidate').value=draftSelected;syncPreparation();syncDraftAvailability();
+ const draftSelected=$('draftCandidate').value;setSelectOptions($('draftCandidate'),'<option value="">지역 후보 전체</option>'+rows.map(row=>`<option value="${esc(row.candidate_id)}">${esc(row.candidate_name)}</option>`).join(''));if(rows.some(row=>row.candidate_id===draftSelected))$('draftCandidate').value=draftSelected;const draftScope=selectedMode()+'|'+region;if(rows.length&&$('draftCandidate')._scope!==draftScope){$('draftCandidate')._scope=draftScope;$('draftCandidate').value=$('candidate').value}syncPreparation();syncDraftAvailability();
  publishNewsroom({snapshot:snap,region,candidate:$('candidate').value});
  const articleKey=snap.mode+'|'+region;if(region&&snap.mode===selectedMode()&&articleKey!==articleContextKey){articleContextKey=articleKey;resetArticleWorkspace();void loadSelectedArticles().catch(error=>{if(articleContextKey===articleKey){$('draftMessage').textContent=error.status===401?'선택 지역: '+region+'. 기사 초안 생성 또는 기사 목록을 누르면 작성자 계정을 연결합니다.':'기사 목록을 불러오지 못했습니다. '+error.message}})}
  const key=region+'|'+$('candidate').value+'|'+snap.mode;if(key!==selectionKey){selectionKey=key;void loadEvidence().catch(e=>{$('evidence').textContent=e.message})}
@@ -134,7 +134,7 @@ function show(a){
  $('aiBadge').textContent=v?.disagreement?'규칙·AI 판정 불일치':a.ai_review?.verdict==='UNAVAILABLE'?'AI 보조 검토 미연결':'AI 판정: '+(a.ai_review?.verdict||'미확인');$('aiBadge').className='pill '+(v?.disagreement?'bad':'warn');$('checkErrors').textContent=(v?.errors||[]).join(' / ');$('checkErrors').hidden=!v?.errors?.length;
  $('validate').disabled=false;syncApproval();$('export').disabled=a.status!=='APPROVED';
 }
-function syncApproval(){const v=current?.validation,allowed=typeof loggedUser==='undefined'||['editor','admin'].includes(loggedUser?.role);$('approve').disabled=!(allowed&&(typeof loggedUser==='undefined'||loggedUser?.name!==current?.author)&&current?.status==='PENDING_HUMAN'&&v?.rule==='PASS'&&!v?.disagreement&&$('checked').checked&&$('aiAck').checked&&$('reason').value.trim().length>=5)}
+function syncApproval(){const v=current?.validation,allowed=typeof loggedUser==='undefined'||['editor','admin'].includes(loggedUser?.role);$('approve').disabled=!(allowed&&(typeof loggedUser==='undefined'||loggedUser?.name!==current?.author)&&current?.status==='PENDING_HUMAN'&&v?.rule==='PASS'&&!v?.disagreement&&$('checked').checked&&$('aiAck').checked&&$('reason').value.trim().length>=5);if(typeof updateWorkflowGuidance==='function')updateWorkflowGuidance()}
 ['checked','aiAck','reason'].forEach(id=>$(id).addEventListener('input',syncApproval));
 const action=f=>async()=>{try{await f();$('message').className='message';$('message').textContent='처리했습니다.'}catch(e){$('message').className='message is-error';$('message').textContent=e.message}};
 function renderEvidence(hits,context,query,view='all'){
@@ -167,7 +167,7 @@ $('articleRegion').onchange=action(async()=>{$('region').value=$('articleRegion'
 $('searchArticles').onclick=action(async()=>{focusArticleWorkspace('list');await loadSelectedArticles(true)});
 
 const pastResultsLink=document.querySelector('a[href="#past-results"]');if(pastResultsLink)pastResultsLink.addEventListener('click',()=>{$('pastResultsToggle').open=true});
-$('candidate').onchange=action(async()=>{if(selectedMode()==='demo')$('query').value='';if($('draftCandidate').value)$('draftCandidate').value=$('candidate').value;syncPreparation();syncDraftAvailability();await loadEvidence()});
+$('candidate').onchange=action(async()=>{if(selectedMode()==='demo')$('query').value='';$('draftCandidate').value=$('candidate').value;syncPreparation();syncDraftAvailability();await loadEvidence()});
 $('draftCandidate').onchange=action(async()=>{syncPreparation();syncDraftAvailability();if($('draftCandidate').value){$('candidate').value=$('draftCandidate').value;await loadEvidence()}});
 $('draftType').onchange=()=>{syncPreparation();syncDraftAvailability()};
 $('goEvidence').onclick=action(goToEvidence);$('confirmEvidence').onclick=action(confirmEvidenceAndContinue);$('evidenceAcknowledged').onchange=syncPreparation;$('search').onclick=action(loadEvidence);$('query').addEventListener('keydown',e=>{if(e.key==='Enter')$('search').click()});
@@ -188,11 +188,13 @@ $('draft').onclick=async()=>{
   const title=$('newArticleTitle').value.trim();if(title.length<2){$('newArticleTitle').focus();throw Error('기사 제목을 2자 이상 입력하세요.');}
   const articleType=$('draftType').value;
   const news=selectedNews.region===scope.region?selectedNews:{ids:[]};
-  const article=await api('/api/articles',{region:scope.region,mode:scope.mode,article_type:articleType,title,evidence_ids:evidenceReady?Object.values(preparation.confirmed).flatMap(item=>item.evidence_ids||[]):null,candidate_id:$('draftCandidate').value||null,news_ids:news.ids,period_from:news.from||'2024-04-03',period_to:news.to||'2024-04-17'});
+  let article=await api('/api/articles',{region:scope.region,mode:scope.mode,article_type:articleType,title,evidence_ids:evidenceReady?Object.values(preparation.confirmed).flatMap(item=>item.evidence_ids||[]):null,candidate_id:$('draftCandidate').value||null,news_ids:news.ids,period_from:news.from||'2024-04-03',period_to:news.to||'2024-04-17'});
+  if(!sameArticleScope(scope))return;
+  let automaticCheckError='';try{article=await api('/api/articles/'+article.id+'/validate',{})}catch(error){automaticCheckError=' 규칙 검증 연결 실패: '+error.message}
   if(!sameArticleScope(scope))return;
   renderArticleButtons([article,...(window.newsroomView?.articles||[]).filter(item=>item.id!==article.id&&item.mode===scope.mode&&item.region_name===scope.region)]);show(article);
   const pledgeCount=article.sentences.filter(s=>s.kind==='pledge').length;
-  notice.textContent=(!evidenceReady?'자료 확인 미완료 상태로 초안을 생성했습니다. 자동 승인되지 않습니다. ':'초안을 생성했습니다. ')+' 04 영역에서 본문·목록을 확인하고, 05 검증 화면으로 이동해 근거 확인과 규칙 검증을 진행하세요.'+(['pledge','combined','news'].includes(articleType)&&!pledgeCount?' 등록된 공약 근거가 없어 공약 문장은 작성하지 않았습니다. 04에서 홍보물·기존 자료를 확인하세요. 기사에 공약 문장을 넣으려면 검증 가능한 본문 근거가 필요합니다.':'');
+  notice.textContent=automaticCheckError+(!evidenceReady?'자료 확인 미완료 상태로 초안을 생성했습니다. 자동 승인되지 않습니다. ':'초안을 생성했습니다. ')+' 04 영역에서 본문·목록을 확인하고, 05에서 자동 규칙 검증 결과와 다음 단계를 확인하세요.'+(['pledge','combined','news'].includes(articleType)&&!pledgeCount?' 등록된 공약 근거가 없어 공약 문장은 작성하지 않았습니다. 04에서 홍보물·기존 자료를 확인하세요. 기사에 공약 문장을 넣으려면 검증 가능한 본문 근거가 필요합니다.':'');
  }catch(e){notice.className='message is-error';notice.textContent=e.message}
  finally{articleBusy=false;syncDraftAvailability();button.textContent='▤ 기사 초안 생성'}
 };
@@ -217,7 +219,7 @@ if(typeof window!=='undefined'){
   const revised=await api('/api/articles/'+req.id+'/revisions',{title:req.title,sentences:req.sentences,reason:req.reason});
   if(!sameArticleScope(scope))return;renderArticleButtons([revised,...(window.newsroomView?.articles||[]).filter(item=>item.id!==revised.id)]);show(revised);$('draftMessage').textContent='수정본 v'+revised.revision+'을 초안으로 저장했습니다. 05에서 다시 검증해 주세요.';
  })()});
- window.addEventListener('newsroom:candidate' ,event=>{if([...$('candidate').options].some(option=>option.value===event.detail)){$('candidate').value=event.detail;table()}});
+ window.addEventListener('newsroom:candidate' ,event=>{if([...$('candidate').options].some(option=>option.value===event.detail)){$('candidate').value=event.detail;$('draftCandidate').value=event.detail;table()}});
  window.addEventListener('newsroom:select-article',event=>{if(window.newsroomView?.articles?.some(article=>article.id===event.detail))void action(async()=>{const article=await api('/api/articles/'+event.detail);show(article);focusArticleWorkspace('editor')})()});
  window.addEventListener('pageshow',event=>{if(event.persisted)connect()});
  window.addEventListener('pagehide',()=>{clearTimeout(reconnectTimer);if(liveSocket){liveSocket.onclose=null;liveSocket.close()}});

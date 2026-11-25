@@ -489,3 +489,18 @@ def test_unified_login_auto_routes_all_roles_and_keeps_permissions(client):
         assert c.cookies.get('staff_session' if role=='admin' else 'admin_session') is None
         assert c.get('/api/admin/users').status_code==(200 if role=='admin' else 403)
         assert c.post('/api/articles',headers=headers,json=dict(region='계양구갑',mode='official')).status_code==(403 if role=='editor' else 200)
+
+
+def test_demo_article_handoff_survives_reviewer_login_and_approval(client):
+    c,module=client
+    module.room.receive(json.loads((ROOT/'fixtures/fallback_snapshot.json').read_text(encoding='utf-8')))
+    article=c.post('/api/articles',headers=auth(),json=dict(region='계양구을',mode='demo',article_type='result',title='TEST 가상 기사 검토 인계')).json()
+    checked=c.post('/api/articles/'+article['id']+'/validate',headers=auth(),json={})
+    assert checked.json()['status']=='PENDING_HUMAN'
+    origin={'Origin':'http://testserver'}
+    assert c.post('/api/session/login',headers=origin,json=dict(name='TEST-editor',token='TEST-editor')).status_code==200
+    reopened=c.get('/api/articles/'+article['id']).json()
+    assert reopened['id']==article['id'] and reopened['author']=='TEST-writer'
+    approved=c.post('/api/articles/'+article['id']+'/approve',headers=origin,json=dict(reason='TEST 검토자 인계 승인 시험',evidence_checked=True,ai_unavailable_ack=True))
+    assert approved.status_code==200 and approved.json()['approved_by']=='TEST-editor'
+    assert c.get('/api/articles/'+article['id']+'/export').status_code==200

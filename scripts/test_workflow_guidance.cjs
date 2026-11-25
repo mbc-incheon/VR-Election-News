@@ -1,0 +1,12 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const els={};const element=id=>els[id]||(els[id]={checked:false,value:'',textContent:''});
+const source=fs.readFileSync('election-news-server/static/article-workflow.js','utf8');
+const context=vm.createContext({document:{getElementById:element}});
+vm.runInContext(`let current=null,loggedUser={name:'admin',role:'admin'};const statuses={DRAFT:'초안',PENDING_HUMAN:'승인 대기',APPROVED:'승인 완료'};`+source.slice(0,source.indexOf("document.getElementById('workflowProduction').onclick")),context);
+vm.runInContext("current={id:'abc',title:'가상 기사',author:'admin',status:'PENDING_HUMAN',validation:{rule:'PASS',errors:[]}};updateWorkflowGuidance()",context);
+assert.match(element('workflowNext').textContent,/작성자이므로 직접 승인할 수 없습니다/);assert.equal(element('reviewHandoff').href,'/login?article=abc');
+vm.runInContext("loggedUser={name:'editor',role:'editor'};updateWorkflowGuidance()",context);assert.match(element('workflowNext').textContent,/승인 사유 5자 이상/);
+element('checked').checked=true;element('aiAck').checked=true;element('reason').value='실제 대조 후 승인 사유';vm.runInContext('updateWorkflowGuidance()',context);assert.match(element('workflowNext').textContent,/누를 수 있습니다/);
+vm.runInContext("current.validation.errors=['DATASET_REVIEW_REQUIRED'];updateWorkflowGuidance()",context);assert.match(element('workflowNext').textContent,/독립 검수/);
+vm.runInContext("current.status='APPROVED';updateWorkflowGuidance()",context);assert.equal(element('workflowProduction').disabled,false);assert.equal(element('reviewHandoff').hidden,true);
+console.log('Verified readable blockers, reviewer handoff, explicit confirmations and approved production step');
