@@ -9158,7 +9158,10 @@ function ae({ candidate: e, index: t, selected: n, onSelect: r }) {
 					children: n ? "선택됨" : "근거 확인"
 				})]
 			}),
-			/* @__PURE__ */ (0, w.jsx)("h4", { children: e.candidate_name }),
+			/* @__PURE__ */ (0, w.jsxs)("h4", { children: [e.candidate_name, e.is_demo && /* @__PURE__ */ (0, w.jsxs)("small", {
+				className: "react-demo-candidate-label",
+				children: ["가상 후보 ", e.candidate_number ?? t + 1]
+			})] }),
 			/* @__PURE__ */ (0, w.jsxs)("div", {
 				className: "react-votes",
 				children: [b(e.votes), e.votes != null && /* @__PURE__ */ (0, w.jsx)("small", { children: "표" })]
