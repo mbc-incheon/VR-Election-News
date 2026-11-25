@@ -294,10 +294,15 @@ def pledge_context(region:str,candidate:str,mode:Mode='official'):
 class Draft(BaseModel):
     region:str=Field(min_length=1,max_length=80)
     mode:Mode|None=None
+    article_type:Literal['combined','result','pledge','news']='combined'
+    candidate_id:str|None=Field(default=None,max_length=100)
+    news_ids:list[str]=Field(default_factory=list,max_length=20)
+    period_from:str='2024-04-03'
+    period_to:str='2024-04-17'
 @app.post('/api/articles')
 def draft(req:Draft,user=Depends(identity)):
     role(user,'writer')
-    try:return room.draft(req.region,user['name'],req.mode)
+    try:return room.draft(req.region,user['name'],req.mode,req.article_type,req.candidate_id,req.news_ids,req.period_from,req.period_to)
     except ValueError as e:raise HTTPException(422,str(e))
 @app.get('/api/articles')
 def articles(user=Depends(identity)):
@@ -329,7 +334,7 @@ def revision(aid:str,req:Revision,user=Depends(identity)):
     role(user,'writer')
     try:
         a=room.get(aid);old=a['id']
-        a.update(id=secrets.token_hex(8),parent_id=old,revision=a['revision']+1,author=user['name'],title=req.title,sentences=req.sentences,status='DRAFT',created_at=now(),ai_review=dict(verdict='UNAVAILABLE',model=None))
+        a.update(summary=req.sentences[0]['text'],id=secrets.token_hex(8),parent_id=old,revision=a['revision']+1,author=user['name'],title=req.title,sentences=req.sentences,status='DRAFT',created_at=now(),ai_review=dict(verdict='UNAVAILABLE',model=None))
         for key in ['validation','approved_by','approved_at','approval_reason']:a.pop(key,None)
         room.save(a);room.audit('revision',user['name'],dict(article_id=a['id'],parent_id=old,reason=req.reason));return a
     except ValueError as e:raise HTTPException(404,str(e))

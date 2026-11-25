@@ -1885,6 +1885,47 @@
               }
             ],
             "title": "Mode"
+          },
+          "article_type": {
+            "type": "string",
+            "enum": [
+              "combined",
+              "result",
+              "pledge",
+              "news"
+            ],
+            "title": "Article Type",
+            "default": "combined"
+          },
+          "candidate_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidate Id"
+          },
+          "news_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "News Ids"
+          },
+          "period_from": {
+            "type": "string",
+            "title": "Period From",
+            "default": "2024-04-03"
+          },
+          "period_to": {
+            "type": "string",
+            "title": "Period To",
+            "default": "2024-04-17"
           }
         },
         "type": "object",
