@@ -9220,9 +9220,12 @@ function se({ summary: e, finalArchive: t = !1 }) {
 }
 // src/components/ArticleList.jsx
 function ce({ articles: e = [], selected: t, onSelect: n }) {
-	return /* @__PURE__ */ (0, C.jsx)("div", {
+	return /* @__PURE__ */ (0, C.jsxs)("div", {
 		className: "react-article-list",
-		children: e.map((e) => /* @__PURE__ */ (0, C.jsxs)("button", {
+		children: [!e.length && /* @__PURE__ */ (0, C.jsx)("p", {
+			className: "react-data-note",
+			children: "선택한 선거구의 기사 목록입니다. 기사 초안을 생성하거나 기사 목록을 눌러 확인하세요."
+		}), e.map((e) => /* @__PURE__ */ (0, C.jsxs)("button", {
 			type: "button",
 			className: "react-article-item " + (t === e.id ? "selected" : ""),
 			onClick: () => n(e.id),
@@ -9238,7 +9241,7 @@ function ce({ articles: e = [], selected: t, onSelect: n }) {
 				className: "react-article-status status-" + e.status,
 				children: y[e.status] || e.status
 			})]
-		}, e.id))
+		}, e.id))]
 	});
 }
 // src/components/PastResults.jsx

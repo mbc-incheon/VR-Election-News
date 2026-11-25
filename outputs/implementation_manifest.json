@@ -1,12 +1,12 @@
 {
-  "captured_at": "2026-11-25T12:05:59.879348+09:00",
+  "captured_at": "2026-11-25T12:22:16.442009+09:00",
   "repository": "https://github.com/mbc-incheon/VR-Election-News",
   "release_version": "2.0.0",
   "imported_from": {
     "repository": "https://github.com/mbc-incheon/election-analysis-project-01",
     "commit": "00ac79dc6ec77d6bd4c1e883e152fd78f2e3ab91"
   },
-  "repository_base_commit": "07164b53e09bfc859c7e29a6394b0720bd9b810b",
+  "repository_base_commit": "ef79bd61a4fadc3527fac19980f42827e851db03",
   "note": "Base commit is the parent context before this manifest is committed; exact publication commit is in Git history.",
   "runtime": {
     "python": "3.12.10"
@@ -44,8 +44,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 22112,
-      "sha256": "9f5dfbd897daba1dec89bfddd15d48746ba3e95f26c8429635a3af06ecd8c6e8"
+      "bytes": 22469,
+      "sha256": "a656785af95b34c909f2af9ad5d30d078327f990fd49d09eca1e681d60bb0e9e"
     },
     {
       "path": "compose.yaml",
@@ -314,13 +314,13 @@
     },
     {
       "path": "election-news-server/dashboard.js",
-      "bytes": 19615,
-      "sha256": "f91fbc5c21aa7ae7e0d53f8d959cab51274e28eea5268d60e90ebff865032df2"
+      "bytes": 21714,
+      "sha256": "73fa7342fb3d0574770be5a326c865b3262c47b35b1f0c244f474a934c335a2c"
     },
     {
       "path": "election-news-server/dashboard.template.html",
-      "bytes": 10846,
-      "sha256": "c355297ea970ced176af8d5fef7cd526607f70bb1ec1e4ae175a5bddb608006e"
+      "bytes": 10964,
+      "sha256": "7929ff6ca090f5fffc936f87cc0fc22e5ebb95db99a37d17c2678f7a978b4734"
     },
     {
       "path": "election-news-server/fixtures/fallback_snapshot.json",
@@ -329,8 +329,8 @@
     },
     {
       "path": "election-news-server/index.html",
-      "bytes": 41517,
-      "sha256": "21f7ef91b01526896405195138db12ed5d3a2d60e061d508d669a1c6024e5241"
+      "bytes": 43734,
+      "sha256": "d6d15e4bfec4a0f8218c3db4fc254c0102257d072cac37ee1ebe494ec499260f"
     },
     {
       "path": "election-news-server/init_users.py",
@@ -409,8 +409,8 @@
     },
     {
       "path": "election-news-server/static/react/newsroom.js",
-      "bytes": 313570,
-      "sha256": "43ac0564441226ab89631762421d89a05f88c54f4e35ae5c75f0268a05336e2e"
+      "bytes": 313795,
+      "sha256": "89ac1cd702c9112957c60d599acbd68759b2dcf864645aad48f81904a83dbee8"
     },
     {
       "path": "election-news-server/static/staff-login.html",
@@ -464,8 +464,8 @@
     },
     {
       "path": "election-news-server/static/workbench.js",
-      "bytes": 15795,
-      "sha256": "cbde9c4415612302dfb1dc4c7563a69f25ece465e5aeb755545af2ce01ee46ca"
+      "bytes": 15877,
+      "sha256": "eff66ee1844d215ce1f1401e9d130e0947c87a0b2b1232814e8a5d2989642bce"
     },
     {
       "path": "election-news-server/workflow.py",
@@ -504,8 +504,8 @@
     },
     {
       "path": "frontend/src/components/ArticleList.jsx",
-      "bytes": 683,
-      "sha256": "871a7273020fde6d7cb32f2922076a344fbc33f3b0c983f25b71b88bb677fe4e"
+      "bytes": 858,
+      "sha256": "9ca5b4a84e45e59b8911388fecf4146e365b8b9c6e6333dcd9ef6b2151d9ede9"
     },
     {
       "path": "frontend/src/components/CandidateCard.jsx",
@@ -733,6 +733,11 @@
       "sha256": "b3fcc4af4127642e686e12a762dae2688cc9557a4655e6186e2d55632b82c49d"
     },
     {
+      "path": "outputs/screenshots/article-workflow-fixed.jpg",
+      "bytes": 107599,
+      "sha256": "21797c35eeaaa54ba68b5354e133894c46e690d2d4b0810171490692741892c7"
+    },
+    {
       "path": "outputs/screenshots/articles-without-token.jpg",
       "bytes": 233881,
       "sha256": "747c1d29292074f1c4cb37d5c29ed69e2ae6885d89c74816b09642f5d9b1e31c"
@@ -911,6 +916,11 @@
       "path": "scripts/platform_integration.py",
       "bytes": 6551,
       "sha256": "86075f312182ef5a7850c330555584dfab4b190c3de8148c3475103057c2dea8"
+    },
+    {
+      "path": "scripts/test_article_selection.cjs",
+      "bytes": 1748,
+      "sha256": "a36c28d531ed84151df80549c97cc548c04e5dbcf1a0104f731ba88700ecba35"
     },
     {
       "path": "scripts/test_region_selection.cjs",
