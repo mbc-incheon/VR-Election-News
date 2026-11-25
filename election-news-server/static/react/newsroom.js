@@ -9833,6 +9833,20 @@ function pe() {
 				role: "status",
 				children: "실제 보도 목록을 불러오는 중입니다."
 			}),
+			oe && /* @__PURE__ */ (0, T.jsx)("a", {
+				className: "news-more",
+				href: oe,
+				target: "_blank",
+				rel: "noopener noreferrer",
+				children: "같은 후보·기간으로 인터넷 뉴스 원문 더 찾기 ↗"
+			}),
+			/* @__PURE__ */ (0, T.jsx)(fe, {
+				region: t,
+				candidate: ne,
+				from: c,
+				to: u,
+				period: f
+			}),
 			/* @__PURE__ */ (0, T.jsxs)("div", {
 				className: "news-next-step",
 				children: [
@@ -9871,20 +9885,6 @@ function pe() {
 					!re.length && /* @__PURE__ */ (0, T.jsx)("span", { children: "기사의 ‘초안 참고 보도로 선택’ 확인란을 체크하세요. 제목 링크 열기만으로는 선택되지 않습니다." }),
 					re.length > 0 && !ie.length && /* @__PURE__ */ (0, T.jsx)("span", { children: "서로 다른 선거구의 기사입니다. 같은 선거구 기사로 선택해 주세요." })
 				]
-			}),
-			oe && /* @__PURE__ */ (0, T.jsx)("a", {
-				className: "news-more",
-				href: oe,
-				target: "_blank",
-				rel: "noopener noreferrer",
-				children: "같은 후보·기간으로 인터넷 뉴스 원문 더 찾기 ↗"
-			}),
-			/* @__PURE__ */ (0, T.jsx)(fe, {
-				region: t,
-				candidate: ne,
-				from: c,
-				to: u,
-				period: f
 			}),
 			/* @__PURE__ */ (0, T.jsx)("p", {
 				className: "news-caution",
