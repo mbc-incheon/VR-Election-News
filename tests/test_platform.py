@@ -234,6 +234,15 @@ def test_admin_login_accounts_logout_and_role_boundaries(client):
     secret=c.cookies.get('admin_session')
     assert c.get('/admin').status_code==200
     assert c.get('/api/me').json()['role']=='admin'
+    assert c.get('/api/admin/work-mode').json()['mode']=='writer'
+    for mode in ['editor','approval','writer']:
+        switched=c.post('/api/admin/work-mode',headers=origin,json=dict(mode=mode))
+        assert switched.status_code==200 and switched.json()['mode']==mode
+        assert c.get('/api/me').json()==dict(name='admin',role='admin')
+    assert c.post('/api/admin/work-mode',json=dict(mode='approval')).status_code==403
+    assert c.post('/api/admin/work-mode',headers=origin,json=dict(mode='invalid')).status_code==422
+    assert c.get('/api/admin/work-mode',headers=auth()).status_code==403
+
     listed=c.get('/api/admin/users').json()
     assert all({'name','role','active','display_name'}<=set(u) and 'token_hash' not in u and 'token' not in u for u in listed)
     assert c.post('/api/admin/users',json=dict(name='new-reporter',role='writer')).status_code==403

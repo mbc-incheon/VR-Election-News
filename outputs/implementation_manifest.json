@@ -1,12 +1,12 @@
 {
-  "captured_at": "2026-11-25T17:15:20.347320+09:00",
+  "captured_at": "2026-11-25T17:21:45.331755+09:00",
   "repository": "https://github.com/mbc-incheon/VR-Election-News",
   "release_version": "2.0.0",
   "imported_from": {
     "repository": "https://github.com/mbc-incheon/election-analysis-project-01",
     "commit": "00ac79dc6ec77d6bd4c1e883e152fd78f2e3ab91"
   },
-  "repository_base_commit": "67ce0286a5eca65359f40f12a73207621f8ad16c",
+  "repository_base_commit": "cfd7763f575fc205a3bbfa3a9864759f9532defd",
   "note": "Base commit is the parent context before this manifest is committed; exact publication commit is in Git history.",
   "runtime": {
     "python": "3.12.10"
@@ -44,8 +44,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 33761,
-      "sha256": "4fa13163eccc0b46322a461377a5694f0bb83583d61f27a296fe0929757f945f"
+      "bytes": 34448,
+      "sha256": "ecac69214788a90d86a7f85b814ac3d793443491eb7173fc03d14c7752fab7bd"
     },
     {
       "path": "compose.yaml",
@@ -289,8 +289,8 @@
     },
     {
       "path": "election-news-server/admin_auth.py",
-      "bytes": 5820,
-      "sha256": "4ea34dfe013f7ec11387f609f8bb3b44a2c8cdbae0aa722f114fcd832ab96083"
+      "bytes": 6239,
+      "sha256": "218d4510f0610c2735d366eaf9f909115cdb9478076814a98344b48c72eaacae"
     },
     {
       "path": "election-news-server/admin_recovery.py",
@@ -299,8 +299,8 @@
     },
     {
       "path": "election-news-server/app.py",
-      "bytes": 26637,
-      "sha256": "3fa660ffec25fd016bb5d82945b8bda511503927b04c68f964c3fc9b6ad36a1a"
+      "bytes": 27514,
+      "sha256": "246d6ea5b5d4e30634df1780cbbd7ff60128b34433a6a7eab9e52d5910a0d775"
     },
     {
       "path": "election-news-server/core.py",
@@ -319,8 +319,8 @@
     },
     {
       "path": "election-news-server/dashboard.template.html",
-      "bytes": 14087,
-      "sha256": "31368f6e190e23c82f6bd77bd73bcab745f6eeba0a05935ff1d29fffab17dda9"
+      "bytes": 14186,
+      "sha256": "8efdda8bce3127441c4801fd1aa527e68e4800010c074297944679b8ec033f30"
     },
     {
       "path": "election-news-server/fixtures/fallback_snapshot.json",
@@ -334,8 +334,8 @@
     },
     {
       "path": "election-news-server/index.html",
-      "bytes": 58005,
-      "sha256": "87a74a46d94c60711bdc922e895e1de0966cd5954a1ece10b93e7f32caa0dd06"
+      "bytes": 58104,
+      "sha256": "c91f88e7fbedb496d0228f070667feec4623d46ab38211d8bdfa8ef85cf1b8cc"
     },
     {
       "path": "election-news-server/init_users.py",
@@ -378,6 +378,11 @@
       "sha256": "b40a622e92ce9168235f1df4519ae30d5e2c9afe1da55a13d12fc5956f6b6af2"
     },
     {
+      "path": "election-news-server/static/admin-mode.js",
+      "bytes": 2316,
+      "sha256": "afa15592fe30e7a4f11bf77d0bba8c2a8dc07e4bf42e7dab0a34a0df0c6cb1ad"
+    },
+    {
       "path": "election-news-server/static/admin-recovery.js",
       "bytes": 4263,
       "sha256": "3c82985c33e82d83836a74edd6c1a96fc637ff09515ae1f518d1e50fbb57a7b1"
@@ -389,8 +394,8 @@
     },
     {
       "path": "election-news-server/static/admin.html",
-      "bytes": 6600,
-      "sha256": "e0499893e320163ff8c65bcd0527180b50c5895a4cb316632d66d1821ec78adb"
+      "bytes": 6818,
+      "sha256": "d16af75e1c53f57305e5615a6af1bf7560fe1f311bc0e3834c61c2363c62e51e"
     },
     {
       "path": "election-news-server/static/admin.js",
@@ -709,8 +714,8 @@
     },
     {
       "path": "outputs/openapi_news.json",
-      "bytes": 58635,
-      "sha256": "c66b4c7b85ef5499c03d3b337b0b63974f003b605f6e0406445eea8ec80b2fa0"
+      "bytes": 61291,
+      "sha256": "e05e20c5523f20b4a9b9264596125c1b50b2a810563789dacfc7e7c14182e108"
     },
     {
       "path": "outputs/platform_integration_results.json",
@@ -965,7 +970,7 @@
     {
       "path": "outputs/unit_results.xml",
       "bytes": 7712,
-      "sha256": "fc1852afb81adb62d6e5ffe93a16dafff9512b79d81bb8c124fd1713929ead14"
+      "sha256": "0ce0fd654548812c0d72d954c8ee6c26063a7bf4dd5c5b3bec8234b97f49d6b1"
     },
     {
       "path": "requirements.txt",
@@ -1104,8 +1109,8 @@
     },
     {
       "path": "tests/test_platform.py",
-      "bytes": 33049,
-      "sha256": "a659f2627f9ae0e2c7affc55ab8110ad143fab7630ec55fb104594888b6e2e84"
+      "bytes": 33663,
+      "sha256": "a0bd021c1ddcdac532fedf2b9f8a7a5623039c99d469ce3cca4e9ecebd410a18"
     },
     {
       "path": "tests/test_simulation.py",

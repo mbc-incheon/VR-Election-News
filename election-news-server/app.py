@@ -275,6 +275,24 @@ def local_writer_session(request:Request):
     room.audit('local_writer_login','local-writer',dict(role='writer'))
     return response
 
+class AdminWorkMode(BaseModel):
+    mode:Literal['writer','editor','approval']
+
+@app.get('/api/admin/work-mode')
+def admin_work_mode(request:Request,user=Depends(identity)):
+    role(user,'admin')
+    secret=request.cookies.get('staff_session','') or request.cookies.get('admin_session','')
+    return dict(mode=admin_auth.work_mode(secret),account=user['name'])
+
+@app.post('/api/admin/work-mode')
+def set_admin_work_mode(req:AdminWorkMode,request:Request,user=Depends(identity)):
+    role(user,'admin');same_origin(request)
+    secret=request.cookies.get('staff_session','') or request.cookies.get('admin_session','')
+    previous=admin_auth.work_mode(secret)
+    mode=admin_auth.work_mode(secret,req.mode)
+    room.audit('admin_work_mode',user['name'],dict(previous=previous,mode=mode,account_role='admin'))
+    return dict(mode=mode,account=user['name'])
+
 @app.get('/api/me')
 def me(user=Depends(identity)):return dict(name=user['name'],role=user['role'])
 @app.get('/api/capabilities')

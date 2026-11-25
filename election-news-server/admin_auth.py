@@ -61,6 +61,14 @@ class AdminAuth:
                 return None
             return dict(name=session['name'],role=session['role'])
 
+    def work_mode(self,secret,mode=None):
+        with self.lock:
+            user=self.session(secret)
+            if not user or user['role']!='admin':raise HTTPException(401,'관리자 로그인이 필요합니다.')
+            session=self.sessions[hashlib.sha256(secret.encode()).hexdigest()]
+            if mode is not None:session['work_mode']=mode
+            return session.get('work_mode','writer')
+
     def logout(self,secret):
         with self.lock:self.sessions.pop(hashlib.sha256(secret.encode()).hexdigest(),None)
 

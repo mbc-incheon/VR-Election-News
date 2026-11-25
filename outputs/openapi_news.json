@@ -571,6 +571,90 @@
         }
       }
     },
+    "/api/admin/work-mode": {
+      "get": {
+        "summary": "Admin Work Mode",
+        "operationId": "admin_work_mode_api_admin_work_mode_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Set Admin Work Mode",
+        "operationId": "set_admin_work_mode_api_admin_work_mode_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminWorkMode"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/me": {
       "get": {
         "summary": "Me",
@@ -1926,6 +2010,24 @@
           "confirmed"
         ],
         "title": "AdminReset"
+      },
+      "AdminWorkMode": {
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "writer",
+              "editor",
+              "approval"
+            ],
+            "title": "Mode"
+          }
+        },
+        "type": "object",
+        "required": [
+          "mode"
+        ],
+        "title": "AdminWorkMode"
       },
       "Approval": {
         "properties": {
