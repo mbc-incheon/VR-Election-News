@@ -140,7 +140,7 @@ $('draft').onclick=async()=>{
   if(!sameArticleScope(scope))return;
   renderArticleButtons([article,...(window.newsroomView?.articles||[]).filter(item=>item.id!==article.id&&item.mode===scope.mode&&item.region_name===scope.region)]);show(article);
   const pledgeCount=article.sentences.filter(s=>s.kind==='pledge').length;
-  notice.textContent='초안을 생성했습니다. 04 영역에서 본문·목록을 확인하고, 05 영역에서 근거 확인과 규칙 검증을 진행하세요.'+(pledgeCount?'':' 등록된 공약 근거가 없어 개표 결과만 작성했습니다. 03에서 홍보물·기존 자료를 확인하세요. 기사에 공약 문장을 넣으려면 검증 가능한 본문 근거가 필요합니다.');
+  notice.textContent='초안을 생성했습니다. 03 영역에서 본문·목록을 확인하고, 05 영역에서 근거 확인과 규칙 검증을 진행하세요.'+(pledgeCount?'':' 등록된 공약 근거가 없어 개표 결과만 작성했습니다. 04에서 홍보물·기존 자료를 확인하세요. 기사에 공약 문장을 넣으려면 검증 가능한 본문 근거가 필요합니다.');
  }catch(e){notice.className='message is-error';notice.textContent=e.message}
  finally{articleBusy=false;button.disabled=typeof loggedUser!=='undefined'&&loggedUser&&loggedUser.role!=='writer';button.textContent='▤ 기사 초안 생성'}
 };
