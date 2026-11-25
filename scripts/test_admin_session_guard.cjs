@@ -1,0 +1,6 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const source=fs.readFileSync('election-news-server/static/admin.js','utf8'),elements={};let calls=[],role='editor',cleared=0;
+const response=(status,data)=>({status,ok:status<400,json:async()=>data});
+const context=vm.createContext({document:{getElementById:id=>elements[id]||(elements[id]={})},clearToken:()=>cleared++,fetch:async(url)=>{calls.push(url);return url==='/api/me'?response(200,{name:'TEST-user',role}):response(403,{detail:'역할 권한이 없습니다'})}});
+vm.runInContext(source.slice(0,source.indexOf('\nfunction message')),context);
+(async()=>{await assert.rejects(vm.runInContext('ensureAdmin()',context),/관리자 계정으로 다시 로그인/);assert.deepEqual(calls,['/api/me']);assert.equal(elements.adminSessionNotice.hidden,false);assert.equal(cleared,1);calls=[];await assert.rejects(vm.runInContext("request('/api/admin/users/editor/token',{})",context),/토큰 재발급은 관리자 로그인/);assert.equal(calls.length,2);role='admin';const admin=await vm.runInContext('ensureAdmin()',context);assert.equal(admin.role,'admin');assert.equal(elements.adminSessionNotice.hidden,true);console.log('Verified stale editor session blocks token dialog, actionable recovery and admin recheck')})().catch(error=>{console.error(error);process.exitCode=1});

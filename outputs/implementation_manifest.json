@@ -1,12 +1,12 @@
 {
-  "captured_at": "2026-11-25T18:21:39.448874+09:00",
+  "captured_at": "2026-11-25T18:32:45.488023+09:00",
   "repository": "https://github.com/mbc-incheon/VR-Election-News",
   "release_version": "2.0.0",
   "imported_from": {
     "repository": "https://github.com/mbc-incheon/election-analysis-project-01",
     "commit": "00ac79dc6ec77d6bd4c1e883e152fd78f2e3ab91"
   },
-  "repository_base_commit": "f4d4892f22b4a85634957ec7ad4a31401b9f2f0d",
+  "repository_base_commit": "5e964acc42536244f527d422881a2eb13b844c25",
   "note": "Base commit is the parent context before this manifest is committed; exact publication commit is in Git history.",
   "runtime": {
     "python": "3.12.10"
@@ -44,8 +44,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 36204,
-      "sha256": "59ab5ddca7c9aea985ca7cb0bf52c753527df9124702bc51c9c12f3bc5683ec8"
+      "bytes": 36902,
+      "sha256": "19e02c62da0b216814b3c191d5397f4e3d09ffd25ba7cb62250bf8a44c118277"
     },
     {
       "path": "compose.yaml",
@@ -394,13 +394,13 @@
     },
     {
       "path": "election-news-server/static/admin.html",
-      "bytes": 6818,
-      "sha256": "d16af75e1c53f57305e5615a6af1bf7560fe1f311bc0e3834c61c2363c62e51e"
+      "bytes": 6983,
+      "sha256": "1fe3484fc3b93c0b2cdac20e70c31cbdf9607ebf5d7e037c57d7ea5b582a3bb1"
     },
     {
       "path": "election-news-server/static/admin.js",
-      "bytes": 8957,
-      "sha256": "033f63488d35c4094b0b0150e1fcfa669fc5bf53673c583ca521939ea5b8e22e"
+      "bytes": 10615,
+      "sha256": "b6ae09fe15970034d767771c1f85b68fff24f9c0d6daced702495ad059870e9c"
     },
     {
       "path": "election-news-server/static/article-workflow.js",
@@ -1071,6 +1071,11 @@
       "path": "scripts/platform_integration.py",
       "bytes": 6551,
       "sha256": "86075f312182ef5a7850c330555584dfab4b190c3de8148c3475103057c2dea8"
+    },
+    {
+      "path": "scripts/test_admin_session_guard.cjs",
+      "bytes": 1371,
+      "sha256": "8ab161f1358bfb9104b5ac4bbcdc3cda84258203da1448a5e02e899dd79424ae"
     },
     {
       "path": "scripts/test_article_selection.cjs",
