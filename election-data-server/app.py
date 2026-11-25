@@ -9,6 +9,7 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from election_common import load_official
+from election_simulation import simulation_rows
 
 from fastapi import FastAPI, HTTPException, Header, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
@@ -25,6 +26,7 @@ class Store:
         (self.root / 'clean').mkdir(exist_ok=True)
         self.events = []
         self.error = None
+        self.demo_step = 0
         for p in sorted((self.root/'clean').glob('*.json')):
             self.events.append(json.loads(p.read_text(encoding='utf-8')))
 
@@ -45,22 +47,13 @@ class Store:
         return event
 
     def demo(self):
-        n = len(self.events)
-        progress = [30,60,90,100][n%4]
-        rows=[]
-        # This fixture is entirely invented. No actual candidate names or party labels.
-        for ri, region in enumerate(['계양구을','연수구을','서구병']):
-            votes = [int(progress*317+ri*23),int(progress*293+ri*17)]
-            for ci, v in enumerate(votes):
-                rows.append(dict(row_id=f'DEMO-{n+1}-{ri}-{ci}', election_id='KR-20240410-NA22',
-                    region_id=f'DEMO-IC-{ri}', region_name=region, original_region_name='인천광역시 '+region,
-                    candidate_id=f'DEMO-{ri}-{ci}', candidate_name=f'가상후보 {chr(65+ci)}', votes=v,
-                    valid_votes=sum(votes), vote_share=round(v/sum(votes)*100,2),
-                    counted_ballots=progress*1000, total_ballots=100000, count_rate=progress,
-                    turnout=None, baseline_at=f'2024-04-10T{20+n%4:02d}:00:00+09:00',
-                    source_url='demo://fixtures/ballots', is_demo=True))
-        return self.append(dict(mode='demo',label='시뮬레이션 데이터',election_id='KR-20240410-NA22',
-            historical_replay=True, rows=rows), 'demo://fixtures/ballots')
+        progress = self.demo_step % 101
+        self.demo_step += 1
+        rows = simulation_rows(progress, len(self.events)+1)
+        return self.append(dict(mode='demo', label='시뮬레이션 데이터 · 0~100% 반복',
+            election_id='KR-20240410-NA22', historical_replay=True,
+            simulation_progress=progress, simulation_cycle=(self.demo_step-1)//101+1,
+            rows=rows), 'demo://fixtures/ballots')
 
     def archive(self):
         rows,ledger=load_official(Path(__file__).resolve().parents[1])
@@ -96,7 +89,7 @@ async def clock_loop():
     mode=os.environ.get('DATA_MODE','hybrid')
     while True:
         if mode in ['demo','hybrid']: store.demo()
-        await asyncio.sleep(float(os.environ.get('DATA_INTERVAL','4')))
+        await asyncio.sleep(float(os.environ.get('DATA_INTERVAL','1')))
 
 @asynccontextmanager
 async def lifespan(app):

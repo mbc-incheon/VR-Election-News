@@ -60,7 +60,7 @@ def role(user,*roles):
 
 def seed_demo_documents():
     for i,region in enumerate(['계양구을','연수구을','서구병']):
-        for ci in range(2):
+        for ci in range(3):
             room.add_document(dict(title=f'{region} 가상후보 {chr(65+ci)} 시뮬레이션 공약',publisher='VR 선거보도 시스템 가상 자료실',
                 url='demo://fixtures/pledges',published_at='2024-04-01',collected_at='2026-11-20T00:00:00+09:00',
                 document_type='campaign',election_id='KR-20240410-NA22',region_name=region,candidate_id=f'DEMO-{i}-{ci}',

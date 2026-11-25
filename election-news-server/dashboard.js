@@ -41,7 +41,7 @@ function table(){
  const key=region+'|'+$('candidate').value+'|'+snap.mode;if(key!==selectionKey){selectionKey=key;void loadEvidence().catch(e=>{$('evidence').textContent=e.message})}
 }
 function update(v){
- snap=v;publishNewsroom({connection:v.connection});const state=v.connection?.state,demo=v.mode==='demo';$('mode').textContent=demo?'▤ 시뮬레이션 데이터':v.mode==='unavailable'?'자료 없음':'2024년 공식 자료';$('modeNote').textContent=demo?'가상 후보·가상 수치 · 과거 선거 재현':'과거 선거 자료 · 현재 속보 아님';
+ snap=v;publishNewsroom({connection:v.connection});const state=v.connection?.state,demo=v.mode==='demo';$('mode').textContent=demo?'▤ 시뮬레이션 데이터':v.mode==='unavailable'?'자료 없음':'2024년 공식 자료';$('modeNote').textContent=demo?'가상 후보 3명 · '+(v.simulation_cycle||1)+'회차 · 개표율 0~100% 반복 · 실제 개표 아님':'과거 선거 자료 · 현재 속보 아님';
  $('connection').className='pill '+(state==='CONNECTED'||state==='ARCHIVE'?'good':state==='DISCONNECTED'?'bad':'');$('connection').innerHTML='<span class="dot"></span>'+({CONNECTED:'연결됨',ARCHIVE:'공식 보관 자료',DISCONNECTED:'연결 끊김',CONNECTING:'연결 중'}[state]||'연결 대기');$('error').textContent=v.connection?.error||'';
  if($('dataReviewBadge')){$('dataReviewBadge').textContent=demo?'가상 자료 · 실제 보도와 분리':v.review?.status==='APPROVED'?'공식 집계 · 독립 검수 완료':'공식 집계 · 독립 검수 필요';$('dataReviewBadge').className='pill '+(demo?'draft-pill':v.review?.status==='APPROVED'?'good':'warn')}
  $('baseline').textContent=displayArchive(v)?'2024.04.11 06:00 (임의)':timeText(v.rows?.[0]?.baseline_at);$('collected').textContent=timeText(v.collected_at);$('updated').textContent=new Date().toLocaleTimeString('ko-KR',{hour12:false,timeZone:'Asia/Seoul'});

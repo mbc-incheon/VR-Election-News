@@ -1,0 +1,23 @@
+from election_simulation import simulation_rows
+
+
+def test_full_cycle_count_and_shares():
+    previous = [0]*9
+    shares = []
+    for progress in range(101):
+        rows = simulation_rows(progress, progress+1)
+        assert len(rows) == 9
+        assert all(r['is_demo'] and r['source_url'].startswith('demo:') for r in rows)
+        for start in range(0, 9, 3):
+            group = rows[start:start+3]
+            total = sum(r['votes'] for r in group)
+            assert total == progress*1000
+            assert all(r['count_rate']==progress and r['valid_votes']==total and r['counted_ballots']==total for r in group)
+            assert abs(sum(r['vote_share'] for r in group)-(100 if total else 0)) < .02
+            assert all(r['vote_share']==(round(r['votes']/total*100,2) if total else 0) for r in group)
+        assert all(row['votes']>=old for row,old in zip(rows,previous))
+        previous = [r['votes'] for r in rows]
+        if progress: shares.append(rows[0]['vote_share'])
+    assert len(set(shares)) > 20
+    assert rows[0]['baseline_at']=='2024-04-10T21:00:00+09:00'
+    assert simulation_rows(0,102)[0]['votes']==0

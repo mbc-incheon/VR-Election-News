@@ -1,12 +1,12 @@
 {
-  "captured_at": "2026-11-25T11:41:48.470614+09:00",
+  "captured_at": "2026-11-25T11:51:07.799147+09:00",
   "repository": "https://github.com/mbc-incheon/VR-Election-News",
   "release_version": "2.0.0",
   "imported_from": {
     "repository": "https://github.com/mbc-incheon/election-analysis-project-01",
     "commit": "00ac79dc6ec77d6bd4c1e883e152fd78f2e3ab91"
   },
-  "repository_base_commit": "29d02afb53233b5f7c007f6b72bf6e2d1a649441",
+  "repository_base_commit": "70cb896a6a9a7568d01afe2734be9a9370d26b02",
   "note": "Base commit is the parent context before this manifest is committed; exact publication commit is in Git history.",
   "runtime": {
     "python": "3.12.10"
@@ -44,8 +44,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 20773,
-      "sha256": "20de46218ae9aef8b518ab313ab0ceea868551237c63da26a23cbca34c4c07de"
+      "bytes": 21260,
+      "sha256": "216f36f76c0514257d5eef88c305ffda1bb56869aa8cf26abf201206787274ea"
     },
     {
       "path": "compose.yaml",
@@ -154,8 +154,8 @@
     },
     {
       "path": "docs/collaboration.md",
-      "bytes": 7439,
-      "sha256": "6229327589e58e87e4c151c0bc2bea08f8ec02a6a3eadcdab817a7d46eb95f0f"
+      "bytes": 8068,
+      "sha256": "f49ca163673a33c959d3fbc06a9597fd21ee433579d0d028d1f8defd909f729e"
     },
     {
       "path": "docs/deliverables/01_기획서.docx",
@@ -264,8 +264,8 @@
     },
     {
       "path": "election-data-server/app.py",
-      "bytes": 7148,
-      "sha256": "e9afd5313c2aa87d0351cc3dddedfb35a38544adf5745270ade4aebdedf6fc0b"
+      "bytes": 6574,
+      "sha256": "b319c69ba3d4d245102f8416770f76af4ebbb3866b044bb882dac35ec9b6edec"
     },
     {
       "path": "election-data-server/requirements.txt",
@@ -300,7 +300,7 @@
     {
       "path": "election-news-server/app.py",
       "bytes": 24645,
-      "sha256": "5dcd6cfb38e923b255c6b2246e226cb63105062d9b117bf0ca6f1c7d3e1e92f8"
+      "sha256": "b60ab7bbfa607881d43803a348cd12115baf03f1fabcbee84fbcf52bac448ccb"
     },
     {
       "path": "election-news-server/core.py",
@@ -314,13 +314,13 @@
     },
     {
       "path": "election-news-server/dashboard.js",
-      "bytes": 18489,
-      "sha256": "118401ab25c61ba04f762d1eddac6505419f33879b87449ca88b70a1ba868ee4"
+      "bytes": 18543,
+      "sha256": "a029795559fd581c8d51e6ca620050984841b5956471105803ba0f34ceefa8b1"
     },
     {
       "path": "election-news-server/dashboard.template.html",
-      "bytes": 10380,
-      "sha256": "598f9a14e795ea86504bc9b6f14f9e1339404dc0bff119a8256e1e78dc2f02fb"
+      "bytes": 10392,
+      "sha256": "2d00dfe15be068d361777321039572e6833a0776192a78004cebad7b2a56e991"
     },
     {
       "path": "election-news-server/fixtures/fallback_snapshot.json",
@@ -329,8 +329,8 @@
     },
     {
       "path": "election-news-server/index.html",
-      "bytes": 39925,
-      "sha256": "0479a75b6c03c7f1c55bbecd02cf82647a5e26fc08ec70a7a0e8a65dfa011c07"
+      "bytes": 39991,
+      "sha256": "78f84eb4340561c101687716d175aacc82216b46262666b70f49eb4f711e177f"
     },
     {
       "path": "election-news-server/init_users.py",
@@ -476,6 +476,11 @@
       "path": "election_common.py",
       "bytes": 3135,
       "sha256": "e2a1228fcdc96881432225dd4d3a03d6e466935a993b56a271192133814fe11e"
+    },
+    {
+      "path": "election_simulation.py",
+      "bytes": 1434,
+      "sha256": "c774d0a96e89631ad8acac110fdcf0fd7b4a407bd11b6268e391a6c2e86e95f4"
     },
     {
       "path": "fixtures/fallback_snapshot.json",
@@ -814,8 +819,8 @@
     },
     {
       "path": "outputs/unit_results.xml",
-      "bytes": 6133,
-      "sha256": "87afa4d310187af6cd515cb97534b95f7064d3dc97f9f2c71df3565a7c35c20c"
+      "bytes": 6232,
+      "sha256": "381d8581395dd63d10a24e44b11cac4c92b12725ef3f5a7018c58877dd9a516e"
     },
     {
       "path": "requirements.txt",
@@ -926,6 +931,11 @@
       "path": "tests/test_platform.py",
       "bytes": 31795,
       "sha256": "7834db2eb945be6d9a084be951605535f7e03a2ebaac1b2f0890b28a23c46cc5"
+    },
+    {
+      "path": "tests/test_simulation.py",
+      "bytes": 1160,
+      "sha256": "e4839ce6d9e734e72362b50671371f974ca0e930d2a90752f8eeb5a74264fcb1"
     },
     {
       "path": "tests/test_sql.py",
