@@ -66,7 +66,17 @@ function focusArticleWorkspace(view='editor'){
  const target=view==='list'?$('articles'):$('inlineArticleWorkspace');
  target.scrollIntoView({behavior:'smooth',block:'start'});
 }
+function syncDraftTitle(force=false){
+ const field=$('newArticleTitle'),region=selectedRegion();if(!field||!region)return;
+ const row=(snap.rows||[]).find(item=>item.region_name===region&&item.candidate_id===$('draftCandidate').value);
+ const candidate=row?row.candidate_name+(row.is_demo?'(가상 후보 '+row.candidate_number+')':''):'후보 전체';
+ const type=$('draftType').value;
+ const topic=type==='result'?(selectedMode()==='demo'?'가상 개표 현황':'개표 결과'):type==='pledge'?'공약 자료 점검':type==='news'?'선거 전후 보도 정리':'개표 현황과 공약 자료';
+ const suggestion=(region+' '+candidate+' '+topic).slice(0,200);
+ if(force||!field.value.trim()||field.value===field._autoTitle){field.value=suggestion;field._autoTitle=suggestion}
+}
 function syncDraftAvailability(){
+ syncDraftTitle();
  const disabled=articleBusy||!preparationTargets().length||(typeof loggedUser!=='undefined'&&loggedUser&&!['writer','admin'].includes(loggedUser.role));
  $('draft').disabled=Boolean(disabled);
  $('draftAvailability').textContent=articleBusy?'초안을 생성하고 있습니다. 잠시 기다려 주세요.':typeof loggedUser!=='undefined'&&loggedUser&&!['writer','admin'].includes(loggedUser.role)?'현재 계정은 '+(loggedUser.role==='admin'?'관리자':'편집자')+'입니다. 작성자로 로그인해야 초안을 생성할 수 있습니다.':!preparationTargets().length?'지역·후보 자료를 불러오는 중입니다.':!preparationReady()?'초안 생성 가능 · 자료 확인 미완료: '+preparationTargets().filter(row=>!preparation.confirmed[row.candidate_id]).map(row=>row.candidate_name).join(' · ')+'. 생성 후 본문·근거를 확인하세요.':'작성 가능 · '+selectedRegion()+' · 생성 시점 데이터로 초안을 고정합니다.';
@@ -169,6 +179,7 @@ $('searchArticles').onclick=action(async()=>{focusArticleWorkspace('list');await
 const pastResultsLink=document.querySelector('a[href="#past-results"]');if(pastResultsLink)pastResultsLink.addEventListener('click',()=>{$('pastResultsToggle').open=true});
 $('candidate').onchange=action(async()=>{if(selectedMode()==='demo')$('query').value='';$('draftCandidate').value=$('candidate').value;syncPreparation();syncDraftAvailability();await loadEvidence()});
 $('draftCandidate').onchange=action(async()=>{syncPreparation();syncDraftAvailability();if($('draftCandidate').value){$('candidate').value=$('draftCandidate').value;await loadEvidence()}});
+$('regenerateDraftTitle').onclick=()=>syncDraftTitle(true);
 $('draftType').onchange=()=>{syncPreparation();syncDraftAvailability()};
 $('goEvidence').onclick=action(goToEvidence);$('confirmEvidence').onclick=action(confirmEvidenceAndContinue);$('evidenceAcknowledged').onchange=syncPreparation;$('search').onclick=action(loadEvidence);$('query').addEventListener('keydown',e=>{if(e.key==='Enter')$('search').click()});
 $('official').onclick=action(async()=>{if(!$('officialRows').hidden){$('officialRows').hidden=true;$('official').setAttribute('aria-expanded','false');return}const v=await api('/api/official-results');$('officialRows').innerHTML='<p>'+esc(v.label)+'</p><div class="scroll"><table><thead><tr><th>지역구</th><th>후보</th><th>정당</th><th>집계 득표수</th><th>계산 득표율</th></tr></thead><tbody>'+v.rows.map(r=>`<tr><td>${esc(r.region_name)}</td><td>${esc(r.candidate_name)}</td><td>${esc(r.party)}</td><td>${Number(r.votes).toLocaleString('ko-KR')}</td><td>${Number(r.vote_share).toFixed(2)}%</td></tr>`).join('')+'</tbody></table></div>';$('officialRows').hidden=false;$('official').setAttribute('aria-expanded','true')});
@@ -185,7 +196,7 @@ $('draft').onclick=async()=>{
   const user=await ensureArticleSession();
   if(!['writer','admin'].includes(user.role))throw Error('기사 생성은 작성자 또는 관리자 계정으로 가능합니다. 로그아웃 후 담당자 로그인에서 작성자로 로그인해 주세요.');
   if(!sameArticleScope(scope))throw Error('선거구가 변경됐습니다. 선택 지역에서 다시 생성해 주세요.');
-  const title=$('newArticleTitle').value.trim();if(title.length<2){$('newArticleTitle').focus();throw Error('기사 제목을 2자 이상 입력하세요.');}
+  syncDraftTitle();const title=$('newArticleTitle').value.trim();if(title.length<2){$('newArticleTitle').focus();throw Error('기사 제목을 2자 이상 입력하세요.');}
   const articleType=$('draftType').value;
   const news=selectedNews.region===scope.region?selectedNews:{ids:[]};
   let article=await api('/api/articles',{region:scope.region,mode:scope.mode,article_type:articleType,title,evidence_ids:evidenceReady?Object.values(preparation.confirmed).flatMap(item=>item.evidence_ids||[]):null,candidate_id:$('draftCandidate').value||null,news_ids:news.ids,period_from:news.from||'2024-04-03',period_to:news.to||'2024-04-17'});
