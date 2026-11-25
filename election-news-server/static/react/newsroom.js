@@ -9446,18 +9446,18 @@ function de(e) {
 }
 // src/components/GoogleNewsSearch.jsx
 function fe({ region: e, candidate: t, from: n, to: r, period: i }) {
-	let [a, o] = (0, _.useState)(null), [s, c] = (0, _.useState)(!1), [l, u] = (0, _.useState)(""), [d, f] = (0, _.useState)(5), [p, m] = (0, _.useState)(!1), h = (0, _.useRef)(null);
-	(0, _.useEffect)(() => (h.current?.abort(), o(null), u(""), c(!1), f(5), () => h.current?.abort()), [
+	let [a, o] = (0, _.useState)(null), [s, c] = (0, _.useState)(!1), [l, u] = (0, _.useState)(""), [d, f] = (0, _.useState)(5), [p, m] = (0, _.useState)(!1), [h, g] = (0, _.useState)([]), v = (0, _.useRef)(null);
+	(0, _.useEffect)(() => (v.current?.abort(), o(null), g([]), u(""), c(!1), f(5), () => v.current?.abort()), [
 		e,
 		t,
 		n,
 		r,
 		i
 	]);
-	async function g() {
-		h.current?.abort();
+	async function y() {
+		v.current?.abort();
 		let a = new AbortController();
-		h.current = a, c(!0), u(""), o(null), f(5);
+		v.current = a, c(!0), u(""), o(null), g([]), f(5);
 		try {
 			let s = await fetch("/api/google-news?" + new URLSearchParams({
 				region: e,
@@ -9471,10 +9471,10 @@ function fe({ region: e, candidate: t, from: n, to: r, period: i }) {
 		} catch (e) {
 			e.name !== "AbortError" && u(e.message);
 		} finally {
-			h.current === a && c(!1);
+			v.current === a && c(!1);
 		}
 	}
-	let v = n && r && n <= r, y = v ? ue(e, t, n, r) : null;
+	let b = n && r && n <= r, x = b ? ue(e, t, n, r) : null;
 	return /* @__PURE__ */ (0, T.jsxs)("section", {
 		className: "google-news-search",
 		"aria-label": "구글 뉴스 검색",
@@ -9485,11 +9485,11 @@ function fe({ region: e, candidate: t, from: n, to: r, period: i }) {
 				className: "google-news-actions",
 				children: [/* @__PURE__ */ (0, T.jsx)("button", {
 					type: "button",
-					disabled: s || !v,
-					onClick: g,
+					disabled: s || !b,
+					onClick: y,
 					children: s ? "구글 뉴스 검색 중…" : "구글 뉴스 검색 결과 불러오기"
-				}), y && /* @__PURE__ */ (0, T.jsx)("a", {
-					href: y,
+				}), x && /* @__PURE__ */ (0, T.jsx)("a", {
+					href: x,
 					target: "_blank",
 					rel: "noopener noreferrer",
 					children: "구글 뉴스에서 직접 검색 ↗"
@@ -9514,6 +9514,34 @@ function fe({ region: e, candidate: t, from: n, to: r, period: i }) {
 						" · 원문 확인 전"
 					]
 				}),
+				/* @__PURE__ */ (0, T.jsxs)("div", {
+					className: "news-pagination",
+					children: [
+						/* @__PURE__ */ (0, T.jsxs)("button", {
+							type: "button",
+							className: "secondary",
+							disabled: !a.length,
+							onClick: () => g(a.map((e) => e.id)),
+							children: [
+								"구글 검색 기사 전체 선택 (",
+								a.length,
+								"건)"
+							]
+						}),
+						/* @__PURE__ */ (0, T.jsx)("button", {
+							type: "button",
+							className: "secondary",
+							disabled: !h.length,
+							onClick: () => g([]),
+							children: "구글 검색 기사 선택 해제"
+						}),
+						/* @__PURE__ */ (0, T.jsxs)("span", { children: [
+							"원문 확인 대상으로 ",
+							h.length,
+							"건 선택 · 04 자동 연결 안 함"
+						] })
+					]
+				}),
 				/* @__PURE__ */ (0, T.jsx)("div", {
 					className: "news-results",
 					children: a.slice(0, d).map((e) => /* @__PURE__ */ (0, T.jsxs)("article", {
@@ -9529,6 +9557,14 @@ function fe({ region: e, candidate: t, from: n, to: r, period: i }) {
 									}),
 									/* @__PURE__ */ (0, T.jsx)("span", { children: e.publisher })
 								]
+							}),
+							/* @__PURE__ */ (0, T.jsxs)("label", {
+								className: "news-pick",
+								children: [/* @__PURE__ */ (0, T.jsx)("input", {
+									type: "checkbox",
+									checked: h.includes(e.id),
+									onChange: (t) => g((n) => t.target.checked ? [.../* @__PURE__ */ new Set([...n, e.id])] : n.filter((t) => t !== e.id))
+								}), "원문 확인 대상으로 선택"]
 							}),
 							/* @__PURE__ */ (0, T.jsx)("h4", { children: /* @__PURE__ */ (0, T.jsxs)("a", {
 								href: e.url,
@@ -9597,7 +9633,7 @@ function pe() {
 			e.name !== "AbortError" && a(e.message);
 		}), () => e.abort();
 	}, [m]);
-	let C = t ? (e.snapshot?.rows || []).filter((e) => e.region_name === t).map((e) => e.candidate_name) : [], ne = C.includes(o) ? o : "", w = le(n?.items || [], {
+	let C = t ? (e.snapshot?.rows || []).filter((e) => e.region_name === t).map((e) => e.candidate_name) : [...new Set((n?.items || []).flatMap((e) => e.candidate_names))], ne = C.includes(o) ? o : "", w = le(n?.items || [], {
 		region: t,
 		candidate: ne,
 		from: c,
@@ -9634,12 +9670,12 @@ function pe() {
 			/* @__PURE__ */ (0, T.jsxs)("div", {
 				className: "news-filters",
 				children: [
-					/* @__PURE__ */ (0, T.jsxs)("label", { children: ["보도 후보", /* @__PURE__ */ (0, T.jsxs)("select", {
+					/* @__PURE__ */ (0, T.jsxs)("label", { children: ["후보 선택", /* @__PURE__ */ (0, T.jsxs)("select", {
 						value: ne,
 						onChange: (e) => s(e.target.value),
 						children: [/* @__PURE__ */ (0, T.jsx)("option", {
 							value: "",
-							children: t ? "지역 후보 전체" : "전체 후보 · 선거구를 먼저 선택하세요"
+							children: "전체 후보 선택"
 						}), C.map((e) => /* @__PURE__ */ (0, T.jsx)("option", { children: e }, e))]
 					})] }),
 					/* @__PURE__ */ (0, T.jsxs)("label", { children: ["시작일", /* @__PURE__ */ (0, T.jsx)("input", {
@@ -9703,6 +9739,30 @@ function pe() {
 						" · 확인된 기사 ",
 						w.length,
 						"건"
+					]
+				}),
+				/* @__PURE__ */ (0, T.jsxs)("div", {
+					className: "news-pagination",
+					children: [
+						/* @__PURE__ */ (0, T.jsxs)("button", {
+							type: "button",
+							className: "secondary",
+							disabled: !w.length,
+							onClick: () => y((e) => [.../* @__PURE__ */ new Set([...e, ...w.map((e) => e.id)])]),
+							children: [
+								"검색 기사 전체 선택 (",
+								w.length,
+								"건)"
+							]
+						}),
+						/* @__PURE__ */ (0, T.jsx)("button", {
+							type: "button",
+							className: "secondary",
+							disabled: !re.length,
+							onClick: () => y((e) => e.filter((e) => !w.some((t) => t.id === e))),
+							children: "검색 기사 선택 해제"
+						}),
+						/* @__PURE__ */ (0, T.jsx)("span", { children: "더보기 안의 기사까지 현재 검색 조건의 모든 기사를 선택합니다." })
 					]
 				}),
 				/* @__PURE__ */ (0, T.jsx)("div", {
