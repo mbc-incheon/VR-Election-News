@@ -13,7 +13,7 @@ from pathlib import Path
 
 import httpx
 import websockets
-from fastapi import Depends, FastAPI, Header, HTTPException, Request, WebSocket, WebSocketDisconnect
+from fastapi import Depends, FastAPI, Header, HTTPException, Request, WebSocket, WebSocketDisconnect, Query
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
@@ -22,6 +22,7 @@ from election_simulation import DEMO_CANDIDATES
 from production import Production,korean_font
 from admin_auth import AdminAuth
 from admin_recovery import AdminRecovery
+from google_news import search_google_news
 
 ROOT=Path(os.environ.get('NEWS_DIR','runtime/news'))
 room=Newsroom(ROOT)
@@ -123,6 +124,15 @@ async def response_headers(request,call_next):
 def home():return FileResponse(Path(__file__).with_name('index.html'))
 @app.get('/studio')
 def studio():return FileResponse(Path(__file__).with_name('static')/'studio.html')
+
+@app.get('/api/google-news')
+async def google_news(region:str=Query(default='',max_length=60),candidate:str=Query(default='',max_length=60),
+                      start:str=Query(default='2024-04-03',pattern=r'^\d{4}-\d{2}-\d{2}$'),
+                      end:str=Query(default='2024-04-17',pattern=r'^\d{4}-\d{2}-\d{2}$'),
+                      period:Literal['all','선거 전','선거 당일','선거 후']='all'):
+    try:return await search_google_news(region,candidate,start,end,period)
+    except ValueError:raise HTTPException(400,'검색 날짜 또는 응답 형식을 확인하세요.')
+    except Exception:raise HTTPException(502,'구글 뉴스 검색에 연결하지 못했습니다. 잠시 후 다시 검색하거나 구글 뉴스에서 직접 확인하세요.')
 
 def same_origin(request):
     if request.headers.get('origin')!=str(request.base_url).rstrip('/'):

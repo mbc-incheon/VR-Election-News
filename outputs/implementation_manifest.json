@@ -1,12 +1,12 @@
 {
-  "captured_at": "2026-11-25T16:21:39.318401+09:00",
+  "captured_at": "2026-11-25T16:31:53.901668+09:00",
   "repository": "https://github.com/mbc-incheon/VR-Election-News",
   "release_version": "2.0.0",
   "imported_from": {
     "repository": "https://github.com/mbc-incheon/election-analysis-project-01",
     "commit": "00ac79dc6ec77d6bd4c1e883e152fd78f2e3ab91"
   },
-  "repository_base_commit": "0d3101bff752fdbd7761d576307b6ad97ebad7a1",
+  "repository_base_commit": "4ac33893e2acedf0f7fe878749d4d0191c7a642f",
   "note": "Base commit is the parent context before this manifest is committed; exact publication commit is in Git history.",
   "runtime": {
     "python": "3.12.10"
@@ -44,8 +44,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 31241,
-      "sha256": "440360a87f7267666b0dc36afa32ae7b256a40ba26e5234372a24565bd36c1a1"
+      "bytes": 31851,
+      "sha256": "06adfaba683c0ab66c27fd5df9a4fb33a1a6b0c5329eb163aafe8461b920e665"
     },
     {
       "path": "compose.yaml",
@@ -299,8 +299,8 @@
     },
     {
       "path": "election-news-server/app.py",
-      "bytes": 25622,
-      "sha256": "1139836bd1ddce2c48852e73195d40be89ab944e756220b3be1b6adc5d16d201"
+      "bytes": 26459,
+      "sha256": "9a918a8b6086c777c0c6fe4705c53ae3f3c69fa57ab5cd8c91d234aa0d3d95df"
     },
     {
       "path": "election-news-server/core.py",
@@ -319,8 +319,8 @@
     },
     {
       "path": "election-news-server/dashboard.template.html",
-      "bytes": 14091,
-      "sha256": "4789d77b6f9afb657f4d26a573ffe6beac2f56c93d5877e9f39f6e0c34070eec"
+      "bytes": 14071,
+      "sha256": "d21d96193bd21e19163f9cd214306ffec76945aa92c5aa6d1518472737340779"
     },
     {
       "path": "election-news-server/fixtures/fallback_snapshot.json",
@@ -328,9 +328,14 @@
       "sha256": "0568842635ac7034ecde9af9ba45359c22f1caba4dcdf83f288b5411e52446fc"
     },
     {
+      "path": "election-news-server/google_news.py",
+      "bytes": 3443,
+      "sha256": "26705b40bf0ee0fb9444d5af0a57a29db3426df553be34f72b1a61e628bdccd7"
+    },
+    {
       "path": "election-news-server/index.html",
-      "bytes": 57802,
-      "sha256": "71292530b9b28cee6078d846b6384b64b1010e74454d7c2811fc430492eb3819"
+      "bytes": 57782,
+      "sha256": "9a323697138b720f0557c990a4ab7c12c4d5f05706e84763b7aca92ee7055af7"
     },
     {
       "path": "election-news-server/init_users.py",
@@ -409,13 +414,13 @@
     },
     {
       "path": "election-news-server/static/react/newsroom.css",
-      "bytes": 7645,
-      "sha256": "183045da1356c0ebdf09fca416a3b24b4dfe5acc3588799ffcfa03d0d5c13026"
+      "bytes": 7869,
+      "sha256": "8d5820f06fff66d13a0f48edefa1da5959ceb51625f9d09f36995a694a771c5f"
     },
     {
       "path": "election-news-server/static/react/newsroom.js",
-      "bytes": 330372,
-      "sha256": "d2410126e2352e64a20dd2f49394905faa6902ece7c3a3f685b729757c125165"
+      "bytes": 335107,
+      "sha256": "09e347bc32de9c0832a278ac796d7587c893ae9f6f3fa4fb7af61886d93dea5b"
     },
     {
       "path": "election-news-server/static/staff-login.html",
@@ -524,8 +529,13 @@
     },
     {
       "path": "frontend/src/components/ElectionNews.jsx",
-      "bytes": 7160,
-      "sha256": "ee0bd84e173e2b7c49c70a6ca9abf9fbcb008596ac2b80b9161f4a7f6644ca72"
+      "bytes": 7277,
+      "sha256": "16ecd2970870485780ea1ba2ddd45dc49ee1c6edd8779a0374f8cc87d2b671bd"
+    },
+    {
+      "path": "frontend/src/components/GoogleNewsSearch.jsx",
+      "bytes": 3368,
+      "sha256": "c2802287ea12c07ec25f835c53199dcb6a97d12bb2927a43b3e79a12dcd9949e"
     },
     {
       "path": "frontend/src/components/Header.jsx",
@@ -574,8 +584,8 @@
     },
     {
       "path": "frontend/src/style.css",
-      "bytes": 7671,
-      "sha256": "bd752e14a7836e4828902cd434cb50678746115585c40b9728e3139f3d857557"
+      "bytes": 7899,
+      "sha256": "7394e64e0b3a027de91ee1751ade012db6b4b1e914d5d5a8f6281d47bba5f7ef"
     },
     {
       "path": "frontend/vite.config.js",
@@ -699,8 +709,8 @@
     },
     {
       "path": "outputs/openapi_news.json",
-      "bytes": 56285,
-      "sha256": "dd8043d1cca9155d956ce246365fe42f0dbd0d4f45b65b295287c8a6cca9084a"
+      "bytes": 58635,
+      "sha256": "e4d0fbfc0e07a2df602618d2a338f6ac5e542cc8d14df06afce94847bf92ebe1"
     },
     {
       "path": "outputs/platform_integration_results.json",
@@ -823,6 +833,11 @@
       "sha256": "3031fe1759310e225be5291b40c55d5610b5ade822c8e4788056a651d81bbc94"
     },
     {
+      "path": "outputs/screenshots/google-news-search.jpg",
+      "bytes": 62053,
+      "sha256": "b821a5841ae92a37d3415626479d4aad1aaf9b725af9e54f7cb931b9854f6ff4"
+    },
+    {
       "path": "outputs/screenshots/linked-evidence-generation.jpg",
       "bytes": 58561,
       "sha256": "008dff06efe0475851b28c887896c00658b1427be69b48f1b4e9e8c12a88324e"
@@ -924,8 +939,8 @@
     },
     {
       "path": "outputs/unit_results.xml",
-      "bytes": 7335,
-      "sha256": "565f64c7cb9601b10ed36a48d5de88ecdede26b98c0e2e556d6406f5e655cf85"
+      "bytes": 7583,
+      "sha256": "70267d8748e26406e9886e80e87ad53512f76c167c9f3b1ec63d09798704c6ca"
     },
     {
       "path": "requirements.txt",
@@ -1051,6 +1066,11 @@
       "path": "tests/test_flow.py",
       "bytes": 4532,
       "sha256": "5b7acd7e2a0f7a5dceffc4b84c504fd07b09517482f2d769a9a5dc8c8c811d86"
+    },
+    {
+      "path": "tests/test_google_news.py",
+      "bytes": 1588,
+      "sha256": "2834d7a9384d17833a3d162199f4285b073b9e88415ac9badfaddef61ba6f4be"
     },
     {
       "path": "tests/test_platform.py",

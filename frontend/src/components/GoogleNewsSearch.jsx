@@ -1,0 +1,14 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {moreNewsUrl} from '../newsModel.js';
+export default function GoogleNewsSearch({region,candidate,from,to,period}){
+ const [items,setItems]=useState(null),[busy,setBusy]=useState(false),[error,setError]=useState(''),[count,setCount]=useState(5),[cached,setCached]=useState(false);
+ const controller=useRef(null);
+ useEffect(()=>{controller.current?.abort();setItems(null);setError('');setBusy(false);setCount(5);return()=>controller.current?.abort()},[region,candidate,from,to,period]);
+ async function search(){
+  controller.current?.abort();const request=new AbortController();controller.current=request;setBusy(true);setError('');setItems(null);setCount(5);
+  try{const response=await fetch('/api/google-news?'+new URLSearchParams({region,candidate,start:from,end:to,period}),{signal:request.signal});const data=await response.json();if(!response.ok)throw Error(typeof data.detail==='string'?data.detail:'검색 조건을 확인하세요.');setItems(data.items);setCached(data.cached)}
+  catch(error){if(error.name!=='AbortError')setError(error.message)}finally{if(controller.current===request)setBusy(false)}
+ }
+ const valid=from&&to&&from<=to,url=valid?moreNewsUrl(region,candidate,from,to):null;
+ return <section className="google-news-search" aria-label="구글 뉴스 검색"><h3>구글 뉴스 검색</h3><p>위의 지역·후보·기간·보도 시점 조건으로 검색합니다. 구글이 제공하는 결과를 표시하며 전체 보도를 보장하지 않습니다.</p><div className="google-news-actions"><button type="button" disabled={busy||!valid} onClick={search}>{busy?'구글 뉴스 검색 중…':'구글 뉴스 검색 결과 불러오기'}</button>{url&&<a href={url} target="_blank" rel="noopener noreferrer">구글 뉴스에서 직접 검색 ↗</a>}</div>{busy&&<p role="status">구글 뉴스 검색 결과를 불러오는 중입니다.</p>}{error&&<p role="alert">{error}</p>}{items&&<><p role="status">구글 뉴스 결과 {items.length}건{cached?' · 최근 5분 이내 검색 결과':''} · 원문 확인 전</p><div className="news-results">{items.slice(0,count).map(item=><article className="news-result" key={item.id}><div className="news-meta"><span>구글 뉴스</span><time dateTime={item.published_date}>{item.published_date}</time><span>{item.publisher}</span></div><h4><a href={item.url} target="_blank" rel="noopener noreferrer">{item.title} ↗</a></h4><small>검색 결과 · 제목·언론사·날짜는 제공된 메타데이터입니다.</small></article>)}</div>{!items.length&&<p>이 조건으로 받은 검색 결과가 없습니다. 해당 보도가 없다는 뜻은 아닙니다. 기간을 넓히거나 구글 뉴스에서 직접 검색하세요.</p>}{items.length>5&&<div className="news-pagination"><span>{Math.min(count,items.length)} / {items.length}건 표시</span>{count<items.length&&<button className="secondary" type="button" onClick={()=>setCount(value=>value+5)}>구글 뉴스 더보기 (+5건)</button>}{count>5&&<button className="secondary" type="button" onClick={()=>setCount(5)}>접기</button>}</div>}</>}<p className="news-caution">구글 검색 결과는 기존 확인 기사 목록과 구분합니다. 원문과 지역·후보 관련성을 확인하기 전에는 04 기사 근거로 자동 연결하지 않습니다.</p></section>
+}
