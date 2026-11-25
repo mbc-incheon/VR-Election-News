@@ -13,7 +13,8 @@ vm.runInContext(`let selectedNews={ids:[]};let mode='demo',region='R';let snap={
  el('evidenceAcknowledged').checked=true;await vm.runInContext('confirmEvidenceAndContinue()',context);
  assert.equal(vm.runInContext('preparationReady()',context),true);assert.equal(context.location.hash,'article-generator');
  assert.equal(el('article-generator').focused,true);
- vm.runInContext("$('draftType').value='pledge';syncPreparation()",context);assert.equal(vm.runInContext('preparationReady()',context),false);
+ vm.runInContext("$('draftType').value='pledge';syncPreparation()",context);assert.equal(vm.runInContext('preparationReady()',context),true);
+ el('draftCandidate').value='a';vm.runInContext('syncPreparation()',context);assert.equal(vm.runInContext('preparationReady()',context),false);
  vm.runInContext("region='other';syncPreparation()",context);assert.equal(vm.runInContext('preparationReady()',context),false);
  console.log('Verified per-candidate checks, missing-evidence acknowledgement, return to generation and scope invalidation');
 })().catch(error=>{console.error(error);process.exitCode=1});

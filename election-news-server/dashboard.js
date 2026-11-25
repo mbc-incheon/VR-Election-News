@@ -36,7 +36,7 @@ function renderArticleButtons(articles){
 
 let preparation={key:'',confirmed:{},loaded:null};
 function preparationTargets(){return (snap.rows||[]).filter(row=>row.region_name===selectedRegion()&&(!$('draftCandidate').value||row.candidate_id===$('draftCandidate').value))}
-function preparationKey(){return JSON.stringify([selectedMode(),selectedRegion(),$('draftType').value,preparationTargets().map(row=>row.candidate_id)])}
+function preparationKey(){return JSON.stringify([selectedMode(),selectedRegion(),preparationTargets().map(row=>row.candidate_id)])}
 function preparationReady(){const targets=preparationTargets();return preparation.key===preparationKey()&&targets.length>0&&targets.every(row=>preparation.confirmed[row.candidate_id])}
 function syncPreparation(){
  const key=preparationKey();if(preparation.key!==key){preparation={key,confirmed:{},loaded:null};$('evidenceAcknowledged').checked=false}
@@ -66,9 +66,9 @@ function focusArticleWorkspace(view='editor'){
  target.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function syncDraftAvailability(){
- const disabled=articleBusy||!preparationReady()||(typeof loggedUser!=='undefined'&&loggedUser&&loggedUser.role!=='writer');
+ const disabled=articleBusy||!preparationTargets().length||(typeof loggedUser!=='undefined'&&loggedUser&&loggedUser.role!=='writer');
  $('draft').disabled=Boolean(disabled);
- $('draftAvailability').textContent=articleBusy?'초안을 생성하고 있습니다. 잠시 기다려 주세요.':typeof loggedUser!=='undefined'&&loggedUser&&loggedUser.role!=='writer'?'현재 계정은 '+(loggedUser.role==='admin'?'관리자':'편집자')+'입니다. 작성자로 로그인해야 초안을 생성할 수 있습니다.':!preparationReady()?'04에서 선택 후보의 자료를 확인한 뒤 기사 생성으로 이동하세요.':'작성 가능 · '+selectedRegion()+' · 생성 시점 데이터로 초안을 고정합니다.';
+ $('draftAvailability').textContent=articleBusy?'초안을 생성하고 있습니다. 잠시 기다려 주세요.':typeof loggedUser!=='undefined'&&loggedUser&&loggedUser.role!=='writer'?'현재 계정은 '+(loggedUser.role==='admin'?'관리자':'편집자')+'입니다. 작성자로 로그인해야 초안을 생성할 수 있습니다.':!preparationTargets().length?'지역·후보 자료를 불러오는 중입니다.':!preparationReady()?'생성 버튼을 누르면 미확인 후보('+preparationTargets().filter(row=>!preparation.confirmed[row.candidate_id]).map(row=>row.candidate_name).join(' · ')+')의 자료 확인으로 안내합니다.':'작성 가능 · '+selectedRegion()+' · 생성 시점 데이터로 초안을 고정합니다.';
 }
 function articleScope(){return {mode:selectedMode(),region:selectedRegion()}}
 function sameArticleScope(scope){return scope.mode===selectedMode()&&scope.region===selectedRegion()}
@@ -177,7 +177,7 @@ $('draft').onclick=async()=>{
  try{
   const scope=articleScope();
   if(!scope.region)throw Error('02 영역에서 지역을 먼저 선택해 주세요.');
-  if(!preparationReady())throw Error('04 공약 근거 검색에서 자료 확인을 먼저 완료하세요.');
+  if(!preparationReady()){await goToEvidence();$('evidenceFlowMessage').textContent='초안 생성 요청을 받았습니다. 이 후보의 자료를 확인한 뒤 확인 후 기사 생성으로 이동을 눌러 주세요.';return}
   const user=await ensureArticleSession();
   if(user.role!=='writer')throw Error('기사 생성은 작성자 계정으로 가능합니다. 로그아웃 후 담당자 로그인에서 작성자로 로그인해 주세요.');
   if(!sameArticleScope(scope))throw Error('선거구가 변경됐습니다. 선택 지역에서 다시 생성해 주세요.');
