@@ -245,7 +245,18 @@ def test_admin_login_accounts_logout_and_role_boundaries(client):
     assert c.post('/api/admin/users',headers=origin,json=dict(name='new-reporter',role='editor')).status_code==409
     assert c.post('/api/admin/users',headers=origin,json=dict(name='bad<script>',role='writer')).status_code==422
     assert c.post('/api/admin/users',headers=origin,json=dict(name='anotheradmin',role='admin')).status_code==422
-    assert c.post('/api/articles',headers=origin,json=dict(region='계양구갑',mode='official')).status_code==403
+    created=c.post('/api/articles',headers=origin,json=dict(region='계양구갑',mode='official',article_type='result'))
+    assert created.status_code==200 and created.json()['author']=='admin'
+    review=next(item for item in c.get('/api/reviews').json() if item['kind']=='dataset')
+    assert c.post('/api/reviews/'+review['id'],headers=origin,json=dict(approve=True,reason='TEST 관리자 원본 검수',original_checked=True)).status_code==200
+    approval=dict(reason='TEST 관리자 최종 승인',evidence_checked=True,ai_unavailable_ack=True)
+    assert c.post('/api/articles/'+created.json()['id']+'/approve',headers=origin,json=approval).status_code==409
+    writer_article=c.post('/api/articles',headers=auth(),json=dict(region='계양구갑',mode='official',article_type='result')).json()
+    revision=c.post('/api/articles/'+writer_article['id']+'/revisions',headers=origin,json=dict(title='관리자 수정 기사',reason='TEST 관리자 기사 수정',sentences=writer_article['sentences']))
+    assert revision.status_code==200 and revision.json()['author']=='admin'
+    approved=c.post('/api/articles/'+writer_article['id']+'/approve',headers=origin,json=approval)
+    assert approved.status_code==200 and approved.json()['approved_by']=='admin'
+    assert c.get('/api/articles/'+writer_article['id']+'/export').status_code==200
     assert c.post('/api/admin/logout',headers=origin,json={}).status_code==200
     assert c.get('/api/admin/users',headers={'Cookie':'admin_session='+secret}).status_code==401
     assert token not in str(module.room.db.execute('SELECT payload FROM audit').fetchall())
@@ -468,4 +479,4 @@ def test_unified_login_auto_routes_all_roles_and_keeps_permissions(client):
         old_session=c.cookies.get(cookie)
         assert c.cookies.get('staff_session' if role=='admin' else 'admin_session') is None
         assert c.get('/api/admin/users').status_code==(200 if role=='admin' else 403)
-        if role!='writer':assert c.post('/api/articles',headers=headers,json=dict(region='계양구갑',mode='official')).status_code==403
+        assert c.post('/api/articles',headers=headers,json=dict(region='계양구갑',mode='official')).status_code==(403 if role=='editor' else 200)

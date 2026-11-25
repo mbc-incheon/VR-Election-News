@@ -58,7 +58,7 @@ def identity(request:Request,authorization:str=Header(default='')):
     return user
 
 def role(user,*roles):
-    if user['role'] not in roles:raise HTTPException(403,'역할 권한이 없습니다')
+    if user['role'] not in roles and not (user['role']=='admin' and set(roles)&{'writer','editor'}):raise HTTPException(403,'역할 권한이 없습니다')
 
 def seed_demo_documents():
     # Keep original documents in storage, but retire only superseded auto-generated profiles.
