@@ -1,0 +1,3 @@
+import React from 'react';
+import {articleStatuses,timeText} from '../model.js';
+export default function ArticleList({articles=[],selected,onSelect}){return <div className="react-article-list">{articles.map(article=><button type="button" key={article.id} className={'react-article-item '+(selected===article.id?'selected':'')} onClick={()=>onSelect(article.id)} aria-pressed={selected===article.id}><span className="react-article-label"><strong>{article.title}</strong><small>{article.author} · {timeText(article.created_at)}</small></span><span className={'react-article-status status-'+article.status}>{articleStatuses[article.status]||article.status}</span></button>)}</div>}

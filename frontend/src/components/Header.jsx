@@ -1,0 +1,2 @@
+import React from 'react';
+export default function Header({region,mode,connection}){return <div className="react-feed-header"><div><span className="react-eyebrow">ELECTION NEWSROOM</span><h3>{region||'지역 선택'} · 개표 데이터 요약</h3></div><span className={'react-feed-badge '+(mode==='demo'?'demo':'')}>{mode==='demo'?'시뮬레이션 · 가상 자료':mode==='official'?'2024 총선 · 공식 보관 자료':'자료 수신 대기'}</span><span className="react-connection">{connection==='DISCONNECTED'?'연결 끊김 · 재연결 중':connection==='CONNECTED'?'실시간 연결':connection==='ARCHIVE'?'보관 자료 연결':'자료 수신 대기'}</span></div>}

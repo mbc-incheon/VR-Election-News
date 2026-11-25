@@ -1,0 +1,4 @@
+import React from 'react';
+import {number,percent,timeText} from '../model.js';
+// count_rate is 개표율, turnout is 투표율; missing values stay missing.
+export default function TurnoutBar({summary}){const rate=summary.countRate;return <div className="react-progress-panel"><div className="react-progress-heading"><strong>개표율</strong><strong>{percent(rate)}</strong></div>{rate!=null?<div role="progressbar" aria-label="선택 지역 개표율" aria-valuenow={rate} aria-valuemin={0} aria-valuemax={100} className="react-count-track"><span style={{width:Math.max(0,Math.min(100,rate))+'%'}}/></div>:<p className="react-missing">원본에 개표율이 제공되지 않아 진행 막대를 표시하지 않습니다.</p>}<dl><div><dt>후보 득표 합계</dt><dd>{number(summary.votes)}{summary.votes!=null?'표':''}</dd></div><div><dt>투표율</dt><dd>{percent(summary.turnout)}</dd></div><div><dt>자료 기준시각</dt><dd>{timeText(summary.baseline)}</dd></div></dl></div>}

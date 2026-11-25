@@ -1,5 +1,5 @@
 const $=x=>document.getElementById(x);
-let snap={},current=null,selectionKey='',searchRequest=0,liveSocket;
+let snap={},current=null,selectionKey='',searchRequest=0,liveSocket,reconnectTimer;
 const selectedMode=()=> $('dataMode')?.value||'demo';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const showValue=(v,suffix='')=>v===null||v===undefined?'미제공':esc(v)+suffix;
@@ -20,21 +20,35 @@ async function ensureArticleSession(){
  return user;
 }
 let articleBusy=false;
+function publishNewsroom(patch){
+ if(typeof window==='undefined')return;
+ window.newsroomView={...(window.newsroomView||{}),...patch};
+ window.dispatchEvent(new CustomEvent('newsroom:view',{detail:window.newsroomView}));
+}
+function renderArticleButtons(articles){
+ publishNewsroom({articles});
+ if(typeof window!=='undefined'&&window.newsroomReactLists)return;
+ $('articles').innerHTML='';
+ articles.forEach(a=>{const item=document.createElement('button');item.className='secondary';item.textContent=a.title+' · '+(statuses[a.status]||a.status);item.onclick=action(async()=>show(await api('/api/articles/'+a.id)));$('articles').appendChild(item)});
+}
+
 function table(){
  const selected=$('candidate').value,region=$('region').value,rows=(snap.rows||[]).filter(r=>r.region_name===region);
  $('rows').innerHTML=rows.length?rows.map((r,i)=>{const share=Number(r.vote_share),url=safeSource(r.source_url);return `<tr><td class="candidate-name"><span class="candidate-mark ${i%2?'alternate':''}"></span>${esc(r.candidate_name)}</td><td>${showValue(r.votes==null?null:Number(r.votes).toLocaleString('ko-KR'),'표')}</td><td><div class="vote-share"><span class="share-value">${showValue(r.vote_share==null?null:share.toFixed(2),'%')}</span><div class="bar" aria-hidden="true"><span style="width:${Number.isFinite(share)?Math.max(0,Math.min(100,share)):0}%"></span></div></div></td><td>${showValue(r.count_rate,'%')}</td><td class="table-time" title="${esc(r.baseline_at||'미제공')}">${esc(timeText(r.baseline_at,true))}</td><td class="table-source">${r.is_demo?'시뮬레이션':url?`<a href="${url}" target="_blank" rel="noopener noreferrer">공식 원문</a>`:'출처 미제공'}</td></tr>`}).join(''):'<tr><td colspan="6" class="empty">선택한 지역의 자료가 없습니다.</td></tr>';
  $('candidate').innerHTML=rows.map(r=>`<option value="${esc(r.candidate_id)}">${esc(r.candidate_name)}</option>`).join('');if(rows.some(r=>r.candidate_id===selected))$('candidate').value=selected;
+ publishNewsroom({snapshot:snap,region,candidate:$('candidate').value});
  const key=region+'|'+$('candidate').value+'|'+snap.mode;if(key!==selectionKey){selectionKey=key;void loadEvidence().catch(e=>{$('evidence').textContent=e.message})}
 }
 function update(v){
- snap=v;const state=v.connection?.state,demo=v.mode==='demo';$('mode').textContent=demo?'▤ 시뮬레이션 데이터':v.mode==='unavailable'?'자료 없음':'2024년 공식 자료';$('modeNote').textContent=demo?'가상 후보·가상 수치 · 과거 선거 재현':'과거 선거 자료 · 현재 속보 아님';
+ snap=v;publishNewsroom({connection:v.connection});const state=v.connection?.state,demo=v.mode==='demo';$('mode').textContent=demo?'▤ 시뮬레이션 데이터':v.mode==='unavailable'?'자료 없음':'2024년 공식 자료';$('modeNote').textContent=demo?'가상 후보·가상 수치 · 과거 선거 재현':'과거 선거 자료 · 현재 속보 아님';
  $('connection').className='pill '+(state==='CONNECTED'||state==='ARCHIVE'?'good':state==='DISCONNECTED'?'bad':'');$('connection').innerHTML='<span class="dot"></span>'+({CONNECTED:'연결됨',ARCHIVE:'공식 보관 자료',DISCONNECTED:'연결 끊김',CONNECTING:'연결 중'}[state]||'연결 대기');$('error').textContent=v.connection?.error||'';
  if($('dataReviewBadge')){$('dataReviewBadge').textContent=demo?'가상 자료 · 실제 보도와 분리':v.review?.status==='APPROVED'?'공식 집계 · 독립 검수 완료':'공식 집계 · 독립 검수 필요';$('dataReviewBadge').className='pill '+(demo?'draft-pill':v.review?.status==='APPROVED'?'good':'warn')}
  $('baseline').textContent=timeText(v.rows?.[0]?.baseline_at);$('collected').textContent=timeText(v.collected_at);$('updated').textContent=new Date().toLocaleTimeString('ko-KR',{hour12:false,timeZone:'Asia/Seoul'});
  const regions=[...new Set((v.rows||[]).map(r=>r.region_name))],selected=$('region').value;if(regions.join()!==[...$('region').options].map(o=>o.value).join()){$('region').innerHTML=regions.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');if(regions.includes(selected))$('region').value=selected}table();
 }
-function connect(){if(liveSocket){liveSocket.onclose=null;liveSocket.close()}const ws=liveSocket=new WebSocket((location.protocol==='https:'?'wss://':'ws://')+location.host+'/ws?mode='+selectedMode());ws.onmessage=e=>{if(liveSocket!==ws)return;try{update(JSON.parse(e.data))}catch{$('error').textContent='수신 자료를 표시하지 못했습니다. 연결 상태를 확인해 주세요.'}};ws.onclose=()=>{$('connection').className='pill bad';$('connection').innerHTML='<span class="dot"></span>재연결 중';setTimeout(connect,2000)}}
+function connect(){if(typeof clearTimeout!=='undefined')clearTimeout(reconnectTimer);publishNewsroom({connection:{state:'CONNECTING'}});if(liveSocket){liveSocket.onclose=null;liveSocket.close()}const ws=liveSocket=new WebSocket((location.protocol==='https:'?'wss://':'ws://')+location.host+'/ws?mode='+selectedMode());ws.onmessage=e=>{if(liveSocket!==ws)return;try{update(JSON.parse(e.data))}catch{$('error').textContent='수신 자료를 표시하지 못했습니다. 연결 상태를 확인해 주세요.'}};ws.onclose=()=>{if(liveSocket!==ws)return;$('connection').className='pill bad';$('connection').innerHTML='<span class="dot"></span>재연결 중';publishNewsroom({connection:{state:'DISCONNECTED'}});reconnectTimer=setTimeout(connect,2000)}}
 function show(a){
+ if(typeof window!=='undefined'){const articles=(window.newsroomView?.articles||[]).map(item=>item.id===a.id?a:item);publishNewsroom({current:a,articles})}
  if(current?.id!==a.id){$('checked').checked=false;$('aiAck').checked=false;$('reason').value=''}current=a;
  $('selectedTitle').textContent=a.title;$('selectedAuthor').textContent='작성자 '+a.author;$('selectedStatus').textContent=statuses[a.status]||a.status;$('selectedStatus').className='pill '+(a.status==='APPROVED'?'good':a.status==='REVIEW_REQUIRED'?'warn':'draft-pill');
  $('articleStatus').textContent=`${a.title} · ${a.status} · ${a.mode==='demo'?'시뮬레이션':'과거 자료'} · 작성자 ${a.author}`;
@@ -89,9 +103,8 @@ $('list').onclick=async()=>{
  const button=$('list'),notice=$('draftMessage');button.disabled=true;button.textContent='목록 불러오는 중…';notice.className='message';notice.textContent='기사 목록을 확인하고 있습니다…';
  try{
   await ensureArticleSession();
-  const articles=(await api('/api/articles')).filter(a=>a.mode===selectedMode());$('articles').innerHTML='';
-  if(!articles.length){$('articles').textContent='선택한 작업 자료로 작성된 기사가 없습니다.';notice.textContent='기사 초안 생성으로 새 기사를 작성하세요.';return}
-  articles.forEach(a=>{const item=document.createElement('button');item.className='secondary';item.textContent=a.title+' · '+(statuses[a.status]||a.status);item.onclick=action(async()=>show(await api('/api/articles/'+a.id)));$('articles').appendChild(item)});
+  const articles=(await api('/api/articles')).filter(a=>a.mode===selectedMode());renderArticleButtons(articles);
+  if(!articles.length){notice.textContent='기사 초안 생성으로 새 기사를 작성하세요.';return}
   notice.textContent=(selectedMode()==='official'?'공식 자료':'시뮬레이션')+' 기사 '+articles.length+'건을 불러왔습니다. 목록에서 기사를 선택하세요.';
  }catch(error){notice.className='message is-error';notice.textContent=error.message}
  finally{button.disabled=false;button.textContent='☷ 기사 목록'}
@@ -99,4 +112,10 @@ $('list').onclick=async()=>{
 $('validate').onclick=action(async()=>show(await api(`/api/articles/${current.id}/validate`,{})));
 $('approve').onclick=action(async()=>show(await api(`/api/articles/${current.id}/approve`,{reason:$('reason').value,evidence_checked:$('checked').checked,ai_unavailable_ack:$('aiAck').checked})));
 $('export').onclick=action(async()=>{const v=await api(`/api/articles/${current.id}/export`),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(v,null,2)],{type:'application/json'}));a.download=current.id+'.json';a.click();URL.revokeObjectURL(a.href)});
+if(typeof window!=='undefined'){
+ window.addEventListener('newsroom:candidate',event=>{if([...$('candidate').options].some(option=>option.value===event.detail)){$('candidate').value=event.detail;table()}});
+ window.addEventListener('newsroom:select-article',event=>{if(window.newsroomView?.articles?.some(article=>article.id===event.detail))void action(async()=>show(await api('/api/articles/'+event.detail)))()});
+ window.addEventListener('pageshow',event=>{if(event.persisted)connect()});
+ window.addEventListener('pagehide',()=>{clearTimeout(reconnectTimer);if(liveSocket){liveSocket.onclose=null;liveSocket.close()}});
+}
 connect();

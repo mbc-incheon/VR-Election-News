@@ -10,3 +10,5 @@ build/
 *.sqlite-shm
 users.json
 outputs/ci/
+
+frontend/node_modules/

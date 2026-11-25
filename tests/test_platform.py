@@ -123,6 +123,8 @@ def test_platform_api_auth_and_modes(client):
     assert c.get('/studio').status_code==200
     assert c.get('/static/vendor/three.module.js').status_code==200
     assert c.get('/api/capabilities').json()['studio']=='PC_3D'
+    assert c.get('/static/react/newsroom.js').status_code==200
+    assert 'id="react-election"' in c.get('/').text
 
 def test_bad_pdf_and_revision_do_not_crash(client):
     c,module=client
