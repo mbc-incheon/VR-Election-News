@@ -123,11 +123,11 @@ def same_origin(request):
         raise HTTPException(403,'현재 업무 화면에서 다시 요청해 주세요.')
 
 @app.get('/admin/login')
-def admin_login_page():return FileResponse(Path(__file__).with_name('static')/'admin-login.html')
+def admin_login_page():return RedirectResponse('/login',status_code=303)
 
 @app.get('/admin')
 def admin_page(request:Request):
-    if (admin_auth.session(request.cookies.get('admin_session','')) or {}).get('role')!='admin':return RedirectResponse('/admin/login',status_code=303)
+    if (admin_auth.session(request.cookies.get('admin_session','')) or {}).get('role')!='admin':return RedirectResponse('/login',status_code=303)
     return FileResponse(Path(__file__).with_name('static')/'admin.html')
 
 class AdminLogin(BaseModel):
@@ -221,19 +221,20 @@ def account_history(user=Depends(identity)):
     return [json.loads(row[0]) for row in rows if json.loads(row[0]).get('kind') in kinds][:100]
 
 @app.get('/login')
-def staff_login_page():return FileResponse(Path(__file__).with_name('static')/'staff-login.html')
+def staff_login_page():return FileResponse(Path(__file__).with_name('static')/'login.html')
 
 @app.post('/api/session/login')
 def staff_login(req:AdminLogin,request:Request):
     same_origin(request)
-    secret=admin_auth.login(req.name,req.token,request.client.host if request.client else 'unknown',roles=('writer','editor'))
+    secret=admin_auth.login(req.name,req.token,request.client.host if request.client else 'unknown',roles=('admin','writer','editor'))
     staff=admin_auth.session(secret)
     for cookie in ('admin_session','staff_session'):admin_auth.logout(request.cookies.get(cookie,''))
-    response=JSONResponse(staff)
-    response.set_cookie('staff_session',secret,max_age=28800,httponly=True,samesite='strict',secure=request.url.scheme=='https')
-    response.delete_cookie('admin_session');response.delete_cookie('local_writer')
+    cookie='admin_session' if staff['role']=='admin' else 'staff_session'
+    response=JSONResponse(dict(**staff,next='/admin' if staff['role']=='admin' else '/'))
+    response.set_cookie(cookie,secret,max_age=28800,httponly=True,samesite='strict',secure=request.url.scheme=='https')
+    response.delete_cookie('staff_session' if cookie=='admin_session' else 'admin_session');response.delete_cookie('local_writer')
     response.headers['Cache-Control']='no-store'
-    room.audit('staff_login',req.name,dict(role=staff['role']))
+    room.audit('admin_login' if staff['role']=='admin' else 'staff_login',req.name,dict(role=staff['role']))
     return response
 
 @app.post('/api/session/logout')

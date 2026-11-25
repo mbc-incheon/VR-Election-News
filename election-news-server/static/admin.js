@@ -1,6 +1,6 @@
 const el=id=>document.getElementById(id),roles={admin:'관리자',writer:'작성자',editor:'편집자'};let allUsers=[],pendingAction=null;
 const date=value=>value?new Date(value).toLocaleString('ko-KR',{timeZone:'Asia/Seoul',hour12:false}):'기록 없음';
-async function request(url,body){const response=await fetch(url,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});if(response.status===401){location.replace('/admin/login');throw Error('다시 로그인해 주세요.')}const data=await response.json();if(!response.ok)throw Error(typeof data.detail==='string'?data.detail:'입력 내용을 확인해 주세요.');return data}
+async function request(url,body){const response=await fetch(url,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});if(response.status===401){location.replace('/login');throw Error('다시 로그인해 주세요.')}const data=await response.json();if(!response.ok)throw Error(typeof data.detail==='string'?data.detail:'입력 내용을 확인해 주세요.');return data}
 function message(error){el('adminMessage').className='message error';el('adminMessage').textContent=error.message}
 function clearToken(){el('tokenResult').hidden=true;el('issuedToken').value='';el('issuedToken').type='password';el('revealIssued').textContent='토큰 보기'}
 function issued(data){clearToken();el('issuedFor').textContent=data.name+' · '+roles[data.role];el('issuedToken').value=data.token;el('tokenResult').hidden=false;el('tokenResult').scrollIntoView({block:'nearest',behavior:'smooth'})}
@@ -13,7 +13,7 @@ el('userForm').onsubmit=async event=>{event.preventDefault();el('createUser').di
 el('revealIssued').onclick=()=>{const show=el('issuedToken').type==='password';el('issuedToken').type=show?'text':'password';el('revealIssued').textContent=show?'토큰 숨기기':'토큰 보기'};
 el('copyToken').onclick=async()=>{try{await navigator.clipboard.writeText(el('issuedToken').value);el('adminMessage').className='message';el('adminMessage').textContent='토큰을 복사했습니다.'}catch{message(Error('복사할 수 없습니다. 토큰 보기를 누른 뒤 직접 복사하세요.'))}};
 el('hideToken').onclick=clearToken;
-el('logout').onclick=async()=>{try{await request('/api/session/logout',{});clearToken();location.replace('/admin/login')}catch(error){message(error)}};
+el('logout').onclick=async()=>{try{await request('/api/session/logout',{});clearToken();location.replace('/login')}catch(error){message(error)}};
 for(const id of ['accountQuery','roleFilter','stateFilter'])el(id).addEventListener('input',drawUsers);
 el('refreshAccounts').onclick=()=>loadUsers().catch(message);el('refreshHistory').onclick=()=>loadHistory().catch(message);
-(async()=>{try{const user=await request('/api/me');if(user.role!=='admin'){location.replace('/admin/login');return}el('adminIdentity').textContent=user.name+' · 관리자 인증 완료 · 세션 최대 8시간';await Promise.all([loadUsers(),loadHistory()])}catch(error){message(error)}})();
+(async()=>{try{const user=await request('/api/me');if(user.role!=='admin'){location.replace('/login');return}el('adminIdentity').textContent=user.name+' · 관리자 인증 완료 · 세션 최대 8시간';await Promise.all([loadUsers(),loadHistory()])}catch(error){message(error)}})();

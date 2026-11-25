@@ -446,3 +446,26 @@ def test_admin_web_recovery_code_is_rotated_and_attempts_throttled(client,monkey
     with pytest.raises(HTTPException) as error:module.admin_recovery.reset('admin',result['token'],'current_token','TEST-brute')
     assert error.value.status_code==429
     assert code not in module.admin_recovery.secret_path.read_text(encoding='utf-8')
+
+
+def test_unified_login_auto_routes_all_roles_and_keeps_permissions(client):
+    c,module=client
+    users=module.admin_auth.users();users.append(dict(name='admin',role='admin',token_hash=hashlib.sha256(b'TEST-unified-admin').hexdigest()));module.admin_auth.write(users)
+    headers={'Origin':'http://testserver'}
+    redirect=c.get('/admin/login',follow_redirects=False)
+    assert redirect.status_code==303 and redirect.headers['location']=='/login'
+    assert '통합 로그인' in c.get('/login').text
+    assert c.post('/api/session/login',json=dict(name='admin',token='TEST-unified-admin')).status_code==403
+    old_session=None
+    for name,token,role in [('admin','TEST-unified-admin','admin'),('TEST-writer','TEST-writer','writer'),('TEST-editor','TEST-editor','editor')]:
+        response=c.post('/api/session/login',headers=headers,json=dict(name=name,token=token,role='admin'))
+        assert response.status_code==200,response.text
+        assert response.json()['role']==role
+        assert response.json()['next']==('/admin' if role=='admin' else '/')
+        assert c.get('/api/me').json()['role']==role
+        if old_session:assert module.admin_auth.session(old_session) is None
+        cookie='admin_session' if role=='admin' else 'staff_session'
+        old_session=c.cookies.get(cookie)
+        assert c.cookies.get('staff_session' if role=='admin' else 'admin_session') is None
+        assert c.get('/api/admin/users').status_code==(200 if role=='admin' else 403)
+        if role!='writer':assert c.post('/api/articles',headers=headers,json=dict(region='계양구갑',mode='official')).status_code==403

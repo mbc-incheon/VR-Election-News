@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <testsuites>
-	<testcase name="missing official values remain unavailable while zero stays zero" time="0.009820" classname="test" file="C:\Users\EZ\Documents\ChatGPT\선거분석_Project_01\VR-Election-News\frontend\src\model.test.mjs"/>
-	<testcase name="selected district totals and cards share the original rows" time="0.000473" classname="test" file="C:\Users\EZ\Documents\ChatGPT\선거분석_Project_01\VR-Election-News\frontend\src\model.test.mjs"/>
-	<testcase name="mixed times and incomplete totals cannot become fabricated aggregate values" time="0.000586" classname="test" file="C:\Users\EZ\Documents\ChatGPT\선거분석_Project_01\VR-Election-News\frontend\src\model.test.mjs"/>
-	<testcase name="source links and article status labels preserve review boundaries" time="0.000138" classname="test" file="C:\Users\EZ\Documents\ChatGPT\선거분석_Project_01\VR-Election-News\frontend\src\model.test.mjs"/>
-	<!-- tests 4 -->
+	<testcase name="missing official values remain unavailable while zero stays zero" time="0.009523" classname="test" file="C:\Users\EZ\Documents\ChatGPT\선거분석_Project_01\VR-Election-News\frontend\src\model.test.mjs"/>
+	<testcase name="selected district totals and cards share the original rows" time="0.001183" classname="test" file="C:\Users\EZ\Documents\ChatGPT\선거분석_Project_01\VR-Election-News\frontend\src\model.test.mjs"/>
+	<testcase name="mixed times and incomplete totals cannot become fabricated aggregate values" time="0.000146" classname="test" file="C:\Users\EZ\Documents\ChatGPT\선거분석_Project_01\VR-Election-News\frontend\src\model.test.mjs"/>
+	<testcase name="source links and article status labels preserve review boundaries" time="0.000115" classname="test" file="C:\Users\EZ\Documents\ChatGPT\선거분석_Project_01\VR-Election-News\frontend\src\model.test.mjs"/>
+	<testcase name="one-hour replay has zero start, exact final totals and monotone intermediate votes" time="0.000390" classname="test" file="C:\Users\EZ\Documents\ChatGPT\선거분석_Project_01\VR-Election-News\frontend\src\model.test.mjs"/>
+	<testcase name="replay calculations cannot fabricate missing final votes and clamp timeline endpoints" time="0.000108" classname="test" file="C:\Users\EZ\Documents\ChatGPT\선거분석_Project_01\VR-Election-News\frontend\src\model.test.mjs"/>
+	<testcase name="replay totals equal the sum of displayed candidate values even with rounding" time="0.000127" classname="test" file="C:\Users\EZ\Documents\ChatGPT\선거분석_Project_01\VR-Election-News\frontend\src\model.test.mjs"/>
+	<!-- tests 7 -->
 	<!-- suites 0 -->
-	<!-- pass 4 -->
+	<!-- pass 7 -->
 	<!-- fail 0 -->
 	<!-- cancelled 0 -->
 	<!-- skipped 0 -->
 	<!-- todo 0 -->
-	<!-- duration_ms 89.6118 -->
+	<!-- duration_ms 97.7279 -->
 </testsuites>

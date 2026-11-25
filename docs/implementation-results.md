@@ -25,7 +25,7 @@ PC 중심 v2에서는 실제 Three.js 가상 스튜디오, 공식 원본 행 대
 
 | 시험 | 통과 | 증빙 |
 | --- | --- | --- |
-| 단위 및 SQL 및 화면 빌드 | **56/56** | [unit_results.xml](../outputs/unit_results.xml) |
+| 단위 및 SQL 및 화면 빌드 | **57/57** | [unit_results.xml](../outputs/unit_results.xml) |
 | 실제 서버 통합 | **13/13** | [integration_results.json](../outputs/integration_results.json) |
 | PC 스튜디오·영상·자료 검수 통합 | **24/24** | [platform_integration_results.json](../outputs/platform_integration_results.json) |
 | 화면 승인 제어 로직 | **10/10** | [ui_logic_results.json](../outputs/ui_logic_results.json) |
@@ -57,4 +57,6 @@ SQL 스크립트로 만든 예제 DB는 snapshot 1건·chunk 6건·article 1건�
 
 04 토큰 입력란을 제거하고 기사 생성·목록·다운로드를 로그인 세션으로 연결했습니다. 미로그인 상태에서 목록을 먼저 불러오는 흐름, 새 기사 생성 후 목록 표시를 실제 브라우저에서 확인했습니다. 화면 로직 10건, 화면 빌드 재현, 로컬 작성자 API의 생성·목록·승인 권한 차단 시험을 통과했습니다.
 
-2026-11-25 React 컴포넌트 기반 후보 카드·개표 요약·기사 목록을 반영했습니다. 기존 Python 56건과 화면 로직 10건 외에 React 데이터 모델 4건을 통과했습니다. 실제 브라우저에서 후보 선택 연동과 기사 검증 후 목록 상태 변경을 확인했습니다.
+2026-11-25 React 컴포넌트 기반 후보 카드·개표 요약·기사 목록을 반영했습니다. 기존 Python 57건과 화면 로직 10건 외에 React 데이터 모델 7건을 통과했습니다. 실제 브라우저에서 후보 선택 연동과 기사 검증 후 목록 상태 변경을 확인했습니다.
+
+통합 로그인은 관리자/작성자/편집자의 올바른 이동 경로와 권한 유지, 계정 전환 시 이전 세션 폐기를 검증했습니다. 1시간 그래프는 실제 시간대별 기록과 구분한 선형 재현이며 30분 값과 60분 원본 일치를 브라우저로 확인했습니다. React 모델 시험은 7건으로 확대했습니다.

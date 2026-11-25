@@ -10,3 +10,5 @@
 루트에서 npm ci --prefix frontend, npm test --prefix frontend, npm run build --prefix frontend를 실행합니다. 화면 HTML 수정 시 python scripts/build_dashboard.py도 실행하세요. 최종 화면은 기존 FastAPI 서버의 /에서 열립니다. npm run dev는 빌드 감시이며 별도 포트의 개발 웹 서버가 아닙니다.
 
 [검토·적용 기록](../docs/react-dashboard-review.md)을 참고하세요.
+
+ReplayGraph는 최종 집계에 기반한 1시간 선형 재현입니다. 실제 시간대별 기록이 아니며 원본·기사 근거를 수정하지 않습니다. 재생은 1/60/300배를 지원하고 60분 끝점은 최종 집계와 일치합니다.
