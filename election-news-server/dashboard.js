@@ -34,10 +34,35 @@ function renderArticleButtons(articles){
  articles.forEach(a=>{const item=document.createElement('button');item.className='secondary';item.textContent=a.title+' · '+(statuses[a.status]||a.status);item.onclick=action(async()=>show(await api('/api/articles/'+a.id)));$('articles').appendChild(item)});
 }
 
+let preparation={key:'',confirmed:{},loaded:null};
+function preparationTargets(){return (snap.rows||[]).filter(row=>row.region_name===selectedRegion()&&(!$('draftCandidate').value||row.candidate_id===$('draftCandidate').value))}
+function preparationKey(){return JSON.stringify([selectedMode(),selectedRegion(),$('draftType').value,preparationTargets().map(row=>row.candidate_id)])}
+function preparationReady(){const targets=preparationTargets();return preparation.key===preparationKey()&&targets.length>0&&targets.every(row=>preparation.confirmed[row.candidate_id])}
+function syncPreparation(){
+ const key=preparationKey();if(preparation.key!==key){preparation={key,confirmed:{},loaded:null};$('evidenceAcknowledged').checked=false}
+ const targets=preparationTargets(),done=targets.filter(row=>preparation.confirmed[row.candidate_id]).length;
+ $('preparationStatus').textContent=selectedRegion()+' · 자료 확인 '+done+'/'+targets.length+'명'+(preparationReady()?' 완료 · 기사 생성 가능':' · 04에서 확인 후 기사 생성으로 이동하세요.');
+ const loaded=preparation.loaded,valid=loaded&&loaded.key===key&&loaded.candidate===$('candidate').value&&targets.some(row=>row.candidate_id===loaded.candidate);
+ $('evidenceAcknowledged').disabled=!valid;$('confirmEvidence').disabled=!valid||!$('evidenceAcknowledged').checked;
+ const row=(snap.rows||[]).find(row=>row.candidate_id===$('candidate').value&&row.region_name===selectedRegion());
+ $('evidenceScope').textContent='03 연결 지역: '+selectedRegion()+' · 확인 후보: '+(row?.candidate_name||'자료 대기');
+}
+async function goToEvidence(){
+ syncPreparation();const targets=preparationTargets();if(!targets.length)throw Error('지역과 후보 자료를 먼저 선택하세요.');
+ const next=targets.find(row=>!preparation.confirmed[row.candidate_id])||targets[0];$('candidate').value=next.candidate_id;
+ location.hash='pledges';$('evidenceFlowMessage').textContent='자료와 출처를 확인한 뒤 아래 확인란을 선택하세요.';await loadEvidence();
+}
+async function confirmEvidenceAndContinue(){
+ syncPreparation();if($('confirmEvidence').disabled)throw Error('선택 후보의 자료를 불러온 뒤 확인란을 선택하세요.');
+ const loaded=preparation.loaded;preparation.confirmed[loaded.candidate]={at:new Date().toISOString(),evidence_ids:loaded.ids,has_body:loaded.hasBody};$('evidenceAcknowledged').checked=false;
+ const next=preparationTargets().find(row=>!preparation.confirmed[row.candidate_id]);
+ if(next){$('candidate').value=next.candidate_id;$('evidenceFlowMessage').textContent='다음 후보 '+next.candidate_name+'의 자료를 확인해 주세요.';await loadEvidence();return}
+ syncPreparation();syncDraftAvailability();location.hash='article-generator';$('article-generator').focus();$('draftMessage').textContent='선택 후보의 자료 확인을 마쳤습니다. 기사 유형과 후보를 확인하고 기사 초안 생성을 누르세요.';
+}
 function syncDraftAvailability(){
- const disabled=articleBusy||(typeof loggedUser!=='undefined'&&loggedUser&&loggedUser.role!=='writer');
+ const disabled=articleBusy||!preparationReady()||(typeof loggedUser!=='undefined'&&loggedUser&&loggedUser.role!=='writer');
  $('draft').disabled=Boolean(disabled);
- $('draftAvailability').textContent=articleBusy?'초안을 생성하고 있습니다. 잠시 기다려 주세요.':disabled?'현재 계정은 '+(loggedUser.role==='admin'?'관리자':'편집자')+'입니다. 작성자 계정으로 로그인해야 초안을 생성할 수 있습니다.':!selectedRegion()?'지역선거구 자료를 불러오는 중입니다.':'작성 가능 · '+selectedRegion()+' · 생성 시점 데이터로 초안을 고정합니다.';
+ $('draftAvailability').textContent=articleBusy?'초안을 생성하고 있습니다. 잠시 기다려 주세요.':typeof loggedUser!=='undefined'&&loggedUser&&loggedUser.role!=='writer'?'현재 계정은 '+(loggedUser.role==='admin'?'관리자':'편집자')+'입니다. 작성자로 로그인해야 초안을 생성할 수 있습니다.':!preparationReady()?'04에서 선택 후보의 자료를 확인한 뒤 기사 생성으로 이동하세요.':'작성 가능 · '+selectedRegion()+' · 생성 시점 데이터로 초안을 고정합니다.';
 }
 function articleScope(){return {mode:selectedMode(),region:selectedRegion()}}
 function sameArticleScope(scope){return scope.mode===selectedMode()&&scope.region===selectedRegion()}
@@ -63,7 +88,7 @@ function table(){
  const selected=$('candidate').value,region=selectedRegion(),rows=(snap.rows||[]).filter(r=>r.region_name===region);
  $('rows').innerHTML=rows.length?rows.map((r,i)=>{const share=Number(r.vote_share),url=safeSource(r.source_url);return `<tr><td class="candidate-name"><span class="candidate-mark ${i%2?'alternate':''}"></span>${esc(r.candidate_name)}</td><td>${showValue(r.votes==null?null:Number(r.votes).toLocaleString('ko-KR'),'표')}</td><td><div class="vote-share"><span class="share-value">${showValue(r.vote_share==null?null:share.toFixed(2),'%')}</span><div class="bar" aria-hidden="true"><span style="width:${Number.isFinite(share)?Math.max(0,Math.min(100,share)):0}%"></span></div></div></td><td>${displayArchive(snap)?'100% (표시값)':showValue(r.count_rate,'%')}</td><td class="table-time" title="${esc(displayArchive(snap)?'임의 기준시각: 2024.04.11 06:00 (한국시간)':r.baseline_at||'미제공')}">${displayArchive(snap)?'06:00 (임의)':esc(timeText(r.baseline_at,true))}</td><td class="table-source">${r.is_demo?'시뮬레이션':url?`<a href="${url}" target="_blank" rel="noopener noreferrer">공식 원문</a>`:'출처 미제공'}</td></tr>`}).join(''):'<tr><td colspan="6" class="empty">선택한 지역의 자료가 없습니다.</td></tr>';
  $('candidate').innerHTML=rows.map(r=>`<option value="${esc(r.candidate_id)}">${esc(r.candidate_name)}</option>`).join('');if(rows.some(r=>r.candidate_id===selected))$('candidate').value=selected;
- const draftSelected=$('draftCandidate').value;$('draftCandidate').innerHTML='<option value="">지역 후보 전체</option>'+rows.map(row=>`<option value="${esc(row.candidate_id)}">${esc(row.candidate_name)}</option>`).join('');if(rows.some(row=>row.candidate_id===draftSelected))$('draftCandidate').value=draftSelected;syncDraftAvailability();
+ const draftSelected=$('draftCandidate').value;$('draftCandidate').innerHTML='<option value="">지역 후보 전체</option>'+rows.map(row=>`<option value="${esc(row.candidate_id)}">${esc(row.candidate_name)}</option>`).join('');if(rows.some(row=>row.candidate_id===draftSelected))$('draftCandidate').value=draftSelected;syncPreparation();syncDraftAvailability();
  publishNewsroom({snapshot:snap,region,candidate:$('candidate').value});
  const articleKey=snap.mode+'|'+region;if(region&&snap.mode===selectedMode()&&articleKey!==articleContextKey){articleContextKey=articleKey;resetArticleWorkspace();void loadSelectedArticles().catch(error=>{if(articleContextKey===articleKey){$('draftMessage').textContent=error.status===401?'선택 지역: '+region+'. 기사 초안 생성 또는 기사 목록을 누르면 작성자 계정을 연결합니다.':'기사 목록을 불러오지 못했습니다. '+error.message}})}
  const key=region+'|'+$('candidate').value+'|'+snap.mode;if(key!==selectionKey){selectionKey=key;void loadEvidence().catch(e=>{$('evidence').textContent=e.message})}
@@ -115,12 +140,14 @@ function renderEvidence(hits,context,query,view='all'){
 }
 async function loadEvidence(){
  const request=++searchRequest,q=$('query').value.trim(),region=selectedRegion(),candidate=$('candidate').value;if(!region||!candidate)return;
+ preparation.loaded=null;$('evidenceAcknowledged').checked=false;syncPreparation();syncDraftAvailability();
  $('evidence').textContent='홍보물 위치와 기존 보유 자료를 확인하고 있습니다…';
  try{
   const params={region,candidate,mode:selectedMode()};
   const [hits,context]=await Promise.all([api('/api/search?'+new URLSearchParams({q,...params})),api('/api/pledge-context?'+new URLSearchParams(params))]);
   if(request!==searchRequest)return;
   $('evidence').innerHTML=renderEvidence(hits,context,q,$('evidenceView').value);
+  preparation.loaded={key:preparationKey(),candidate,ids:hits.map(hit=>hit.id),hasBody:context.active_chunks>0};syncPreparation();syncDraftAvailability();
  }catch(error){if(request===searchRequest)$('evidence').textContent='공약 자료를 불러오지 못했습니다. '+error.message}
 }
 $('allEvidence').onclick=action(async()=>{$('query').value='';await loadEvidence()});
@@ -129,7 +156,10 @@ $('region').onchange=chooseRegion;
 $('articleRegion').onchange=action(async()=>{$('region').value=$('articleRegion').value;chooseRegion();await loadSelectedArticles(true)});
 $('searchArticles').onclick=action(async()=>{await loadSelectedArticles(true)});
 const pastResultsLink=document.querySelector('a[href="#past-results"]');if(pastResultsLink)pastResultsLink.addEventListener('click',()=>{$('pastResultsToggle').open=true});
-$('candidate').onchange=action(loadEvidence);$('search').onclick=action(loadEvidence);$('query').addEventListener('keydown',e=>{if(e.key==='Enter')$('search').click()});
+$('candidate').onchange=action(async()=>{if($('draftCandidate').value)$('draftCandidate').value=$('candidate').value;syncPreparation();syncDraftAvailability();await loadEvidence()});
+$('draftCandidate').onchange=action(async()=>{syncPreparation();syncDraftAvailability();if($('draftCandidate').value){$('candidate').value=$('draftCandidate').value;await loadEvidence()}});
+$('draftType').onchange=()=>{syncPreparation();syncDraftAvailability()};
+$('goEvidence').onclick=action(goToEvidence);$('confirmEvidence').onclick=action(confirmEvidenceAndContinue);$('evidenceAcknowledged').onchange=syncPreparation;$('search').onclick=action(loadEvidence);$('query').addEventListener('keydown',e=>{if(e.key==='Enter')$('search').click()});
 $('official').onclick=action(async()=>{if(!$('officialRows').hidden){$('officialRows').hidden=true;$('official').setAttribute('aria-expanded','false');return}const v=await api('/api/official-results');$('officialRows').innerHTML='<p>'+esc(v.label)+'</p><div class="scroll"><table><thead><tr><th>지역구</th><th>후보</th><th>정당</th><th>집계 득표수</th><th>계산 득표율</th></tr></thead><tbody>'+v.rows.map(r=>`<tr><td>${esc(r.region_name)}</td><td>${esc(r.candidate_name)}</td><td>${esc(r.party)}</td><td>${Number(r.votes).toLocaleString('ko-KR')}</td><td>${Number(r.vote_share).toFixed(2)}%</td></tr>`).join('')+'</tbody></table></div>';$('officialRows').hidden=false;$('official').setAttribute('aria-expanded','true')});
 $('productionToggle').onclick=()=>{const open=$('productionInfo').hidden;$('productionInfo').hidden=!open;$('productionToggle').setAttribute('aria-expanded',String(open))};
 $('draft').onclick=async()=>{
@@ -139,6 +169,7 @@ $('draft').onclick=async()=>{
  try{
   const scope=articleScope();
   if(!scope.region)throw Error('02 영역에서 지역을 먼저 선택해 주세요.');
+  if(!preparationReady())throw Error('04 공약 근거 검색에서 자료 확인을 먼저 완료하세요.');
   const user=await ensureArticleSession();
   if(user.role!=='writer')throw Error('기사 생성은 작성자 계정으로 가능합니다. 로그아웃 후 담당자 로그인에서 작성자로 로그인해 주세요.');
   if(!sameArticleScope(scope))throw Error('선거구가 변경됐습니다. 선택 지역에서 다시 생성해 주세요.');
