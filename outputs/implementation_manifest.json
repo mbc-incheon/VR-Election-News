@@ -1,12 +1,12 @@
 {
-  "captured_at": "2026-11-25T12:38:22.049193+09:00",
+  "captured_at": "2026-11-25T12:46:45.809798+09:00",
   "repository": "https://github.com/mbc-incheon/VR-Election-News",
   "release_version": "2.0.0",
   "imported_from": {
     "repository": "https://github.com/mbc-incheon/election-analysis-project-01",
     "commit": "00ac79dc6ec77d6bd4c1e883e152fd78f2e3ab91"
   },
-  "repository_base_commit": "3804b04dd2229c62966e271683c1c0994a84f7c5",
+  "repository_base_commit": "f96cfa89b6079056e41453c1eab8aa47530ba70c",
   "note": "Base commit is the parent context before this manifest is committed; exact publication commit is in Git history.",
   "runtime": {
     "python": "3.12.10"
@@ -319,8 +319,8 @@
     },
     {
       "path": "election-news-server/dashboard.template.html",
-      "bytes": 11665,
-      "sha256": "238fd9a4422ed02420032703df2c6dd9d2cdf6414e4eb4b66d2c2c59ee8cd845"
+      "bytes": 11590,
+      "sha256": "6be537c6a89af1a86a4cbcbda372819c4b2f8a5860755677ec4aca2642eb6ff6"
     },
     {
       "path": "election-news-server/fixtures/fallback_snapshot.json",
@@ -329,8 +329,8 @@
     },
     {
       "path": "election-news-server/index.html",
-      "bytes": 44943,
-      "sha256": "525f89ddf15120a753dc3a9b33d91ac9777f4ea468f7a16f6b34c6c0c158056d"
+      "bytes": 44868,
+      "sha256": "ae60de3278f2d26e97541d4a33dea08fbab6e83c4f1f903fc633736287e894ca"
     },
     {
       "path": "election-news-server/init_users.py",
