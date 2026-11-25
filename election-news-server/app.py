@@ -299,10 +299,12 @@ class Draft(BaseModel):
     news_ids:list[str]=Field(default_factory=list,max_length=20)
     period_from:str='2024-04-03'
     period_to:str='2024-04-17'
+    title:str|None=Field(default=None,min_length=2,max_length=200)
+    evidence_ids:list[str]|None=Field(default=None,max_length=100)
 @app.post('/api/articles')
 def draft(req:Draft,user=Depends(identity)):
     role(user,'writer')
-    try:return room.draft(req.region,user['name'],req.mode,req.article_type,req.candidate_id,req.news_ids,req.period_from,req.period_to)
+    try:return room.draft(req.region,user['name'],req.mode,req.article_type,req.candidate_id,req.news_ids,req.period_from,req.period_to,req.title,req.evidence_ids)
     except ValueError as e:raise HTTPException(422,str(e))
 @app.get('/api/articles')
 def articles(user=Depends(identity)):
@@ -323,7 +325,7 @@ class Revision(BaseModel):
     @classmethod
     def valid_sentences(cls,items):
         for s in items:
-            if s.get('kind') not in ['result','pledge'] or not isinstance(s.get('text'),str) or not 1<=len(s['text'])<=5000:raise ValueError('invalid sentence')
+            if s.get('kind') not in ['result','pledge','news'] or not isinstance(s.get('text'),str) or not 1<=len(s['text'])<=5000:raise ValueError('invalid sentence')
             if s['kind']=='result':
                 if not isinstance(s.get('values'),dict) or not isinstance(s.get('row_ids'),list) or any(not isinstance(x,str) for x in s['row_ids']):raise ValueError('result reference required')
             else:

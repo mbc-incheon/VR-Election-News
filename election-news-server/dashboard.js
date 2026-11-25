@@ -181,13 +181,14 @@ $('draft').onclick=async()=>{
   const user=await ensureArticleSession();
   if(user.role!=='writer')throw Error('기사 생성은 작성자 계정으로 가능합니다. 로그아웃 후 담당자 로그인에서 작성자로 로그인해 주세요.');
   if(!sameArticleScope(scope))throw Error('선거구가 변경됐습니다. 선택 지역에서 다시 생성해 주세요.');
+  const title=$('newArticleTitle').value.trim();if(title.length<2)throw Error('기사 제목을 2자 이상 입력하세요.');
   const articleType=$('draftType').value;
   const news=selectedNews.region===scope.region?selectedNews:{ids:[]};
-  const article=await api('/api/articles',{region:scope.region,mode:scope.mode,article_type:articleType,candidate_id:$('draftCandidate').value||null,news_ids:news.ids,period_from:news.from||'2024-04-03',period_to:news.to||'2024-04-17'});
+  const article=await api('/api/articles',{region:scope.region,mode:scope.mode,article_type:articleType,title,evidence_ids:Object.values(preparation.confirmed).flatMap(item=>item.evidence_ids||[]),candidate_id:$('draftCandidate').value||null,news_ids:news.ids,period_from:news.from||'2024-04-03',period_to:news.to||'2024-04-17'});
   if(!sameArticleScope(scope))return;
   renderArticleButtons([article,...(window.newsroomView?.articles||[]).filter(item=>item.id!==article.id&&item.mode===scope.mode&&item.region_name===scope.region)]);show(article);
   const pledgeCount=article.sentences.filter(s=>s.kind==='pledge').length;
-  notice.textContent='초안을 생성했습니다. 04 영역에서 본문·목록을 확인하고, 05 검증 화면으로 이동해 근거 확인과 규칙 검증을 진행하세요.'+(articleType==='pledge'&&!pledgeCount?' 등록된 공약 근거가 없어 개표 결과만 작성했습니다. 04에서 홍보물·기존 자료를 확인하세요. 기사에 공약 문장을 넣으려면 검증 가능한 본문 근거가 필요합니다.':'');
+  notice.textContent='초안을 생성했습니다. 04 영역에서 본문·목록을 확인하고, 05 검증 화면으로 이동해 근거 확인과 규칙 검증을 진행하세요.'+(['pledge','combined','news'].includes(articleType)&&!pledgeCount?' 등록된 공약 근거가 없어 개표 결과만 작성했습니다. 04에서 홍보물·기존 자료를 확인하세요. 기사에 공약 문장을 넣으려면 검증 가능한 본문 근거가 필요합니다.':'');
  }catch(e){notice.className='message is-error';notice.textContent=e.message}
  finally{articleBusy=false;syncDraftAvailability();button.textContent='▤ 기사 초안 생성'}
 };

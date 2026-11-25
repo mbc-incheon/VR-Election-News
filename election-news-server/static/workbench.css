@@ -11,3 +11,5 @@
 #inlineArticleWorkspace{margin-top:18px;scroll-margin-top:18px;min-width:0}#inlineArticleWorkspace h3{font-size:17px}#inlineArticleWorkspace .article-body{max-height:none;overflow:visible}
 
 #productionDialog{width:min(1100px,96vw);max-height:92vh;padding:0}#productionDialog::backdrop{background:rgba(7,26,46,.55)}#productionDialog .dialog-head{position:sticky;top:0;z-index:2;background:#f2f7fa}#productionDialog #productionMessage{margin:14px 18px}#productionDialog #productionInfo{padding:0 18px 20px}#productionDialog .prod-options{display:flex;gap:12px;flex-wrap:wrap}#productionDialog .prod-select{max-height:none;overflow:visible}
+
+.draft-title-input{margin:16px 0;padding:14px;background:#edf5f9;border-radius:7px}.draft-title-input label{display:block;font-size:13px;margin-bottom:8px}.draft-title-input input{width:100%;font-size:15px}.draft-title-input p{font-size:12px;color:#587284;line-height:1.7;margin:8px 0 0}

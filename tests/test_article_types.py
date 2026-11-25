@@ -36,7 +36,7 @@ def test_news_selection_is_scoped_and_cannot_be_fabricated(room):
  with pytest.raises(ValueError):room.draft('연수구을','TEST-writer','official','news',news_ids=['NEWS24-017'],period_from='2024-04-10')
  article=room.draft('연수구을','TEST-writer','official','news',news_ids=['NEWS24-017'])
  assert article['news_references'][0]['publisher']=='뉴스1'
- assert all(s['kind']=='result' for s in article['sentences'])
+ assert any(s['kind']=='news' for s in article['sentences'])
  article['news_references'][0]['url']='https://example.invalid/changed'
  assert 'NEWS_REFERENCE_MISMATCH' in room.validate(article)['validation']['errors']
 
@@ -53,3 +53,24 @@ def test_wrong_candidate_and_summary_are_blocked(room):
  article=room.draft('연수구을','TEST-writer','official','result')
  article['summary']='근거 없는 변경'
  assert 'SUMMARY_MISMATCH' in room.validate(article)['validation']['errors']
+
+def test_custom_title_and_news_reference_text_have_traceable_sources(room):
+ article=room.draft('연수구을','TEST-writer','official','news',news_ids=['NEWS24-017'],title='연수구을 선거 보도와 결과 확인')
+ assert article['title']=='연수구을 선거 보도와 결과 확인'
+ news=next(s for s in article['sentences'] if s['kind']=='news')
+ assert news['evidence_ids']==['NEWS24-017'] and news['source_url'].startswith('https://')
+ news['text']='확인되지 않은 내용'
+ assert any('NEWS_REFERENCE_MISMATCH' in value for value in room.validate(article)['validation']['errors'])
+ with pytest.raises(ValueError):room.draft('연수구을','TEST-writer','official',title=' ')
+
+def test_explicit_evidence_cannot_point_to_another_candidate(room):
+ with pytest.raises(ValueError):room.draft('연수구을','TEST-writer','official',title='공약과 근거 확인',explicit_evidence_ids=['unknown'])
+
+def test_checked_pledge_content_and_custom_title_are_used(room):
+ row=next(r for r in room.latest('official')['rows'] if r['region_name']=='연수구을')
+ ids=room.add_document(dict(title='TEST 확인 공약',publisher='TEST',url='https://library.nec.go.kr/TEST-CONTENT',published_at='2024-04-01',collected_at='2026-11-25T00:00:00+09:00',document_type='campaign',election_id=row['election_id'],region_name=row['region_name'],candidate_id=row['candidate_id'],text='TEST 환승 편의 개선을 검토한다. 실제 공약이 아닌 검증용 문장이다.',is_demo=False,rights='TEST',human_verified=True),'TEST-writer')
+ article=room.draft(row['region_name'],'TEST-writer','official','combined',row['candidate_id'],title='선택 공약과 개표 결과 확인',explicit_evidence_ids=ids)
+ pledge=next(s for s in article['sentences'] if s['kind']=='pledge')
+ assert pledge['evidence_ids']==ids and '환승 편의 개선' in pledge['text']
+ errors=room.validate(article)['validation']['errors']
+ assert any('DOCUMENT_REVIEW_REQUIRED' in error for error in errors)

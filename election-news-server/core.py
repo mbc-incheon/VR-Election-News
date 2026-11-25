@@ -105,15 +105,17 @@ class Newsroom(WorkflowMixin):
         return sorted(results,key=lambda c:(-c['score'],c['id']))[:5]
 
     @locked
-    def draft(self,region,author,mode=None,article_type="combined",candidate_id=None,news_ids=None,period_from="2024-04-03",period_to="2024-04-17"):
+    def draft(self,region,author,mode=None,article_type="combined",candidate_id=None,news_ids=None,period_from="2024-04-03",period_to="2024-04-17",title=None,explicit_evidence_ids=None):
         snap=self.latest(mode);rows=[r for r in snap['rows'] if r['region_name']==region]
         if not rows: raise ValueError('region not available')
         if article_type not in ('combined','result','pledge','news'):raise ValueError('unknown article type')
         if candidate_id:
             rows=[r for r in rows if r['candidate_id']==candidate_id]
             if not rows:raise ValueError('candidate not available in selected region')
+        if title is not None and (not 2<=len(title.strip())<=200):raise ValueError('기사 제목은 2~200자로 입력하세요.')
         references=[]
-        if article_type=='news':
+        if article_type=='news' and not news_ids:raise ValueError('선거 전후 언론 기사에서 참고할 보도를 선택하세요.')
+        if news_ids:
             if snap['mode']!='official':raise ValueError('실제 보도 정리는 실제 선거구에서 사용하세요.')
             if not news_ids:raise ValueError('선거 전후 언론 기사에서 참고할 보도를 선택하세요.')
             from datetime import date
@@ -130,14 +132,26 @@ class Newsroom(WorkflowMixin):
         for r in rows:
             text=result_text(r)
             sentences.append(dict(kind='result',text=text,row_ids=[r['row_id']],values={k:r[k] for k in ['region_name','candidate_id','candidate_name','baseline_at','votes','vote_share','count_rate']}))
-            hits=self.search('교통 주거 지역경제',region,r['candidate_id'],demo=r['is_demo']) if article_type in ('combined','pledge') else []
-            if not hits and article_type in ('combined','pledge'):hits=self.search('',region,r['candidate_id'],demo=r['is_demo'])
-            if hits:
-                c=hits[0]; sentences.append(dict(kind='pledge',text=f"{r['candidate_name']}의 공약 자료에는 다음 내용이 제시돼 있다: {c['text']}",candidate_id=r['candidate_id'],region_name=region,evidence_ids=[c['id']],evidence_hashes=[c['sha256']]))
+            hits=self.search(title or '교통 주거 지역경제',region,r['candidate_id'],demo=r['is_demo']) if article_type in ('combined','pledge','news') else []
+            if not hits and article_type in ('combined','pledge','news'):hits=self.search('',region,r['candidate_id'],demo=r['is_demo'])
+            if explicit_evidence_ids is not None:
+                hits=[]
+                for eid in dict.fromkeys(explicit_evidence_ids):
+                    record=self.db.execute('SELECT payload,active FROM chunk WHERE id=?',(eid,)).fetchone()
+                    if not record or not record[1]:raise ValueError('선택한 공약 근거가 삭제되었거나 비활성입니다.')
+                    chunk=json.loads(record[0])
+                    if chunk['region_name']!=region or chunk['is_demo']!=(snap['mode']=='demo') or chunk['candidate_id'] not in [row['candidate_id'] for row in rows]:raise ValueError('공약 근거의 후보·지역·자료 종류가 일치하지 않습니다.')
+                    if chunk['candidate_id']==r['candidate_id'] and article_type!='result':hits.append(chunk)
+            for c in (hits if explicit_evidence_ids is not None else hits[:1]):
+                sentences.append(dict(kind='pledge',text=f"{r['candidate_name']}의 공약 자료에는 다음 내용이 제시돼 있다: {c['text']}",candidate_id=r['candidate_id'],region_name=region,evidence_ids=[c['id']],evidence_hashes=[c['sha256']]))
+        for reference in references:
+            text=f"{reference['published_date']} {reference['publisher']}은 ‘{reference['title']}’ 제목의 보도를 게재했다."
+            sentences.append(dict(kind='news',text=text,evidence_ids=[reference['id']],evidence_hashes=[sha(reference)],region_name=region,candidate_id=candidate_id or '',source_url=reference['url']))
         a=dict(id=secrets.token_hex(8),revision=1,author=author,created_at=now(),snapshot_id=snap['snapshot_id'],mode=snap['mode'],region_name=region,
                title=f"[{('가상 개표' if snap['mode']=='demo' else '실제 결과')}] {region} {rows[0]['candidate_name']+' · ' if candidate_id else ''}"+{'combined':'개표와 공약 확인','result':'후보별 득표 결과','pledge':'후보 공약 근거 비교','news':'선거 전후 보도 참고 초안'}[article_type],
                data_sources=[dict(row_id=r['row_id'],candidate_name=r['candidate_name'],url=r['source_url']) for r in rows],article_type=article_type,candidate_id=candidate_id,candidate_names=[r['candidate_name'] for r in rows],summary=sentences[0]['text'] if sentences else '',
                news_references=references,news_period=dict(start=period_from,end=period_to),generator='근거 기반 문장 템플릿',sentences=sentences,ai_review=dict(verdict='UNAVAILABLE',model=None),status='DRAFT')
+        if title is not None:a['title']=title.strip()
         self.save(a);self.audit('draft',author,dict(article_id=a['id'],snapshot_id=a['snapshot_id']))
         return a
 
@@ -194,9 +208,14 @@ class Newsroom(WorkflowMixin):
                 candidate=next((r['candidate_name'] for r in rows.values() if r['candidate_id']==c['candidate_id']),None)
                 if s['text']!=f"{candidate}의 공약 자료에는 다음 내용이 제시돼 있다: {c['text']}":errors.append(prefix+'UNSUPPORTED_TEXT')
                 if c['is_demo']!=(a['mode']=='demo'):errors.append(prefix+'MODE_MISMATCH')
+            elif s['kind']=='news':
+                reference=next((item for item in a.get('news_references',[]) if s.get('evidence_ids')==[item['id']]),None)
+                if not reference:errors.append(prefix+'NEWS_REFERENCE_MISSING');continue
+                expected=f"{reference['published_date']} {reference['publisher']}은 ‘{reference['title']}’ 제목의 보도를 게재했다."
+                if s['text']!=expected or s.get('evidence_hashes')!=[sha(reference)] or s.get('source_url')!=reference['url'] or s.get('region_name')!=a['region_name']:errors.append(prefix+'NEWS_REFERENCE_MISMATCH')
             else:errors.append(prefix+'UNSUPPORTED_CLAIM')
         if a.get('article_type','combined') in ('combined','pledge') and not any(s['kind']=='pledge' for s in a['sentences']):errors.append('NO_PLEDGE_EVIDENCE')
-        if a.get('article_type')=='news':
+        if a.get('article_type')=='news' or a.get('news_references'):
             if not a.get('news_references'):errors.append('NO_NEWS_REFERENCE')
             catalogue=json.loads((Path(__file__).with_name('static')/'election-news-index.json').read_text(encoding='utf-8'))['items']
             for reference in a.get('news_references',[]):
