@@ -73,6 +73,7 @@ function refreshRegionOptions(){
  const select=$('region'),selected=select.value;
  select.innerHTML='<option value="">가상후보 3명 · 개표 진행</option>'+officialRegions.map(region=>`<option value="${esc(region)}">${esc(region)} · 2024년 실제 결과</option>`).join('');
  select.value=selectedMode()==='demo'?'':officialRegions.includes(selected)?selected:(officialRegions[0]||'');
+ if($('articleRegion')){$('articleRegion').innerHTML=select.innerHTML;$('articleRegion').value=select.value}
 }
 function chooseRegion(){
  const mode=$('region').value?'official':'demo';
@@ -118,7 +119,11 @@ async function loadEvidence(){
 }
 $('allEvidence').onclick=action(async()=>{$('query').value='';await loadEvidence()});
 $('evidenceView').onchange=action(loadEvidence);
-$('region').onchange=chooseRegion;$('candidate').onchange=action(loadEvidence);$('search').onclick=action(loadEvidence);$('query').addEventListener('keydown',e=>{if(e.key==='Enter')$('search').click()});
+$('region').onchange=chooseRegion;
+$('articleRegion').onchange=action(async()=>{$('region').value=$('articleRegion').value;chooseRegion();await loadSelectedArticles(true)});
+$('searchArticles').onclick=action(async()=>{await loadSelectedArticles(true)});
+const pastResultsLink=document.querySelector('a[href="#past-results"]');if(pastResultsLink)pastResultsLink.addEventListener('click',()=>{$('pastResultsToggle').open=true});
+$('candidate').onchange=action(loadEvidence);$('search').onclick=action(loadEvidence);$('query').addEventListener('keydown',e=>{if(e.key==='Enter')$('search').click()});
 $('official').onclick=action(async()=>{if(!$('officialRows').hidden){$('officialRows').hidden=true;$('official').setAttribute('aria-expanded','false');return}const v=await api('/api/official-results');$('officialRows').innerHTML='<p>'+esc(v.label)+'</p><div class="scroll"><table><thead><tr><th>지역구</th><th>후보</th><th>정당</th><th>집계 득표수</th><th>계산 득표율</th></tr></thead><tbody>'+v.rows.map(r=>`<tr><td>${esc(r.region_name)}</td><td>${esc(r.candidate_name)}</td><td>${esc(r.party)}</td><td>${Number(r.votes).toLocaleString('ko-KR')}</td><td>${Number(r.vote_share).toFixed(2)}%</td></tr>`).join('')+'</tbody></table></div>';$('officialRows').hidden=false;$('official').setAttribute('aria-expanded','true')});
 $('productionToggle').onclick=()=>{const open=$('productionInfo').hidden;$('productionInfo').hidden=!open;$('productionToggle').setAttribute('aria-expanded',String(open))};
 $('draft').onclick=async()=>{
