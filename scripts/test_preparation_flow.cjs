@@ -3,7 +3,7 @@ const source=fs.readFileSync('election-news-server/dashboard.js','utf8');
 const elements={};const el=id=>elements[id]||(elements[id]={value:'',checked:false,disabled:false,textContent:'',focus(){this.focused=true}});
 el('draftType').value='result';el('candidate').value='a';
 const context=vm.createContext({document:{},$:el,location:{hash:''},Date});
-vm.runInContext(`let mode='demo',region='R';let snap={rows:[{region_name:'R',candidate_id:'a',candidate_name:'A'},{region_name:'R',candidate_id:'b',candidate_name:'B'}]};const selectedMode=()=>mode,selectedRegion=()=>region;function syncDraftAvailability(){};async function loadEvidence(){preparation.loaded={key:preparationKey(),candidate:$('candidate').value,ids:[],hasBody:false};syncPreparation()};`+source.slice(source.indexOf("let preparation={"),source.indexOf('function syncDraftAvailability(){')),context);
+vm.runInContext(`let selectedNews={ids:[]};let mode='demo',region='R';let snap={rows:[{region_name:'R',candidate_id:'a',candidate_name:'A'},{region_name:'R',candidate_id:'b',candidate_name:'B'}]};const selectedMode=()=>mode,selectedRegion=()=>region;function syncDraftAvailability(){};async function loadEvidence(){preparation.loaded={key:preparationKey(),candidate:$('candidate').value,ids:[],hasBody:false};syncPreparation()};`+source.slice(source.indexOf("let preparation={"),source.indexOf('function syncDraftAvailability(){')),context);
 (async()=>{
  vm.runInContext('syncPreparation()',context);assert.equal(vm.runInContext('preparationReady()',context),false);
  await vm.runInContext('loadEvidence()',context);

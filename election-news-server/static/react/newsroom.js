@@ -9482,7 +9482,7 @@ function fe() {
 		g,
 		n
 	]);
-	let re = c && u && c <= u ? de(t, te, c, u) : null;
+	let re = S.filter((e) => g.includes(e.id)), C = c && u && c <= u ? de(t, te, c, u) : null;
 	return /* @__PURE__ */ (0, w.jsxs)("section", {
 		className: "election-news",
 		"aria-label": "선거일 전후 언론 기사 검색",
@@ -9635,9 +9635,38 @@ function fe() {
 				role: "status",
 				children: "실제 보도 목록을 불러오는 중입니다."
 			}),
-			re && /* @__PURE__ */ (0, w.jsx)("a", {
+			/* @__PURE__ */ (0, w.jsxs)("div", {
+				className: "news-next-step",
+				children: [
+					/* @__PURE__ */ (0, w.jsxs)("strong", { children: [
+						"참고 기사 ",
+						re.length,
+						"건 선택"
+					] }),
+					/* @__PURE__ */ (0, w.jsx)("button", {
+						type: "button",
+						disabled: !t || !re.length,
+						onClick: () => window.dispatchEvent(new CustomEvent("newsroom:review-selected-news", { detail: {
+							region: t,
+							from: c,
+							to: u,
+							ids: re.map((e) => e.id),
+							references: re.map((e) => ({
+								id: e.id,
+								title: e.title,
+								url: e.url,
+								publisher: e.publisher
+							})),
+							candidate_id: te ? (e.snapshot?.rows || []).find((e) => e.region_name === t && e.candidate_name === te)?.candidate_id : null
+						} })),
+						children: "선택 기사로 04 공약 근거 확인 →"
+					}),
+					!t && /* @__PURE__ */ (0, w.jsx)("span", { children: "지역선거구를 먼저 선택하세요." })
+				]
+			}),
+			C && /* @__PURE__ */ (0, w.jsx)("a", {
 				className: "news-more",
-				href: re,
+				href: C,
 				target: "_blank",
 				rel: "noopener noreferrer",
 				children: "같은 후보·기간으로 인터넷 뉴스 원문 더 찾기 ↗"

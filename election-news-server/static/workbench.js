@@ -1,7 +1,7 @@
 /* Editorial workstation uses the authenticated session; approvals are never preselected. */
 let loggedUser=null,jobTimer=null,pdfDigest=null;
 const wbDialog=document.getElementById('workspaceDialog');
-const wbError=e=>{const text=e?.message||String(e);if(wbDialog.open)$('dialogMessage').textContent=text;else{$('message').className='message is-error';$('message').textContent=text}};
+const wbError=e=>{const text=e?.message||String(e);if($('productionDialog').open){$('productionMessage').textContent=text;return}if(wbDialog.open)$('dialogMessage').textContent=text;else{$('message').className='message is-error';$('message').textContent=text}};
 const wbAction=fn=>async()=>{try{await fn()}catch(e){wbError(e)}};
 function wbOpen(title,body){$('dialogTitle').textContent=title;$('dialogBody').innerHTML=body;$('dialogMessage').textContent='';if(!wbDialog.open)wbDialog.showModal()}
 async function wbIdentity(){const previous=loggedUser;loggedUser=await api('/api/me');if(previous?.name!==loggedUser.name||previous?.role!==loggedUser.role)resetReviewConfirmation();$('accountStatus').textContent=loggedUser.name+' · '+(loggedUser.role==='admin'?'시스템 관리자':loggedUser.role==='editor'?'독립 편집 담당자':'기사·자료 작성 담당자');$('signOut').hidden=false;
@@ -36,10 +36,10 @@ $('openAudit').onclick=wbAction(async()=>{await wbIdentity();const [records,inte
 
 async function wbJobs(){
  const jobs=await api('/api/production/jobs');$('renderJobs').innerHTML=jobs.length?jobs.map(j=>`<div class="job-card"><span class="job-state">${esc(({QUEUED:'제작 대기',RUNNING:'FHD 영상 제작 중',COMPLETED:'제작 완료',FAILED:'제작 실패'})[j.status]||j.status)}</span> · ${esc(j.id)}<p>${esc(j.created_at)} · ${j.mode==='demo'?'시뮬레이션':'공식 자료'} ${j.error?' · '+esc(j.error):''}</p>${j.status==='COMPLETED'?['news.mp4','news-package.zip','subtitles.srt','manifest.json','script.txt'].map(name=>`<button class="secondary" data-job="${esc(j.id)}" data-file="${name}">${({ 'news.mp4':'FHD 영상','news-package.zip':'전체 제작물','subtitles.srt':'자막','manifest.json':'제작 원장','script.txt':'대본'})[name]} ↓</button>`).join(''):''}</div>`).join(''):'<p>제작 작업이 없습니다.</p>';document.querySelectorAll('[data-job]').forEach(b=>b.onclick=wbAction(()=>wbDownload('/api/production/jobs/'+b.dataset.job+'/files/'+b.dataset.file,b.dataset.file)));
- if(jobTimer)clearTimeout(jobTimer);if(jobs.some(j=>['QUEUED','RUNNING'].includes(j.status))&&!$('productionInfo').hidden)jobTimer=setTimeout(()=>wbJobs().catch(wbError),2500);
+ if(jobTimer)clearTimeout(jobTimer);if(jobs.some(j=>['QUEUED','RUNNING'].includes(j.status))&&$('productionDialog').open)jobTimer=setTimeout(()=>wbJobs().catch(wbError),2500);
 }
 async function wbProduction(){
- await wbIdentity();const articles=(await api('/api/articles')).filter(a=>a.status==='APPROVED'&&a.mode===selectedMode());
+ await ensureArticleSession();const articles=(await api('/api/articles')).filter(a=>a.status==='APPROVED'&&a.mode===selectedMode());
  $('productionInfo').innerHTML=`<div class="notice">승인 기사와 고정 근거로 1920×1080 MP4·대본·자막·CG를 만듭니다. 원문 또는 승인이 철회되면 완성 파일 다운로드도 차단됩니다. 음성이 없으면 자막형 무음 영상으로 명시합니다.</div><div class="prod-select">${articles.length?articles.map(a=>`<label><input type="checkbox" class="render-article" value="${esc(a.id)}">${esc(a.title)} · ${esc(a.author)}</label>`).join(''):'승인된 기사가 없습니다. 기사 검증과 독립 편집 승인을 먼저 진행하세요.'}</div><div class="prod-options"><label>기사당 초 <input type="number" id="renderSeconds" min="5" max="120" value="30"></label><label>내레이션 PCM WAV · 선택<input type="file" id="renderAudio" accept="audio/wav"></label><button id="renderStart" ${articles.length?'':'disabled'}>FHD 뉴스 제작</button><button id="renderRefresh" class="secondary">상태 새로고침</button></div><div id="renderJobs"></div>`;
  const disclosure=document.createElement('label');disclosure.innerHTML='음성 출처 <select id="renderAudioType"><option value="">음성 사용 시 선택</option><option value="human">직접 녹음한 음성</option><option value="synthetic">AI 합성 음성</option></select>';$('renderAudio').parentElement.after(disclosure);
  $('renderStart').onclick=wbAction(async()=>{
@@ -48,7 +48,7 @@ async function wbProduction(){
   await api('/api/production/jobs',{article_ids:ids,seconds_per_article:Number($('renderSeconds').value),narration_wav_base64:audio?await wbBase64(audio):null,narration_disclosure:audio?$('renderAudioType').value:'none'});await wbJobs()
  });$('renderRefresh').onclick=wbAction(wbJobs);await wbJobs();
 }
-const wbOldProduction=$('productionToggle').onclick;$('productionToggle').onclick=wbAction(async()=>{wbOldProduction();if(!$('productionInfo').hidden)await wbProduction()});
+const wbOldProduction=$('productionToggle').onclick;$('productionToggle').onclick=wbAction(async()=>{wbOldProduction();if($('productionDialog').open){await wbProduction();$('productionMessage').textContent='승인 기사를 선택해 제작할 수 있습니다.'}});
 
 $('signOut').onclick=wbAction(async()=>{await api('/api/session/logout',{});loggedUser=null;location.href='/login'});
 wbIdentity().catch(()=>{});
