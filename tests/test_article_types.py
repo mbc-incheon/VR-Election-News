@@ -74,3 +74,18 @@ def test_checked_pledge_content_and_custom_title_are_used(room):
  assert pledge['evidence_ids']==ids and '환승 편의 개선' in pledge['text']
  errors=room.validate(article)['validation']['errors']
  assert any('DOCUMENT_REVIEW_REQUIRED' in error for error in errors)
+
+
+def test_google_metadata_is_persisted_scoped_and_tamper_checked(room):
+ source=dict(id='external-id',title='연수구을 선거 결과',publisher='테스트 언론사',published_date='2024-04-11',url='https://news.google.com/rss/articles/test')
+ item=room.retain_google_news([source],'연수구을')[0]
+ assert item['body_verified'] is False
+ assert item['id']==room.retain_google_news([source],'연수구을')[0]['id']
+ article=room.draft('연수구을','TEST-writer','official','news',news_ids=[item['id']])
+ assert article['news_references']==[item]
+ assert '원문 본문은 확인하지 않았다' in article['sentences'][-1]['text']
+ assert 'NEWS_REFERENCE_MISMATCH' not in room.validate(article)['validation']['errors']
+ with pytest.raises(ValueError):room.draft('계양구갑','TEST-writer','official','news',news_ids=[item['id']])
+ with pytest.raises(ValueError):room.draft('연수구을','TEST-writer','official','news',news_ids=['GOOGLE-forged'])
+ article['news_references'][0]['title']='변조 제목'
+ assert 'NEWS_REFERENCE_MISMATCH' in room.validate(article)['validation']['errors']

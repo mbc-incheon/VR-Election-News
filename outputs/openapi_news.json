@@ -2002,7 +2002,7 @@
               "type": "string"
             },
             "type": "array",
-            "maxItems": 20,
+            "maxItems": 60,
             "title": "News Ids"
           },
           "period_from": {

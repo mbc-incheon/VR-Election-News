@@ -30,6 +30,35 @@ class Newsroom(WorkflowMixin):
         self.db.executescript(Path(__file__).with_name('platform_schema.sql').read_text())
         self.db.commit()
 
+    def news_catalogue(self):
+        items=json.loads((Path(__file__).with_name('static')/'election-news-index.json').read_text(encoding='utf-8'))['items']
+        folder=self.root/'google_news'
+        if folder.exists():
+            for path in folder.glob('*.json'):
+                item=json.loads(path.read_text(encoding='utf-8'))
+                if item.get('id')=='GOOGLE-'+sha({k:v for k,v in item.items() if k!='id'}):items.append(item)
+        return items
+
+    @locked
+    def retain_google_news(self,items,region='',candidate=''):
+        rows=self.latest('official').get('rows',[])
+        known=sorted({row['region_name'] for row in rows})
+        if region and region not in known:raise ValueError('공식 선거구를 확인하세요.')
+        folder=self.root/'google_news';folder.mkdir(exist_ok=True)
+        saved=[]
+        for source in items:
+            names=[row['candidate_name'] for row in rows if row['candidate_name'] in source['title']]
+            related=sorted({row['region_name'] for row in rows if row['candidate_name'] in names or row['region_name'] in source['title']})
+            item={**source,'regions':[region] if region else related or known,'candidate_names':sorted(set(names)),
+                  'candidate_regions':{name:sorted({row['region_name'] for row in rows if row['candidate_name']==name}) for name in names},
+                  'kind':'구글 뉴스 검색 메타데이터','source_kind':'google_news','scope_status':'SEARCH_CONTEXT_ONLY',
+                  'search_region':region,'search_candidate':candidate,'body_verified':False}
+            item.pop('id',None);item['id']='GOOGLE-'+sha(item)
+            target=folder/(item['id']+'.json')
+            if not target.exists():target.write_text(canonical(item),encoding='utf-8')
+            saved.append(item)
+        return saved
+
     @locked
     def audit(self,kind,actor,details):
         last=self.db.execute('SELECT hash FROM audit ORDER BY id DESC LIMIT 1').fetchone()
@@ -123,7 +152,7 @@ class Newsroom(WorkflowMixin):
                 start=date.fromisoformat(period_from);end=date.fromisoformat(period_to)
                 if start>end:raise ValueError()
             except (TypeError,ValueError):raise ValueError('보도 검색 기간을 확인하세요.')
-            catalogue=json.loads((Path(__file__).with_name('static')/'election-news-index.json').read_text(encoding='utf-8'))['items']
+            catalogue=self.news_catalogue()
             for nid in dict.fromkeys(news_ids):
                 item=next((item for item in catalogue if item['id']==nid),None)
                 if not item or region not in item['regions'] or not period_from<=item['published_date']<=period_to or (candidate_id and rows[0]['candidate_name'] not in item['candidate_names']):raise ValueError('선택 보도의 후보·지역·기간이 일치하지 않습니다.')
@@ -146,6 +175,7 @@ class Newsroom(WorkflowMixin):
                 sentences.append(dict(kind='pledge',text=f"{r['candidate_name']}의 공약 자료에는 다음 내용이 제시돼 있다: {c['text']}",candidate_id=r['candidate_id'],region_name=region,evidence_ids=[c['id']],evidence_hashes=[c['sha256']]))
         for reference in references:
             text=f"{reference['published_date']} {reference['publisher']}은 ‘{reference['title']}’ 제목의 보도를 게재했다."
+            if reference.get('source_kind')=='google_news':text+=' (구글 뉴스 검색 메타데이터 기준이며 원문 본문은 확인하지 않았다.)'
             sentences.append(dict(kind='news',text=text,evidence_ids=[reference['id']],evidence_hashes=[sha(reference)],region_name=region,candidate_id=candidate_id or '',source_url=reference['url']))
         a=dict(id=secrets.token_hex(8),revision=1,author=author,created_at=now(),snapshot_id=snap['snapshot_id'],mode=snap['mode'],region_name=region,
                title=f"[{('가상 개표' if snap['mode']=='demo' else '실제 결과')}] {region} {rows[0]['candidate_name']+' · ' if candidate_id else ''}"+{'combined':'개표와 공약 확인','result':'후보별 득표 결과','pledge':'후보 공약 근거 비교','news':'선거 전후 보도 참고 초안'}[article_type],
@@ -212,12 +242,13 @@ class Newsroom(WorkflowMixin):
                 reference=next((item for item in a.get('news_references',[]) if s.get('evidence_ids')==[item['id']]),None)
                 if not reference:errors.append(prefix+'NEWS_REFERENCE_MISSING');continue
                 expected=f"{reference['published_date']} {reference['publisher']}은 ‘{reference['title']}’ 제목의 보도를 게재했다."
+                if reference.get('source_kind')=='google_news':expected+=' (구글 뉴스 검색 메타데이터 기준이며 원문 본문은 확인하지 않았다.)'
                 if s['text']!=expected or s.get('evidence_hashes')!=[sha(reference)] or s.get('source_url')!=reference['url'] or s.get('region_name')!=a['region_name']:errors.append(prefix+'NEWS_REFERENCE_MISMATCH')
             else:errors.append(prefix+'UNSUPPORTED_CLAIM')
         if a.get('article_type','combined') in ('combined','pledge') and not any(s['kind']=='pledge' for s in a['sentences']):errors.append('NO_PLEDGE_EVIDENCE')
         if a.get('article_type')=='news' or a.get('news_references'):
             if not a.get('news_references'):errors.append('NO_NEWS_REFERENCE')
-            catalogue=json.loads((Path(__file__).with_name('static')/'election-news-index.json').read_text(encoding='utf-8'))['items']
+            catalogue=self.news_catalogue()
             for reference in a.get('news_references',[]):
                 original=next((item for item in catalogue if item['id']==reference.get('id')),None)
                 period=a.get('news_period',{})

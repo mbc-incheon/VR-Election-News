@@ -130,7 +130,9 @@ async def google_news(region:str=Query(default='',max_length=60),candidate:str=Q
                       start:str=Query(default='2024-04-03',pattern=r'^\d{4}-\d{2}-\d{2}$'),
                       end:str=Query(default='2024-04-17',pattern=r'^\d{4}-\d{2}-\d{2}$'),
                       period:Literal['all','선거 전','선거 당일','선거 후']='all'):
-    try:return await search_google_news(region,candidate,start,end,period)
+    try:
+        result=await search_google_news(region,candidate,start,end,period)
+        return dict(**result, references=room.retain_google_news(result['items'],region,candidate))
     except ValueError:raise HTTPException(400,'검색 날짜 또는 응답 형식을 확인하세요.')
     except Exception:raise HTTPException(502,'구글 뉴스 검색에 연결하지 못했습니다. 잠시 후 다시 검색하거나 구글 뉴스에서 직접 확인하세요.')
 
@@ -312,7 +314,7 @@ class Draft(BaseModel):
     mode:Mode|None=None
     article_type:Literal['combined','result','pledge','news']='combined'
     candidate_id:str|None=Field(default=None,max_length=100)
-    news_ids:list[str]=Field(default_factory=list,max_length=20)
+    news_ids:list[str]=Field(default_factory=list,max_length=60)
     period_from:str='2024-04-03'
     period_to:str='2024-04-17'
     title:str|None=Field(default=None,min_length=2,max_length=200)
