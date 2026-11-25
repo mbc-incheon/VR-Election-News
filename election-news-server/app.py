@@ -18,6 +18,7 @@ from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
 from core import Newsroom, now
+from election_simulation import DEMO_CANDIDATES
 from production import Production,korean_font
 from admin_auth import AdminAuth
 from admin_recovery import AdminRecovery
@@ -59,12 +60,17 @@ def role(user,*roles):
     if user['role'] not in roles:raise HTTPException(403,'역할 권한이 없습니다')
 
 def seed_demo_documents():
+    # Keep original documents in storage, but retire only superseded auto-generated profiles.
+    for doc in room.documents():
+        if (doc.get('is_demo') and doc.get('publisher')=='VR 선거보도 시스템 가상 자료실'
+                and doc.get('url')=='demo://fixtures/pledges' and '가상후보 ' in doc.get('title','')):
+            for chunk in doc['chunks']:room.retire(chunk['id'],'demo-profile-update')
     for i,region in enumerate(['계양구을','연수구을','서구병']):
-        for ci in range(3):
-            room.add_document(dict(title=f'{region} 가상후보 {chr(65+ci)} 시뮬레이션 공약',publisher='VR 선거보도 시스템 가상 자료실',
-                url='demo://fixtures/pledges',published_at='2024-04-01',collected_at='2026-11-20T00:00:00+09:00',
+        for ci,profile in enumerate(DEMO_CANDIDATES):
+            room.add_document(dict(title=f"{region} {profile['name']} 가상 공약",publisher='VR 선거보도 시스템 가상 자료실',
+                url='demo://fixtures/pledges',published_at='2024-04-01',collected_at='2026-11-25T00:00:00+09:00',
                 document_type='campaign',election_id='KR-20240410-NA22',region_name=region,candidate_id=f'DEMO-{i}-{ci}',
-                text=('교통 분야에서 환승 편의를 개선하겠다는 가상 공약이다. 추진 일정과 재원은 명시하지 않았다.' if ci==0 else '주거 분야에서 공공임대 상담을 확대하겠다는 가상 공약이다. 추진 일정과 재원은 명시하지 않았다.'),
+                text=f"{profile['name']}({profile['party']}, 가상 정당)은 {profile['pledge']} 이 내용은 사용자 설정의 가상 공약이며 실제 후보의 공약이 아니다. 구체적인 일정·예산은 설정하지 않았다.",
                 is_demo=True,rights='프로젝트 제작 가상 자료'), 'demo-bootstrap')
 
 async def receive_loop():

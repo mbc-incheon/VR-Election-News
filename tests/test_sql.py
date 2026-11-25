@@ -19,11 +19,12 @@ spec.loader.exec_module(initializer)
 def test_schema_and_seed_roundtrip(tmp_path):
     assert (ROOT / 'db/001_schema.sql').read_bytes() == (ROOT / 'election-news-server/schema.sql').read_bytes()
     counts = initializer.initialize(tmp_path / 'news.sqlite', demo=True)
-    assert counts == {'snapshot': 1, 'chunk': 6, 'article': 1, 'approval': 0, 'audit': 8}
+    assert counts == {'snapshot': 1, 'chunk': 9, 'article': 1, 'approval': 0, 'audit': 11}
     room = Newsroom(tmp_path)
     try:
         article = room.get('SQL-DEMO-ARTICLE-001')
         assert article['status'] == 'DRAFT'
+        assert {r['candidate_name'] for r in room.latest('demo')['rows']} == {'서지훈','한도윤','박채린'}
         assert room.validate(article)['status'] == 'PENDING_HUMAN'
         with pytest.raises(ValueError):
             room.export(article['id'])

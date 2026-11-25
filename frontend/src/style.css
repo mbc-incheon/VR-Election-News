@@ -9,3 +9,5 @@
 .news-pagination{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0;font-size:12px}.news-pagination button{font-size:12px}
 
 .news-next-step{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:14px;background:#e4f1f3;border-radius:7px;margin:14px 0;font-size:12px}.news-next-step button{white-space:normal}.selected-news-summary{padding:14px;background:#edf5f8;border:1px solid #c7dfe5;border-radius:7px;margin:12px 0;font-size:12px;line-height:1.8;overflow-wrap:anywhere}.selected-news-summary p{margin:6px 0}.selected-news-summary a{color:#08708a}
+
+.react-profile-message{font-size:12px;color:#506d7f;line-height:1.7;margin:12px 0 0;overflow-wrap:anywhere}

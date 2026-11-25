@@ -9149,7 +9149,7 @@ function ae({ candidate: e, index: t, selected: n, onSelect: r }) {
 				className: "react-candidate-heading",
 				children: [/* @__PURE__ */ (0, w.jsx)("span", {
 					className: "react-party",
-					children: e.is_demo ? "가상 후보" : e.party || "정당 미제공"
+					children: e.is_demo ? e.party ? e.party + " (가상)" : "가상 후보" : e.party || "정당 미제공"
 				}), /* @__PURE__ */ (0, w.jsx)("button", {
 					type: "button",
 					onClick: r,
@@ -9171,6 +9171,10 @@ function ae({ candidate: e, index: t, selected: n, onSelect: r }) {
 				className: "react-share-track",
 				"aria-hidden": "true",
 				children: /* @__PURE__ */ (0, w.jsx)("span", { style: { width: Math.max(0, Math.min(100, e.vote_share ?? 0)) + "%" } })
+			}),
+			e.is_demo && e.profile_message && /* @__PURE__ */ (0, w.jsx)("p", {
+				className: "react-profile-message",
+				children: e.profile_message
 			}),
 			/* @__PURE__ */ (0, w.jsx)("div", {
 				className: "react-candidate-source",
