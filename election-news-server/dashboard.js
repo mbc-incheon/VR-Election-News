@@ -31,7 +31,7 @@ function renderArticleButtons(articles){
  publishNewsroom({articles});
  if(typeof window!=='undefined'&&window.newsroomReactLists)return;
  $('articles').innerHTML='';
- articles.forEach(a=>{const item=document.createElement('button');item.className='secondary';item.textContent=a.title+' · '+(statuses[a.status]||a.status);item.onclick=action(async()=>{show(await api('/api/articles/'+a.id));openArticlePopup('editor')});$('articles').appendChild(item)});
+ articles.forEach(a=>{const item=document.createElement('button');item.className='secondary';item.textContent=a.title+' · '+(statuses[a.status]||a.status);item.onclick=action(async()=>{show(await api('/api/articles/'+a.id));focusArticleWorkspace('editor')});$('articles').appendChild(item)});
 }
 
 let preparation={key:'',confirmed:{},loaded:null};
@@ -59,12 +59,9 @@ async function confirmEvidenceAndContinue(){
  if(next){$('candidate').value=next.candidate_id;$('evidenceFlowMessage').textContent='다음 후보 '+next.candidate_name+'의 자료를 확인해 주세요.';await loadEvidence();return}
  syncPreparation();syncDraftAvailability();location.hash='article-generator';$('article-generator').focus();$('draftMessage').textContent='선택 후보의 자료 확인을 마쳤습니다. 기사 유형과 후보를 확인하고 기사 초안 생성을 누르세요.';
 }
-function openArticlePopup(view='editor'){
- const list=view==='list';$('popupEditorPane').hidden=list;$('popupListPane').hidden=!list;
- $('articlePopupTitle').textContent=list?'기사 목록':'기사 초안 생성과 편집';
- $('articlePopupScope').textContent=selectedRegion()+' · '+(selectedMode()==='demo'?'가상 개표 자료':'2024년 공식 결과')+' · '+($('draftCandidate').selectedOptions?.[0]?.textContent||'후보 전체');
- if(!$('articlePopup').open)$('articlePopup').showModal();
- requestAnimationFrame(()=>{$('articlePopup').querySelectorAll('textarea').forEach(field=>{field.style.height='auto';field.style.height=field.scrollHeight+'px'})});
+function focusArticleWorkspace(view='editor'){
+ const target=view==='list'?$('articles'):$('inlineArticleWorkspace');
+ target.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function syncDraftAvailability(){
  const disabled=articleBusy||!preparationReady()||(typeof loggedUser!=='undefined'&&loggedUser&&loggedUser.role!=='writer');
@@ -84,7 +81,6 @@ async function loadSelectedArticles(connectSession=false){
  return articles;
 }
 function resetArticleWorkspace(){
- if($('articlePopup').open)$('articlePopup').close();
  current=null;renderArticleButtons([]);publishNewsroom({current:null});
  $('draftPreview').hidden=true;$('draftPreview').innerHTML='';
  $('selectedTitle').textContent=selectedRegion()+' · 기사를 생성하거나 선택하세요';$('selectedAuthor').textContent='작성자 —';$('selectedStatus').textContent='대기';
@@ -162,8 +158,8 @@ $('allEvidence').onclick=action(async()=>{$('query').value='';await loadEvidence
 $('evidenceView').onchange=action(loadEvidence);
 $('region').onchange=chooseRegion;
 $('articleRegion').onchange=action(async()=>{$('region').value=$('articleRegion').value;chooseRegion();await loadSelectedArticles(true)});
-$('searchArticles').onclick=action(async()=>{openArticlePopup('list');await loadSelectedArticles(true)});
-$('closeArticlePopup').onclick=()=>$('articlePopup').close();$('popupEditorTab').onclick=()=>openArticlePopup('editor');$('popupListTab').onclick=action(async()=>{openArticlePopup('list');await loadSelectedArticles(true)});$('popupReview').onclick=()=>{$('articlePopup').close();location.hash='review'};
+$('searchArticles').onclick=action(async()=>{focusArticleWorkspace('list');await loadSelectedArticles(true)});
+
 const pastResultsLink=document.querySelector('a[href="#past-results"]');if(pastResultsLink)pastResultsLink.addEventListener('click',()=>{$('pastResultsToggle').open=true});
 $('candidate').onchange=action(async()=>{if($('draftCandidate').value)$('draftCandidate').value=$('candidate').value;syncPreparation();syncDraftAvailability();await loadEvidence()});
 $('draftCandidate').onchange=action(async()=>{syncPreparation();syncDraftAvailability();if($('draftCandidate').value){$('candidate').value=$('draftCandidate').value;await loadEvidence()}});
@@ -172,7 +168,7 @@ $('goEvidence').onclick=action(goToEvidence);$('confirmEvidence').onclick=action
 $('official').onclick=action(async()=>{if(!$('officialRows').hidden){$('officialRows').hidden=true;$('official').setAttribute('aria-expanded','false');return}const v=await api('/api/official-results');$('officialRows').innerHTML='<p>'+esc(v.label)+'</p><div class="scroll"><table><thead><tr><th>지역구</th><th>후보</th><th>정당</th><th>집계 득표수</th><th>계산 득표율</th></tr></thead><tbody>'+v.rows.map(r=>`<tr><td>${esc(r.region_name)}</td><td>${esc(r.candidate_name)}</td><td>${esc(r.party)}</td><td>${Number(r.votes).toLocaleString('ko-KR')}</td><td>${Number(r.vote_share).toFixed(2)}%</td></tr>`).join('')+'</tbody></table></div>';$('officialRows').hidden=false;$('official').setAttribute('aria-expanded','true')});
 $('productionToggle').onclick=()=>{const open=$('productionInfo').hidden;$('productionInfo').hidden=!open;$('productionToggle').setAttribute('aria-expanded',String(open))};
 $('draft').onclick=async()=>{
- if(articleBusy)return;openArticlePopup('editor');articleBusy=true;
+ if(articleBusy)return;focusArticleWorkspace('editor');articleBusy=true;
  const button=$('draft'),notice=$('draftMessage');
  button.disabled=true;button.textContent='초안 생성 중…';notice.className='message';notice.textContent='작성자 연결과 선택 지역의 자료를 확인하고 있습니다…';
  try{
@@ -188,12 +184,12 @@ $('draft').onclick=async()=>{
   if(!sameArticleScope(scope))return;
   renderArticleButtons([article,...(window.newsroomView?.articles||[]).filter(item=>item.id!==article.id&&item.mode===scope.mode&&item.region_name===scope.region)]);show(article);
   const pledgeCount=article.sentences.filter(s=>s.kind==='pledge').length;
-  notice.textContent='초안을 생성했습니다. 팝업에서 본문·목록을 확인하고, 05 검증 화면으로 이동해 근거 확인과 규칙 검증을 진행하세요.'+(articleType==='pledge'&&!pledgeCount?' 등록된 공약 근거가 없어 개표 결과만 작성했습니다. 04에서 홍보물·기존 자료를 확인하세요. 기사에 공약 문장을 넣으려면 검증 가능한 본문 근거가 필요합니다.':'');
+  notice.textContent='초안을 생성했습니다. 04 영역에서 본문·목록을 확인하고, 05 검증 화면으로 이동해 근거 확인과 규칙 검증을 진행하세요.'+(articleType==='pledge'&&!pledgeCount?' 등록된 공약 근거가 없어 개표 결과만 작성했습니다. 04에서 홍보물·기존 자료를 확인하세요. 기사에 공약 문장을 넣으려면 검증 가능한 본문 근거가 필요합니다.':'');
  }catch(e){notice.className='message is-error';notice.textContent=e.message}
  finally{articleBusy=false;syncDraftAvailability();button.textContent='▤ 기사 초안 생성'}
 };
 $('list').onclick=async()=>{
- openArticlePopup('list');
+ focusArticleWorkspace('list');
  const button=$('list'),notice=$('draftMessage');button.disabled=true;button.textContent='목록 불러오는 중…';notice.className='message';notice.textContent='기사 목록을 확인하고 있습니다…';
  try{
   await loadSelectedArticles(true);
@@ -213,7 +209,7 @@ if(typeof window!=='undefined'){
   if(!sameArticleScope(scope))return;renderArticleButtons([revised,...(window.newsroomView?.articles||[]).filter(item=>item.id!==revised.id)]);show(revised);$('draftMessage').textContent='수정본 v'+revised.revision+'을 초안으로 저장했습니다. 05에서 다시 검증해 주세요.';
  })()});
  window.addEventListener('newsroom:candidate' ,event=>{if([...$('candidate').options].some(option=>option.value===event.detail)){$('candidate').value=event.detail;table()}});
- window.addEventListener('newsroom:select-article',event=>{if(window.newsroomView?.articles?.some(article=>article.id===event.detail))void action(async()=>{const article=await api('/api/articles/'+event.detail);show(article);openArticlePopup('editor')})()});
+ window.addEventListener('newsroom:select-article',event=>{if(window.newsroomView?.articles?.some(article=>article.id===event.detail))void action(async()=>{const article=await api('/api/articles/'+event.detail);show(article);focusArticleWorkspace('editor')})()});
  window.addEventListener('pageshow',event=>{if(event.persisted)connect()});
  window.addEventListener('pagehide',()=>{clearTimeout(reconnectTimer);if(liveSocket){liveSocket.onclose=null;liveSocket.close()}});
 }

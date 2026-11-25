@@ -1,12 +1,12 @@
 {
-  "captured_at": "2026-11-25T14:22:58.408874+09:00",
+  "captured_at": "2026-11-25T14:25:29.420638+09:00",
   "repository": "https://github.com/mbc-incheon/VR-Election-News",
   "release_version": "2.0.0",
   "imported_from": {
     "repository": "https://github.com/mbc-incheon/election-analysis-project-01",
     "commit": "00ac79dc6ec77d6bd4c1e883e152fd78f2e3ab91"
   },
-  "repository_base_commit": "43f662d0c591e8009f559a3d5f630a9d8ca300aa",
+  "repository_base_commit": "b4efd2df9ab8ad4a1e918a19ec1f482c504e2232",
   "note": "Base commit is the parent context before this manifest is committed; exact publication commit is in Git history.",
   "runtime": {
     "python": "3.12.10"
@@ -44,8 +44,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 27079,
-      "sha256": "a6ac9e7eb1a6fb725530c7181fb50c07d6f9d0ac9dc5cac075828b7f21cb06c0"
+      "bytes": 27356,
+      "sha256": "1d5da35b7bc10c8ada027c08ca561d07ae883e8791df60ca099e3f69b072ea72"
     },
     {
       "path": "compose.yaml",
@@ -314,13 +314,13 @@
     },
     {
       "path": "election-news-server/dashboard.js",
-      "bytes": 29649,
-      "sha256": "6566434c5d3b1fdd1572094fdfb7aaffe999c65f06ad06aff4cf45cff526846f"
+      "bytes": 28830,
+      "sha256": "4693ea5933586e25098d309abbaa3ed7c9e766400162c1a18842766345e06439"
     },
     {
       "path": "election-news-server/dashboard.template.html",
-      "bytes": 13778,
-      "sha256": "514d67df26a39fd04e46fe8b9d9c19b963e0fac7f5ca0894b1793a391d1d7b0d"
+      "bytes": 13257,
+      "sha256": "038cd819dceff0556f1ba91d1011059cbf0880661d6d83995181b4a195f7d03c"
     },
     {
       "path": "election-news-server/fixtures/fallback_snapshot.json",
@@ -329,8 +329,8 @@
     },
     {
       "path": "election-news-server/index.html",
-      "bytes": 54969,
-      "sha256": "b8df6a6d864f37269609f868bb1d0e8365f33c432e0eb5a27250b66f233ca786"
+      "bytes": 53629,
+      "sha256": "12a1cada87a1d37f6a6fb8117ed94c971244f1bbfebb311acb9dbb6a5dacb5ee"
     },
     {
       "path": "election-news-server/init_users.py",
@@ -464,8 +464,8 @@
     },
     {
       "path": "election-news-server/static/workbench.css",
-      "bytes": 6691,
-      "sha256": "de4426c2b162c13592e3f174184a67dcd1c20e929bf78f2ec708bba3f7d806b0"
+      "bytes": 6342,
+      "sha256": "5a97bbcd7078c7ec7118228c8f7a813d069e7b6548bfcd62ca89efec758e0f41"
     },
     {
       "path": "election-news-server/static/workbench.js",
