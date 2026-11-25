@@ -7,6 +7,7 @@ import CandidateCard from './components/CandidateCard.jsx';
 import TurnoutBar from './components/TurnoutBar.jsx';
 import ArticleList from './components/ArticleList.jsx';
 import PastResults from './components/PastResults.jsx';
+import ElectionNews from './components/ElectionNews.jsx';
 import './style.css';
 const notify=(name,detail)=>window.dispatchEvent(new CustomEvent(name,{detail}));
 class Boundary extends React.Component{constructor(props){super(props);this.state={error:false}}static getDerivedStateFromError(){return {error:true}}render(){return this.state.error?<p className="empty">요약 화면을 표시하지 못했습니다. 아래 수치 표를 확인하거나 새로고침해 주세요.</p>:this.props.children}}
@@ -16,3 +17,5 @@ const election=document.getElementById('react-election');if(election)createRoot(
 const articles=document.getElementById('articles');if(articles){createRoot(articles).render(<Boundary><NewsArticles/></Boundary>);window.newsroomReactLists=true}
 
 const past=document.getElementById('react-past-results');if(past)createRoot(past).render(<Boundary><PastResults/></Boundary>);
+
+const news=document.getElementById('react-election-news');if(news)createRoot(news).render(<Boundary><ElectionNews/></Boundary>);

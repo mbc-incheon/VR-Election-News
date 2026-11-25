@@ -6,7 +6,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
-    "test": "node --test src/model.test.mjs"
+    "test": "node --test src/model.test.mjs src/newsModel.test.mjs"
   },
   "dependencies": {
     "react": "19.3.1",
