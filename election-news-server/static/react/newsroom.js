@@ -9177,32 +9177,36 @@ function oe({ candidate: e, index: t, selected: n, onSelect: r }) {
 	});
 }
 // src/components/TurnoutBar.jsx
-function se({ summary: e }) {
-	let t = e.countRate;
+function se({ summary: e, finalArchive: t = !1 }) {
+	let n = t ? 100 : e.countRate, r = t ? "2024-04-11T06:00:00+09:00" : e.baseline;
 	return /* @__PURE__ */ (0, S.jsxs)("div", {
 		className: "react-progress-panel",
 		children: [
 			/* @__PURE__ */ (0, S.jsxs)("div", {
 				className: "react-progress-heading",
-				children: [/* @__PURE__ */ (0, S.jsx)("strong", { children: "개표율" }), /* @__PURE__ */ (0, S.jsx)("strong", { children: ee(t) })]
+				children: [/* @__PURE__ */ (0, S.jsx)("strong", { children: "개표율" }), /* @__PURE__ */ (0, S.jsx)("strong", { children: ee(n) })]
 			}),
-			t == null ? /* @__PURE__ */ (0, S.jsx)("p", {
+			n == null ? /* @__PURE__ */ (0, S.jsx)("p", {
 				className: "react-missing",
 				children: "원본에 개표율이 제공되지 않아 진행 막대를 표시하지 않습니다."
 			}) : /* @__PURE__ */ (0, S.jsx)("div", {
 				role: "progressbar",
 				"aria-label": "선택 지역 개표율",
-				"aria-valuenow": t,
+				"aria-valuenow": n,
 				"aria-valuemin": 0,
 				"aria-valuemax": 100,
 				className: "react-count-track",
-				children: /* @__PURE__ */ (0, S.jsx)("span", { style: { width: Math.max(0, Math.min(100, t)) + "%" } })
+				children: /* @__PURE__ */ (0, S.jsx)("span", { style: { width: Math.max(0, Math.min(100, n)) + "%" } })
 			}),
 			/* @__PURE__ */ (0, S.jsxs)("dl", { children: [
 				/* @__PURE__ */ (0, S.jsxs)("div", { children: [/* @__PURE__ */ (0, S.jsx)("dt", { children: "후보 득표 합계" }), /* @__PURE__ */ (0, S.jsxs)("dd", { children: [b(e.votes), e.votes == null ? "" : "표"] })] }),
 				/* @__PURE__ */ (0, S.jsxs)("div", { children: [/* @__PURE__ */ (0, S.jsx)("dt", { children: "투표율" }), /* @__PURE__ */ (0, S.jsx)("dd", { children: ee(e.turnout) })] }),
-				/* @__PURE__ */ (0, S.jsxs)("div", { children: [/* @__PURE__ */ (0, S.jsx)("dt", { children: "자료 기준시각" }), /* @__PURE__ */ (0, S.jsx)("dd", { children: x(e.baseline) })] })
-			] })
+				/* @__PURE__ */ (0, S.jsxs)("div", { children: [/* @__PURE__ */ (0, S.jsx)("dt", { children: t ? "표시 기준시각 (임의)" : "자료 기준시각" }), /* @__PURE__ */ (0, S.jsx)("dd", { children: x(r) })] })
+			] }),
+			t && /* @__PURE__ */ (0, S.jsx)("p", {
+				className: "react-missing",
+				children: "화면 설정값: 개표율 100% · 임의 기준시각 2024.04.11 06:00 (한국시간). 원본에 제공된 개표율·기준시각이 아니며 기사 근거에 사용하지 않습니다."
+			})
 		]
 	});
 }
@@ -9262,7 +9266,10 @@ function de() {
 					onSelect: () => le("newsroom:candidate", t.candidate_id)
 				}, t.candidate_id))
 			}),
-			/* @__PURE__ */ (0, S.jsx)(se, { summary: n }),
+			/* @__PURE__ */ (0, S.jsx)(se, {
+				summary: n,
+				finalArchive: t.mode === "official" && t.stage === "FINAL_FILE_AGGREGATION"
+			}),
 			/* @__PURE__ */ (0, S.jsxs)("p", {
 				className: "react-data-note",
 				children: [t.mode === "demo" ? "가상 후보·가상 수치입니다." : "과거 선거의 공식 파일 집계이며 현재 선거 속보가 아닙니다.", " 후보 카드는 득표수 순으로 표시하며 당선 예측을 제공하지 않습니다."]
