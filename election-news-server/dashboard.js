@@ -2,8 +2,9 @@ const $=x=>document.getElementById(x);
 let snap={},current=null,selectionKey='',searchRequest=0,liveSocket,reconnectTimer;
 const selectedMode=()=> $('dataMode')?.value||'demo';
 let officialRegions=[];
-const selectedRegion=()=>selectedMode()==='demo'?(snap.rows?.[0]?.region_name||''):($('region').value||'');
+const selectedRegion=()=>selectedMode()==='demo'?'계양구을':($('region').value||'');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function setSelectOptions(select,markup){if(select&&select._optionsMarkup!==markup){select.innerHTML=markup;select._optionsMarkup=markup}}
 const showValue=(v,suffix='')=>v===null||v===undefined?'미제공':esc(v)+suffix;
 const statuses={DRAFT:'초안',PENDING_HUMAN:'승인 대기',REVIEW_REQUIRED:'검토 필요',APPROVED:'승인 완료'};
 function timeText(value,clockOnly=false){if(!value)return '미제공';const d=new Date(value);if(Number.isNaN(d.getTime()))return String(value);return new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',...(clockOnly?{}:{year:'numeric',month:'2-digit',day:'2-digit'}),hour:'2-digit',minute:'2-digit',hour12:false}).format(d)}
@@ -93,13 +94,14 @@ function displayArchive(snapshot){return snapshot.mode==='official'&&snapshot.st
 function table(){
  const selected=$('candidate').value,region=selectedRegion(),rows=(snap.rows||[]).filter(r=>r.region_name===region);
  $('rows').innerHTML=rows.length?rows.map((r,i)=>{const share=Number(r.vote_share),url=safeSource(r.source_url);return `<tr><td class="candidate-name"><span class="candidate-mark ${i%2?'alternate':''}"></span>${esc(r.candidate_name)}</td><td>${showValue(r.votes==null?null:Number(r.votes).toLocaleString('ko-KR'),'표')}</td><td><div class="vote-share"><span class="share-value">${showValue(r.vote_share==null?null:share.toFixed(2),'%')}</span><div class="bar" aria-hidden="true"><span style="width:${Number.isFinite(share)?Math.max(0,Math.min(100,share)):0}%"></span></div></div></td><td>${displayArchive(snap)?'100% (표시값)':showValue(r.count_rate,'%')}</td><td class="table-time" title="${esc(displayArchive(snap)?'임의 기준시각: 2024.04.11 06:00 (한국시간)':r.baseline_at||'미제공')}">${displayArchive(snap)?'06:00 (임의)':esc(timeText(r.baseline_at,true))}</td><td class="table-source">${r.is_demo?'시뮬레이션':url?`<a href="${url}" target="_blank" rel="noopener noreferrer">공식 원문</a>`:'출처 미제공'}</td></tr>`}).join(''):'<tr><td colspan="6" class="empty">선택한 지역의 자료가 없습니다.</td></tr>';
- $('candidate').innerHTML=rows.map(r=>`<option value="${esc(r.candidate_id)}">${esc(r.candidate_name)}</option>`).join('');if(rows.some(r=>r.candidate_id===selected))$('candidate').value=selected;
- const draftSelected=$('draftCandidate').value;$('draftCandidate').innerHTML='<option value="">지역 후보 전체</option>'+rows.map(row=>`<option value="${esc(row.candidate_id)}">${esc(row.candidate_name)}</option>`).join('');if(rows.some(row=>row.candidate_id===draftSelected))$('draftCandidate').value=draftSelected;syncPreparation();syncDraftAvailability();
+ setSelectOptions($('candidate'),rows.map(r=>`<option value="${esc(r.candidate_id)}">${esc(r.candidate_name)}${r.is_demo?' · 가상 후보 '+r.candidate_number:''}</option>`).join(''));if(rows.some(r=>r.candidate_id===selected))$('candidate').value=selected;
+ const draftSelected=$('draftCandidate').value;setSelectOptions($('draftCandidate'),'<option value="">지역 후보 전체</option>'+rows.map(row=>`<option value="${esc(row.candidate_id)}">${esc(row.candidate_name)}</option>`).join(''));if(rows.some(row=>row.candidate_id===draftSelected))$('draftCandidate').value=draftSelected;syncPreparation();syncDraftAvailability();
  publishNewsroom({snapshot:snap,region,candidate:$('candidate').value});
  const articleKey=snap.mode+'|'+region;if(region&&snap.mode===selectedMode()&&articleKey!==articleContextKey){articleContextKey=articleKey;resetArticleWorkspace();void loadSelectedArticles().catch(error=>{if(articleContextKey===articleKey){$('draftMessage').textContent=error.status===401?'선택 지역: '+region+'. 기사 초안 생성 또는 기사 목록을 누르면 작성자 계정을 연결합니다.':'기사 목록을 불러오지 못했습니다. '+error.message}})}
  const key=region+'|'+$('candidate').value+'|'+snap.mode;if(key!==selectionKey){selectionKey=key;void loadEvidence().catch(e=>{$('evidence').textContent=e.message})}
 }
 function update(v){
+ if(v.mode!==selectedMode())return;
  snap=v;publishNewsroom({connection:v.connection});const state=v.connection?.state,demo=v.mode==='demo';$('mode').textContent=demo?'▤ 시뮬레이션 데이터':v.mode==='unavailable'?'자료 없음':'2024년 공식 자료';$('modeNote').textContent=demo?'가상 후보 3명 · '+(v.simulation_cycle||1)+'회차 · 개표율 0~100% 반복 · 실제 개표 아님':'과거 선거 자료 · 현재 속보 아님';
  $('connection').className='pill '+(state==='CONNECTED'||state==='ARCHIVE'?'good':state==='DISCONNECTED'?'bad':'');$('connection').innerHTML='<span class="dot"></span>'+({CONNECTED:'연결됨',ARCHIVE:'공식 보관 자료',DISCONNECTED:'연결 끊김',CONNECTING:'연결 중'}[state]||'연결 대기');$('error').textContent=v.connection?.error||'';
  if($('dataReviewBadge')){$('dataReviewBadge').textContent=demo?'가상 자료 · 실제 보도와 분리':v.review?.status==='APPROVED'?'공식 집계 · 독립 검수 완료':'공식 집계 · 독립 검수 필요';$('dataReviewBadge').className='pill '+(demo?'draft-pill':v.review?.status==='APPROVED'?'good':'warn')}
@@ -108,9 +110,10 @@ function update(v){
 }
 function refreshRegionOptions(){
  const select=$('region'),selected=select.value;
- select.innerHTML='<option value="">가상후보 3명 · 개표 진행</option>'+officialRegions.map(region=>`<option value="${esc(region)}">${esc(region)} · 2024년 실제 결과</option>`).join('');
+ setSelectOptions(select,'<option value="">계양구을 · 가상 후보 3명 (기본)</option>'+officialRegions.map(region=>`<option value="${esc(region)}">${esc(region)} · 2024년 실제 결과</option>`).join(''));
  select.value=selectedMode()==='demo'?'':officialRegions.includes(selected)?selected:(officialRegions[0]||'');
- if($('articleRegion')){$('articleRegion').innerHTML=select.innerHTML;$('articleRegion').value=select.value}
+ if($('evidenceRegion')){setSelectOptions($('evidenceRegion'),select.innerHTML);$('evidenceRegion').value=select.value}
+ if($('articleRegion')){setSelectOptions($('articleRegion'),select.innerHTML);$('articleRegion').value=select.value}
 }
 function chooseRegion(){
  const mode=$('region').value?'official':'demo';
@@ -159,11 +162,12 @@ async function loadEvidence(){
 $('allEvidence').onclick=action(async()=>{$('query').value='';await loadEvidence()});
 $('evidenceView').onchange=action(loadEvidence);
 $('region').onchange=chooseRegion;
+$('evidenceRegion').onchange=action(async()=>{$('region').value=$('evidenceRegion').value;chooseRegion();if(snap.mode===selectedMode())await loadEvidence()});
 $('articleRegion').onchange=action(async()=>{$('region').value=$('articleRegion').value;chooseRegion();await loadSelectedArticles(true)});
 $('searchArticles').onclick=action(async()=>{focusArticleWorkspace('list');await loadSelectedArticles(true)});
 
 const pastResultsLink=document.querySelector('a[href="#past-results"]');if(pastResultsLink)pastResultsLink.addEventListener('click',()=>{$('pastResultsToggle').open=true});
-$('candidate').onchange=action(async()=>{if($('draftCandidate').value)$('draftCandidate').value=$('candidate').value;syncPreparation();syncDraftAvailability();await loadEvidence()});
+$('candidate').onchange=action(async()=>{if(selectedMode()==='demo')$('query').value='';if($('draftCandidate').value)$('draftCandidate').value=$('candidate').value;syncPreparation();syncDraftAvailability();await loadEvidence()});
 $('draftCandidate').onchange=action(async()=>{syncPreparation();syncDraftAvailability();if($('draftCandidate').value){$('candidate').value=$('draftCandidate').value;await loadEvidence()}});
 $('draftType').onchange=()=>{syncPreparation();syncDraftAvailability()};
 $('goEvidence').onclick=action(goToEvidence);$('confirmEvidence').onclick=action(confirmEvidenceAndContinue);$('evidenceAcknowledged').onchange=syncPreparation;$('search').onclick=action(loadEvidence);$('query').addEventListener('keydown',e=>{if(e.key==='Enter')$('search').click()});

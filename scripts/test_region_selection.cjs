@@ -11,6 +11,7 @@ $('dataMode').onchange=()=>{changed++;refreshRegionOptions()};
 snap={rows:[{region_name:'계양구을'}]};officialRegions=['계양구갑','계양구을','연수구을'];
 refreshRegionOptions();
 `,context);
+let rewrites=0,markup=elements.region.innerHTML;Object.defineProperty(elements.region,'innerHTML',{get(){return markup},set(value){rewrites++;markup=value}});vm.runInContext('refreshRegionOptions();refreshRegionOptions()',context);assert.equal(rewrites,0,'live updates must not rebuild an unchanged region menu');vm.runInContext("snap={rows:[{region_name:'연수구을'}]}",context);
 assert.equal(elements.region.value,'');
 assert.match(elements.region.innerHTML,/계양구갑 · 2024년 실제 결과/);
 assert.equal(vm.runInContext('selectedRegion()',context),'계양구을');
