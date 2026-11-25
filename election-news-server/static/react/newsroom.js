@@ -9617,63 +9617,68 @@ function de() {
 }
 // src/components/DraftEditor.jsx
 function fe() {
-	let e = v().current, [t, n] = (0, _.useState)(""), [r, i] = (0, _.useState)([]), [a, o] = (0, _.useState)("");
+	let e = (0, _.useRef)(null), t = v().current, [n, r] = (0, _.useState)(""), [i, a] = (0, _.useState)([]), [o, s] = (0, _.useState)("");
 	return (0, _.useEffect)(() => {
-		n(e?.title || ""), i(e?.sentences?.map((e) => e.text) || []), o("");
-	}, [e?.id]), e ? /* @__PURE__ */ (0, T.jsxs)("section", {
+		r(t?.title || ""), a(t?.sentences?.map((e) => e.text) || []), s("");
+	}, [t?.id]), (0, _.useLayoutEffect)(() => {
+		e.current?.querySelectorAll("textarea").forEach((e) => {
+			e.style.height = "auto", e.style.height = e.scrollHeight + "px";
+		});
+	}, [i, t?.id]), t ? /* @__PURE__ */ (0, T.jsxs)("section", {
+		ref: e,
 		className: "draft-editor",
 		"aria-label": "기사 초안 편집",
 		children: [
 			/* @__PURE__ */ (0, T.jsx)("h3", { children: "초안 확인과 수정" }),
 			/* @__PURE__ */ (0, T.jsxs)("p", { children: [
 				"작성 방식: ",
-				e.generator || "근거 기반 문장 템플릿",
+				t.generator || "근거 기반 문장 템플릿",
 				" · 버전 ",
-				e.revision || 1,
+				t.revision || 1,
 				" · 자료 고정 ID ",
-				e.snapshot_id
+				t.snapshot_id
 			] }),
 			/* @__PURE__ */ (0, T.jsxs)("p", { children: [
 				/* @__PURE__ */ (0, T.jsx)("strong", { children: "요약" }),
 				" ",
-				e.summary || e.sentences?.[0]?.text
+				t.summary || t.sentences?.[0]?.text
 			] }),
 			/* @__PURE__ */ (0, T.jsxs)("form", {
-				onSubmit: (n) => {
-					n.preventDefault(), window.dispatchEvent(new CustomEvent("newsroom:save-revision", { detail: {
-						id: e.id,
-						title: t,
-						reason: a,
-						sentences: e.sentences.map((e, t) => ({
+				onSubmit: (e) => {
+					e.preventDefault(), window.dispatchEvent(new CustomEvent("newsroom:save-revision", { detail: {
+						id: t.id,
+						title: n,
+						reason: o,
+						sentences: t.sentences.map((e, t) => ({
 							...e,
-							text: r[t]
+							text: i[t]
 						}))
 					} }));
 				},
 				children: [
 					/* @__PURE__ */ (0, T.jsxs)("label", { children: ["기사 제목", /* @__PURE__ */ (0, T.jsx)("input", {
-						value: t,
-						onChange: (e) => n(e.target.value),
+						value: n,
+						onChange: (e) => r(e.target.value),
 						required: !0,
 						minLength: 2,
 						maxLength: 200
 					})] }),
-					e.sentences.map((e, t) => /* @__PURE__ */ (0, T.jsxs)("label", { children: [
+					t.sentences.map((e, t) => /* @__PURE__ */ (0, T.jsxs)("label", { children: [
 						"본문 문장 ",
 						t + 1,
 						" · 근거 ",
 						(e.row_ids || e.evidence_ids || []).join(", "),
 						/* @__PURE__ */ (0, T.jsx)("textarea", {
-							value: r[t] || "",
-							onChange: (e) => i((n) => n.map((n, r) => r === t ? e.target.value : n)),
+							value: i[t] || "",
+							onChange: (e) => a((n) => n.map((n, r) => r === t ? e.target.value : n)),
 							required: !0,
 							maxLength: 5e3,
 							rows: 3
 						})
 					] }, t)),
 					/* @__PURE__ */ (0, T.jsxs)("label", { children: ["수정 사유", /* @__PURE__ */ (0, T.jsx)("input", {
-						value: a,
-						onChange: (e) => o(e.target.value),
+						value: o,
+						onChange: (e) => s(e.target.value),
 						required: !0,
 						minLength: 5,
 						maxLength: 2e3,
@@ -9687,7 +9692,7 @@ function fe() {
 				]
 			}),
 			/* @__PURE__ */ (0, T.jsx)("h4", { children: "출처와 참고 자료" }),
-			/* @__PURE__ */ (0, T.jsxs)("ul", { children: [(e.data_sources || []).map((e) => /* @__PURE__ */ (0, T.jsxs)("li", { children: [
+			/* @__PURE__ */ (0, T.jsxs)("ul", { children: [(t.data_sources || []).map((e) => /* @__PURE__ */ (0, T.jsxs)("li", { children: [
 				e.candidate_name,
 				" · ",
 				te(e.url) ? /* @__PURE__ */ (0, T.jsx)("a", {
@@ -9698,7 +9703,7 @@ function fe() {
 				}) : "가상 개표 데이터",
 				" · ",
 				e.row_id
-			] }, e.row_id)), e.news_references?.map((e) => /* @__PURE__ */ (0, T.jsxs)("li", { children: [
+			] }, e.row_id)), t.news_references?.map((e) => /* @__PURE__ */ (0, T.jsxs)("li", { children: [
 				/* @__PURE__ */ (0, T.jsxs)("a", {
 					href: te(e.url),
 					target: "_blank",
