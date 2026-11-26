@@ -187,12 +187,24 @@ class Newsroom(WorkflowMixin):
 
     @locked
     def save(self,a):
+        previous=self.db.execute('SELECT payload FROM article WHERE id=?',(a['id'],)).fetchone()
+        if previous and json.loads(previous[0]).get('deleted_at') and not a.get('deleted_at'):raise ValueError('삭제된 기사는 변경할 수 없습니다.')
         self.db.execute('INSERT OR REPLACE INTO article VALUES(?,?,?)',(a['id'],canonical(a),a['status']));self.db.commit()
     @locked
     def get(self,aid):
         r=self.db.execute('SELECT payload FROM article WHERE id=?',(aid,)).fetchone()
         if not r: raise ValueError('article not found')
-        return json.loads(r[0])
+        article=json.loads(r[0])
+        if article.get('deleted_at'):raise ValueError('삭제된 기사입니다.')
+        return article
+
+    @locked
+    def archive_article(self,aid,actor,admin=False):
+        article=self.get(aid)
+        if not admin and article['author']!=actor:raise PermissionError('본인이 작성한 기사만 삭제할 수 있습니다.')
+        article.update(deleted_at=now(),deleted_by=actor)
+        self.save(article);self.audit('article_deleted',actor,dict(article_id=aid,title=article['title'],previous_status=article['status'],recoverable=True))
+        return dict(id=aid,deleted=True)
 
     @locked
     def validate(self,a,actor='validator'):

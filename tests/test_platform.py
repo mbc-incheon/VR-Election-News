@@ -548,3 +548,24 @@ def test_approved_article_narration_is_real_pcm_and_revocation_blocks_audio(clie
     with wave.open(io.BytesIO(audio.content)) as wav:assert wav.getnframes()>0 and wav.getcomptype()=='NONE'
     changed=module.room.get(article['id']);changed['status']='DRAFT';module.room.save(changed)
     assert c.get(record['audio_url'],headers=auth('editor')).status_code==409
+
+
+def test_article_list_delete_preserves_records_and_enforces_ownership(client):
+    c,module=client
+    module.room.receive(json.loads((ROOT/'fixtures/fallback_snapshot.json').read_text(encoding='utf-8')))
+    article=module.room.draft('하늘도시갑','TEST-writer','demo','result')
+    module.room.approve(article['id'],'TEST-editor','TEST 삭제 승인 이력 보존',True,True)
+    stale=module.room.get(article['id'])
+    assert c.post('/api/articles/'+article['id']+'/delete',headers=auth('editor'),json={}).status_code==403
+    users=module.admin_auth.users();users.extend([dict(name='other-writer',role='writer',token_hash=hashlib.sha256(b'TEST-other').hexdigest()),dict(name='admin',role='admin',token_hash=hashlib.sha256(b'TEST-list-admin').hexdigest())]);module.admin_auth.write(users)
+    assert c.post('/api/articles/'+article['id']+'/delete',headers={'Authorization':'Bearer TEST-other'},json={}).status_code==403
+    assert c.post('/api/articles/'+article['id']+'/delete',headers=auth(),json={}).status_code==200
+    assert c.get('/api/articles/'+article['id'],headers=auth()).status_code==404
+    assert all(a['id']!=article['id'] for a in c.get('/api/articles',headers=auth()).json())
+    retained=json.loads(module.room.db.execute('SELECT payload FROM article WHERE id=?',(article['id'],)).fetchone()[0])
+    assert retained['deleted_by']=='TEST-writer' and retained['sentences']==article['sentences']
+    assert module.room.db.execute('SELECT COUNT(*) FROM approval WHERE article_id=?',(article['id'],)).fetchone()[0]==1
+    with pytest.raises(ValueError):module.room.export(article['id'])
+    with pytest.raises(ValueError):module.room.save(stale)
+    other=module.room.draft('하늘도시갑','other-writer','demo','result')
+    assert c.post('/api/articles/'+other['id']+'/delete',headers={'Authorization':'Bearer TEST-list-admin'},json={}).status_code==200

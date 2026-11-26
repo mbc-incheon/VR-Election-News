@@ -1008,6 +1008,53 @@
         }
       }
     },
+    "/api/articles/{aid}/delete": {
+      "post": {
+        "summary": "Delete Article",
+        "operationId": "delete_article_api_articles__aid__delete_post",
+        "parameters": [
+          {
+            "name": "aid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Aid"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/articles/{aid}": {
       "get": {
         "summary": "Get",

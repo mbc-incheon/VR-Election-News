@@ -6,7 +6,7 @@ const wbAction=fn=>async()=>{try{await fn()}catch(e){wbError(e)}};
 function wbOpen(title,body){$('dialogTitle').textContent=title;$('dialogBody').innerHTML=body;$('dialogMessage').textContent='';if(!wbDialog.open)wbDialog.showModal()}
 async function wbIdentity(){const previous=loggedUser;loggedUser=await api('/api/me');if(previous?.name!==loggedUser.name||previous?.role!==loggedUser.role)resetReviewConfirmation();$('accountStatus').textContent=loggedUser.name+' · '+(loggedUser.role==='admin'?'관리자 · 작성·편집·승인':loggedUser.role==='editor'?'독립 편집 담당자':'기사·자료 작성 담당자');$('signOut').hidden=false;
  syncDraftAvailability();$('openDocuments').disabled=!['writer','admin'].includes(loggedUser.role);$('editArticle').disabled=!['writer','admin'].includes(loggedUser.role);$('openReviews').disabled=false;
- syncApproval();return loggedUser}
+ syncApproval();publishNewsroom({user:loggedUser});return loggedUser}
 async function wbDownload(url,name){const r=await fetch(url,{credentials:'same-origin'});if(!r.ok){const e=await r.json();throw Error(e.detail||'다운로드 실패')}const blob=await r.blob(),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
 function wbBase64(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.onerror=reject;reader.readAsDataURL(file)})}
 $('closeDialog').onclick=()=>wbDialog.close();$('identify').onclick=wbAction(wbIdentity);

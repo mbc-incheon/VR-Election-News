@@ -9226,8 +9226,8 @@ function D({ summary: e, finalArchive: t = !1 }) {
 	});
 }
 // src/components/ArticleList.jsx
-function ie({ articles: e = [], selected: t, onSelect: n }) {
-	let [r, i] = (0, _.useState)(""), [a, o] = (0, _.useState)(""), s = e.filter((e) => (!a || e.status === a) && [e.title, ...e.candidate_names || []].join(" ").toLowerCase().includes(r.trim().toLowerCase()));
+function ie({ articles: e = [], selected: t, user: n, onSelect: r, onEdit: i, onDelete: a }) {
+	let [o, s] = (0, _.useState)(""), [c, l] = (0, _.useState)(""), u = e.filter((e) => (!c || e.status === c) && [e.title, ...e.candidate_names || []].join(" ").toLowerCase().includes(o.trim().toLowerCase()));
 	return /* @__PURE__ */ (0, T.jsxs)("div", {
 		className: "react-article-list",
 		children: [
@@ -9236,13 +9236,13 @@ function ie({ articles: e = [], selected: t, onSelect: n }) {
 				children: [
 					/* @__PURE__ */ (0, T.jsxs)("label", { children: ["작성 기사 검색어", /* @__PURE__ */ (0, T.jsx)("input", {
 						type: "search",
-						value: r,
-						onChange: (e) => i(e.target.value),
+						value: o,
+						onChange: (e) => s(e.target.value),
 						placeholder: "제목 또는 후보명"
 					})] }),
 					/* @__PURE__ */ (0, T.jsxs)("label", { children: ["기사 상태", /* @__PURE__ */ (0, T.jsxs)("select", {
-						value: a,
-						onChange: (e) => o(e.target.value),
+						value: c,
+						onChange: (e) => l(e.target.value),
 						children: [/* @__PURE__ */ (0, T.jsx)("option", {
 							value: "",
 							children: "전체 상태"
@@ -9251,32 +9251,60 @@ function ie({ articles: e = [], selected: t, onSelect: n }) {
 							children: t
 						}, e))]
 					})] }),
-					/* @__PURE__ */ (0, T.jsxs)("span", { children: [s.length, "건"] })
+					/* @__PURE__ */ (0, T.jsxs)("span", { children: [u.length, "건"] })
 				]
 			}),
 			!e.length && /* @__PURE__ */ (0, T.jsx)("p", {
 				className: "react-data-note",
 				children: "선택한 선거구의 기사 목록입니다. 기사 초안을 생성하거나 기사 목록을 눌러 확인하세요."
 			}),
-			s.map((e) => /* @__PURE__ */ (0, T.jsxs)("button", {
-				type: "button",
-				className: "react-article-item " + (t === e.id ? "selected" : ""),
-				onClick: () => n(e.id),
-				"aria-pressed": t === e.id,
-				children: [/* @__PURE__ */ (0, T.jsxs)("span", {
-					className: "react-article-label",
-					children: [/* @__PURE__ */ (0, T.jsx)("strong", { children: e.title }), /* @__PURE__ */ (0, T.jsxs)("small", { children: [
-						e.mode === "demo" ? "가상 개표" : "실제 결과",
-						" · ",
-						e.author,
-						" · ",
-						C(e.created_at),
-						" · v",
-						e.revision || 1
-					] })]
-				}), /* @__PURE__ */ (0, T.jsx)("span", {
-					className: "react-article-status status-" + e.status,
-					children: y[e.status] || e.status
+			u.map((e) => /* @__PURE__ */ (0, T.jsxs)("div", {
+				className: "react-article-row",
+				children: [/* @__PURE__ */ (0, T.jsxs)("button", {
+					type: "button",
+					className: "react-article-item " + (t === e.id ? "selected" : ""),
+					onClick: () => r(e.id),
+					"aria-pressed": t === e.id,
+					children: [/* @__PURE__ */ (0, T.jsxs)("span", {
+						className: "react-article-label",
+						children: [/* @__PURE__ */ (0, T.jsx)("strong", { children: e.title }), /* @__PURE__ */ (0, T.jsxs)("small", { children: [
+							e.mode === "demo" ? "가상 개표" : "실제 결과",
+							" · ",
+							e.author,
+							" · ",
+							C(e.created_at),
+							" · v",
+							e.revision || 1
+						] })]
+					}), /* @__PURE__ */ (0, T.jsx)("span", {
+						className: "react-article-status status-" + e.status,
+						children: y[e.status] || e.status
+					})]
+				}), /* @__PURE__ */ (0, T.jsxs)("div", {
+					className: "react-article-actions",
+					children: [
+						/* @__PURE__ */ (0, T.jsx)("button", {
+							type: "button",
+							onClick: () => r(e.id),
+							"aria-label": e.title + " 선택",
+							children: "선택"
+						}),
+						/* @__PURE__ */ (0, T.jsx)("button", {
+							type: "button",
+							disabled: n && !["writer", "admin"].includes(n.role),
+							onClick: () => i(e.id),
+							"aria-label": e.title + " 수정",
+							children: "수정"
+						}),
+						/* @__PURE__ */ (0, T.jsx)("button", {
+							type: "button",
+							className: "article-delete",
+							disabled: n && n.role !== "admin" && (n.role !== "writer" || n.name !== e.author),
+							onClick: () => a(e.id),
+							"aria-label": e.title + " 삭제",
+							children: "삭제"
+						})
+					]
 				})]
 			}, e.id))
 		]
@@ -10074,7 +10102,10 @@ function ge() {
 	return /* @__PURE__ */ (0, T.jsx)(ie, {
 		articles: e.articles,
 		selected: e.current?.id,
-		onSelect: (e) => pe("newsroom:select-article", e)
+		user: e.user,
+		onSelect: (e) => pe("newsroom:select-article", e),
+		onEdit: (e) => pe("newsroom:edit-article", e),
+		onDelete: (e) => pe("newsroom:delete-article", e)
 	});
 }
 var _e = document.getElementById("react-election");

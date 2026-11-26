@@ -346,7 +346,14 @@ def draft(req:Draft,user=Depends(identity)):
     except ValueError as e:raise HTTPException(422,str(e))
 @app.get('/api/articles')
 def articles(user=Depends(identity)):
-    return [json.loads(r[0]) for r in room.db.execute('SELECT payload FROM article ORDER BY rowid DESC')]
+    return [a for r in room.db.execute('SELECT payload FROM article ORDER BY rowid DESC') if not (a:=json.loads(r[0])).get('deleted_at')]
+@app.post('/api/articles/{aid}/delete')
+def delete_article(aid:str,user=Depends(identity)):
+    role(user,'writer')
+    try:return room.archive_article(aid,user['name'],admin=user['role']=='admin')
+    except PermissionError as e:raise HTTPException(403,str(e))
+    except ValueError as e:raise HTTPException(404,str(e))
+
 @app.get('/api/articles/{aid}')
 def get(aid:str,user=Depends(identity)):
     try:return room.get(aid)
