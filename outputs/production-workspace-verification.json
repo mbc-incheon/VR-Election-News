@@ -1,0 +1,14 @@
+{
+  "job_id": "033833e02dd813627aca46a3",
+  "article_ids": [
+    "d3893bb6d039d7eb"
+  ],
+  "width": 1920,
+  "height": 1080,
+  "duration": 46.0,
+  "narration": "synthetic",
+  "audio_codec": "aac",
+  "wav_in_package": true,
+  "video_sha256": "f692b2525bcc0d2cc95fcac20fe0a49a442e4a69a4cc0c244c86b07f548696d8",
+  "verified": "live browser MP4 metadata and ffmpeg decode"
+}

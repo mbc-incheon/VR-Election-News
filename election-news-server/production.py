@@ -1,5 +1,6 @@
 """Create real FHD MP4, SRT, CG stills and a manifest from pinned approved articles."""
 import base64
+import hashlib
 import io
 import json
 import os
@@ -83,12 +84,12 @@ def render_bundle(folder,bundles,seconds,audio=None,audio_disclosure='none'):
     with (folder/'ffmpeg.log').open('w',encoding='utf-8') as log:
         subprocess.run(command,cwd=folder,stdout=log,stderr=log,check=True,timeout=1800)
     manifest=dict(created_at=now(),width=1920,height=1080,fps=25,duration_seconds=round(cursor,3),
-        narration=audio_disclosure,mode=bundles[0]['article']['mode'],timeline=timeline,
+        narration=audio_disclosure,narration_sha256=hashlib.sha256(audio).hexdigest() if audio else None,mode=bundles[0]['article']['mode'],timeline=timeline,
         articles=[dict(id=b['article']['id'],snapshot_id=b['snapshot_id'],bundle_sha256=sha(b)) for b in bundles])
     (folder/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2),encoding='utf-8')
     with zipfile.ZipFile(folder/'news-package.zip','w',zipfile.ZIP_DEFLATED) as archive:
         for p in folder.iterdir():
-            if p.suffix in ['.mp4','.srt','.png','.json'] or p.name=='script.txt':archive.write(p,p.name)
+            if p.suffix in ['.mp4','.srt','.png','.json','.wav'] or p.name=='script.txt':archive.write(p,p.name)
     return manifest
 
 class Production:
@@ -123,6 +124,8 @@ class Production:
                 with wave.open(io.BytesIO(audio)) as wav:
                     if wav.getnchannels() not in [1,2] or wav.getsampwidth() not in [1,2,3,4] or wav.getnframes()/wav.getframerate()>1200:raise ValueError('invalid WAV')
             except Exception:raise ValueError('valid PCM WAV required, at most 20 minutes')
+            with wave.open(io.BytesIO(audio)) as wav:audio_seconds=wav.getnframes()/wav.getframerate()
+            if audio_seconds>len(ids)*seconds:raise ValueError('음성이 영상보다 깁니다. 기사당 영상 길이를 늘리세요.')
         if not korean_font():raise ValueError('Korean font unavailable; configure NEWS_FONT')
         with self.guard,self.room.lock:
             if self.room.db.execute("SELECT COUNT(*) FROM render_job WHERE status IN ('QUEUED','RUNNING')").fetchone()[0]>=4:raise ValueError('render queue full')

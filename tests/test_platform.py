@@ -520,3 +520,25 @@ def test_sample_narration_can_enter_demo_production(client,monkeypatch,sample_id
     assert response.status_code==200,response.text
     assert captured and captured[0][-1]==content
     assert captured[0][2]['narration']=='synthetic'
+
+
+def test_approved_article_narration_is_real_pcm_and_revocation_blocks_audio(client):
+    import os,wave
+    if os.name!='nt':pytest.skip('Windows Heami TTS required')
+    c,module=client
+    module.room.receive(json.loads((ROOT/'fixtures/fallback_snapshot.json').read_text(encoding='utf-8')))
+    article=module.room.draft('하늘도시갑','TEST-writer','demo','result','DEMO-0-0',title='TEST 승인 본문 내레이션')
+    body=dict(article_ids=[article['id']])
+    assert c.post('/api/production/narration',json=body).status_code==401
+    assert c.post('/api/production/narration',headers={**auth(),'Origin':'http://testserver'},json=body).status_code==409
+    module.room.approve(article['id'],'TEST-editor','TEST 본문 합성 승인',True,True)
+    response=c.post('/api/production/narration',headers={**auth('editor'),'Origin':'http://testserver'},json=body)
+    assert response.status_code==200,response.text
+    record=response.json()
+    assert all(sentence['text'] in record['text'] for sentence in article['sentences'])
+    assert record['duration']>1 and record['disclosure']=='synthetic'
+    audio=c.get(record['audio_url'],headers=auth('editor'))
+    assert audio.status_code==200
+    with wave.open(io.BytesIO(audio.content)) as wav:assert wav.getnframes()>0 and wav.getcomptype()=='NONE'
+    changed=module.room.get(article['id']);changed['status']='DRAFT';module.room.save(changed)
+    assert c.get(record['audio_url'],headers=auth('editor')).status_code==409

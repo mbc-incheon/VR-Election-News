@@ -20,6 +20,7 @@ from pydantic import BaseModel, Field, field_validator
 from core import Newsroom, now
 from election_simulation import DEMO_CANDIDATES
 from production import Production,korean_font
+from article_narration import ArticleNarration
 from admin_auth import AdminAuth
 from admin_recovery import AdminRecovery
 from google_news import search_google_news
@@ -29,6 +30,7 @@ room=Newsroom(ROOT)
 admin_auth=AdminAuth(ROOT)
 admin_recovery=AdminRecovery(admin_auth)
 production=Production(room)
+article_narration=ArticleNarration(room)
 Mode=Literal['official','demo']
 connection=dict(state='CONNECTING',error=None,last_received_at=None,mode='unavailable')
 UPSTREAM=os.environ.get('UPSTREAM_URL','http://127.0.0.1:8101')
@@ -464,6 +466,20 @@ def document_pdf(did:str,user=Depends(identity)):
 @app.get('/api/audit/integrity')
 def integrity(user=Depends(identity)):
     role(user,'editor');return room.audit_integrity()
+
+class NarrationRequest(BaseModel):
+    article_ids:list[str]=Field(min_length=1,max_length=30)
+
+@app.post('/api/production/narration')
+async def create_article_narration(req:NarrationRequest,request:Request,user=Depends(identity)):
+    same_origin(request)
+    try:return await asyncio.to_thread(article_narration.create,req.article_ids,user['name'])
+    except ValueError as e:raise HTTPException(409,str(e))
+
+@app.get('/api/production/narration/{nid}/audio')
+def get_article_narration(nid:str,user=Depends(identity)):
+    try:return FileResponse(article_narration.file(nid),media_type='audio/wav',headers={'Cache-Control':'no-store'})
+    except ValueError as e:raise HTTPException(409,str(e))
 
 class RenderRequest(BaseModel):
     article_ids:list[str]=Field(min_length=1,max_length=30)
