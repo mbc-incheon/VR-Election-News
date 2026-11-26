@@ -9674,7 +9674,7 @@ function de() {
 		i,
 		e
 	]);
-	let { regions: ie, destination: ae, articles: de } = le(D, r, C), fe = u && f && u <= f ? ce(r, re, u, f) : null;
+	let { regions: ie, destination: ae, articles: de } = le(D, r, C), fe = C === "하늘도시갑" || !ae && n.snapshot?.mode === "demo" ? "하늘도시갑" : ae, pe = fe === "하늘도시갑", me = ["하늘도시갑", ...new Set([r, ...ie].filter(Boolean))], he = u && f && u <= f ? ce(r, re, u, f) : null;
 	return /* @__PURE__ */ (0, T.jsxs)("section", {
 		className: "election-news",
 		"aria-label": "선거일 전후 언론 기사 검색",
@@ -9851,9 +9851,9 @@ function de() {
 				role: "status",
 				children: "실제 보도 목록을 불러오는 중입니다."
 			}),
-			fe && /* @__PURE__ */ (0, T.jsx)("a", {
+			he && /* @__PURE__ */ (0, T.jsx)("a", {
 				className: "news-more",
-				href: fe,
+				href: he,
 				target: "_blank",
 				rel: "noopener noreferrer",
 				children: "같은 후보·기간으로 인터넷 뉴스 원문 더 찾기 ↗"
@@ -9876,8 +9876,8 @@ function de() {
 					] }),
 					/* @__PURE__ */ (0, T.jsx)("button", {
 						type: "button",
-						disabled: !de.length,
-						onClick: () => window.dispatchEvent(new CustomEvent("newsroom:review-selected-news", { detail: {
+						disabled: !pe && !de.length,
+						onClick: () => pe ? window.dispatchEvent(new CustomEvent("newsroom:review-demo")) : window.dispatchEvent(new CustomEvent("newsroom:review-selected-news", { detail: {
 							region: ae,
 							from: u,
 							to: f,
@@ -9890,21 +9890,24 @@ function de() {
 							})),
 							candidate_id: re ? (n.snapshot?.rows || []).find((e) => e.region_name === r && e.candidate_name === re)?.candidate_id : null
 						} })),
-						children: "선택 기사로 04 공약 근거 확인 →"
+						children: pe ? "하늘도시갑 04 공약 근거 확인 →" : "선택 기사로 04 공약 근거 확인 →"
 					}),
-					!r && ie.length > 1 && /* @__PURE__ */ (0, T.jsxs)("label", { children: ["근거 확인 선거구", /* @__PURE__ */ (0, T.jsx)("select", {
-						value: ae,
+					/* @__PURE__ */ (0, T.jsxs)("label", { children: ["근거 확인 선거구", /* @__PURE__ */ (0, T.jsx)("select", {
+						value: fe,
 						onChange: (e) => ne(e.target.value),
-						children: ie.map((e) => /* @__PURE__ */ (0, T.jsx)("option", { children: e }, e))
+						children: me.map((e) => /* @__PURE__ */ (0, T.jsx)("option", {
+							value: e,
+							children: e === "하늘도시갑" ? "하늘도시갑 · 가상 후보 공약" : e + " · 실제 선거구"
+						}, e))
 					})] }),
-					ae && /* @__PURE__ */ (0, T.jsxs)("span", { children: [
+					pe ? /* @__PURE__ */ (0, T.jsx)("span", { children: "하늘도시갑 가상 후보 공약으로 이동합니다. 실제 기사는 가상 후보의 근거로 연결하지 않습니다." }) : ae && /* @__PURE__ */ (0, T.jsxs)("span", { children: [
 						"연결 선거구: ",
 						ae,
 						" · 해당 지역 기사 ",
 						de.length,
 						"건을 04로 연결합니다."
 					] }),
-					!D.length && /* @__PURE__ */ (0, T.jsx)("span", { children: "기사의 ‘초안 참고 보도로 선택’ 확인란을 체크하세요. 제목 링크 열기만으로는 선택되지 않습니다." }),
+					!D.length && !pe && /* @__PURE__ */ (0, T.jsx)("span", { children: "기사의 ‘초안 참고 보도로 선택’ 확인란을 체크하세요. 제목 링크 열기만으로는 선택되지 않습니다." }),
 					D.length > 0 && !ie.length && /* @__PURE__ */ (0, T.jsx)("span", { children: "선택 기사의 선거구 정보를 확인해 주세요." })
 				]
 			}),
