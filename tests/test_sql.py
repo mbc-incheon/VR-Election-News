@@ -24,7 +24,7 @@ def test_schema_and_seed_roundtrip(tmp_path):
     try:
         article = room.get('SQL-DEMO-ARTICLE-001')
         assert article['status'] == 'DRAFT'
-        assert {r['candidate_name'] for r in room.latest('demo')['rows']} == {'서지훈','한도윤','박채린'}
+        assert {r['candidate_name'] for r in room.latest('demo')['rows']} == {'서지도','한반도','박리본'}
         assert room.validate(article)['status'] == 'PENDING_HUMAN'
         with pytest.raises(ValueError):
             room.export(article['id'])

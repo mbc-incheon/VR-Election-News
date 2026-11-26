@@ -66,7 +66,8 @@ def seed_demo_documents():
     # Keep original documents in storage, but retire only superseded auto-generated profiles.
     for doc in room.documents():
         if (doc.get('is_demo') and doc.get('publisher')=='VR 선거보도 시스템 가상 자료실'
-                and doc.get('url')=='demo://fixtures/pledges' and '가상후보 ' in doc.get('title','')):
+                and doc.get('url')=='demo://fixtures/pledges'
+                and not any(doc.get('title')==f"{doc.get('region_name')} {profile['name']} 가상 공약" for profile in DEMO_CANDIDATES)):
             for chunk in doc['chunks']:room.retire(chunk['id'],'demo-profile-update')
     for i,region in enumerate(['하늘도시갑','연수구을','서구병']):
         for ci,profile in enumerate(DEMO_CANDIDATES):

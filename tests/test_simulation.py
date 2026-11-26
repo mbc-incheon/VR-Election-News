@@ -26,7 +26,7 @@ def test_full_cycle_count_and_shares():
 def test_fictional_profiles_are_consistent_in_each_region():
  rows=simulation_rows(50,100)
  for start in range(0,9,3):
-  assert [r['candidate_name'] for r in rows[start:start+3]]==['서지훈','한도윤','박채린']
+  assert [r['candidate_name'] for r in rows[start:start+3]]==['서지도','한반도','박리본']
   assert [r['party'] for r in rows[start:start+3]]==['미래민주연합','국민통합당','새길진보당']
   assert [r['candidate_number'] for r in rows[start:start+3]]==[1,2,3]
   assert all(r['is_demo'] and r['profile_message'] for r in rows[start:start+3])

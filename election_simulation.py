@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 
 
 DEMO_CANDIDATES = (
-    dict(name='서지훈', party='미래민주연합', message='지역 현안 연속성과 교통·생활 인프라 확충 강조', character='조직력 우위', pledge='지역 현안의 연속성을 바탕으로 교통·생활 인프라 확충을 제시한다.'),
-    dict(name='한도윤', party='국민통합당', message='원도심 재정비·청년 일자리·세금 감축 공약', character='추격자', pledge='원도심 재정비, 청년 일자리 확대, 세금 감축을 제시한다.'),
-    dict(name='박채린', party='새길진보당', message='돌봄·환경·서민 주거 안정', character='캐스팅보트·개혁 표심', pledge='돌봄 서비스 확대, 환경 보호, 서민 주거 안정을 제시한다.'),
+    dict(name='서지도', party='미래민주연합', message='지역 현안 연속성과 교통·생활 인프라 확충 강조', character='조직력 우위', pledge='지역 현안의 연속성을 바탕으로 교통·생활 인프라 확충을 제시한다.'),
+    dict(name='한반도', party='국민통합당', message='원도심 재정비·청년 일자리·세금 감축 공약', character='추격자', pledge='원도심 재정비, 청년 일자리 확대, 세금 감축을 제시한다.'),
+    dict(name='박리본', party='새길진보당', message='돌봄·환경·서민 주거 안정', character='캐스팅보트·개혁 표심', pledge='돌봄 서비스 확대, 환경 보호, 서민 주거 안정을 제시한다.'),
 )
 
 
