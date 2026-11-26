@@ -9158,17 +9158,10 @@ function E({ candidate: e, index: t, selected: n, onSelect: r }) {
 					children: n ? "선택됨" : "근거 확인"
 				})]
 			}),
-			/* @__PURE__ */ (0, T.jsxs)("h4", { children: [
-				e.candidate_name,
-				/* @__PURE__ */ (0, T.jsx)("small", {
-					className: "react-candidate-party",
-					children: e.party || "정당 미제공"
-				}),
-				e.is_demo && /* @__PURE__ */ (0, T.jsxs)("small", {
-					className: "react-demo-candidate-label",
-					children: ["가상 후보 ", e.candidate_number ?? t + 1]
-				})
-			] }),
+			/* @__PURE__ */ (0, T.jsxs)("h4", { children: [e.candidate_name, /* @__PURE__ */ (0, T.jsx)("small", {
+				className: "react-candidate-party",
+				children: e.party || "정당 미제공"
+			})] }),
 			/* @__PURE__ */ (0, T.jsxs)("div", {
 				className: "react-votes",
 				children: [b(e.votes), e.votes != null && /* @__PURE__ */ (0, T.jsx)("small", { children: "표" })]

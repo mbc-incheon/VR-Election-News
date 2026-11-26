@@ -19,3 +19,5 @@
 .react-article-row{display:flex;align-items:center;gap:10px;margin:8px 0}.react-article-row .react-article-item{flex:1;margin:0;min-width:0}.react-article-actions{display:flex;gap:6px;flex-shrink:0}.react-article-actions button{font-size:12px;padding:6px 10px;min-height:32px}.react-article-actions .article-delete{background:#fff;color:#a22b3f;border-color:#dbadba}@media(max-width:650px){.react-article-row{align-items:stretch;flex-direction:column}.react-article-actions{justify-content:flex-end}}
 
 .react-candidate-party{display:inline-block;margin-left:8px;font-size:13px;font-weight:600;color:#526579;vertical-align:middle}
+
+.table-candidate-party{display:inline-block;margin-left:6px;font-size:12px;font-weight:500;color:#526579;white-space:normal}
