@@ -9897,7 +9897,7 @@ function de() {
 						onChange: (e) => ne(e.target.value),
 						children: me.map((e) => /* @__PURE__ */ (0, T.jsx)("option", {
 							value: e,
-							children: e === "하늘도시갑" ? "하늘도시갑 · 가상 후보 공약" : e + " · 실제 선거구"
+							children: e === "하늘도시갑" ? "하늘도시갑 · 가상 후보 공약" : e + " · 선거구"
 						}, e))
 					})] }),
 					pe ? /* @__PURE__ */ (0, T.jsx)("span", { children: "하늘도시갑 가상 후보 공약으로 이동합니다. 실제 기사는 가상 후보의 근거로 연결하지 않습니다." }) : ae && /* @__PURE__ */ (0, T.jsxs)("span", { children: [

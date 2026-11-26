@@ -1,12 +1,12 @@
 {
-  "captured_at": "2026-11-26T10:59:30.424206+09:00",
+  "captured_at": "2026-11-26T11:02:53.213774+09:00",
   "repository": "https://github.com/mbc-incheon/VR-Election-News",
   "release_version": "2.0.0",
   "imported_from": {
     "repository": "https://github.com/mbc-incheon/election-analysis-project-01",
     "commit": "00ac79dc6ec77d6bd4c1e883e152fd78f2e3ab91"
   },
-  "repository_base_commit": "f5e16b075f95ad7f25b41904038bd3c159faced6",
+  "repository_base_commit": "9bebe2144be7764393e4647a9b9abdfc5d9b39bc",
   "note": "Base commit is the parent context before this manifest is committed; exact publication commit is in Git history.",
   "runtime": {
     "python": "3.12.10"
@@ -429,8 +429,8 @@
     },
     {
       "path": "election-news-server/static/react/newsroom.js",
-      "bytes": 338160,
-      "sha256": "6e88420678b975342c4eaaf3e097bec2dbd522d1ec80e18de0fed832941a96bf"
+      "bytes": 338153,
+      "sha256": "ea0dac2b44d57f15b300d543c118b7969a503baf784fee7a2a79e62f9ed7ebe2"
     },
     {
       "path": "election-news-server/static/staff-login.html",
@@ -539,8 +539,8 @@
     },
     {
       "path": "frontend/src/components/ElectionNews.jsx",
-      "bytes": 8801,
-      "sha256": "feea8468bd4cea9040df97016b1221c400ca10c4a729622893b940ac6b2b13c0"
+      "bytes": 8794,
+      "sha256": "c6ef7499f04054217223e671714550a1e2be1d05898a0293af1c85c4fce2f14d"
     },
     {
       "path": "frontend/src/components/GoogleNewsSearch.jsx",
