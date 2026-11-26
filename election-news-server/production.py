@@ -72,7 +72,8 @@ def render_bundle(folder,bundles,seconds,audio=None,audio_disclosure='none'):
             cursor=end
     if cursor>1200.001:raise ValueError('video must not exceed 20 minutes')
     (folder/'subtitles.srt').write_text('\n'.join(subtitles),encoding='utf-8')
-    (folder/'script.txt').write_text('\n\n'.join(b['script'] for b in bundles),encoding='utf-8')
+    from article_narration import broadcast_script
+    (folder/'script.txt').write_text(broadcast_script(bundles),encoding='utf-8')
     (folder/'approved-bundles.json').write_text(json.dumps(bundles,ensure_ascii=False,indent=2),encoding='utf-8')
     concat=''.join(f"file '{name}'\nduration {duration:.6f}\n" for name,duration in slides)+f"file '{slides[-1][0]}'\n"
     (folder/'slides.txt').write_text(concat,encoding='utf-8')

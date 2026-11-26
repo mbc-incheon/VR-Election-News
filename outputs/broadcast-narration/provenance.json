@@ -1,0 +1,36 @@
+{
+  "disclosure": "Synthetic narration derived from approved fictional election data",
+  "voice": "Microsoft Heami Windows TTS",
+  "variants": [
+    {
+      "file": "standard.wav",
+      "label": "표준 보도",
+      "duration": 29.57,
+      "source_mode": "demo",
+      "article_ids": [
+        "d3893bb6d039d7eb"
+      ],
+      "sha256": "2d09b9a6d471786fd140a279c3c8eaea33786fb1be64d26afee8e9de69d6213d"
+    },
+    {
+      "file": "calm.wav",
+      "label": "차분한 해설",
+      "duration": 36.91,
+      "source_mode": "demo",
+      "article_ids": [
+        "d3893bb6d039d7eb"
+      ],
+      "sha256": "d8dc7f44702d6c60f88944c55e7f3ad46551040d846cec497748a08c30781b36"
+    },
+    {
+      "file": "brief.wav",
+      "label": "빠른 브리핑",
+      "duration": 23.79,
+      "source_mode": "demo",
+      "article_ids": [
+        "d3893bb6d039d7eb"
+      ],
+      "sha256": "f6819346e7477bcc563dd65e6753889e3697b4953567d5e026303438e49f988d"
+    }
+  ]
+}

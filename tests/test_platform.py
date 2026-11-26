@@ -535,7 +535,13 @@ def test_approved_article_narration_is_real_pcm_and_revocation_blocks_audio(clie
     response=c.post('/api/production/narration',headers={**auth('editor'),'Origin':'http://testserver'},json=body)
     assert response.status_code==200,response.text
     record=response.json()
-    assert all(sentence['text'] in record['text'] for sentence in article['sentences'])
+    from article_narration import broadcast_script
+    assert record['text']==broadcast_script(module.room.prepare_render([article['id']]))
+    assert '가상' not in record['text']
+    assert len(record['variants'])==3 and {item['rate'] for item in record['variants']}=={-2,0,2}
+    assert record['variants'][1]['duration']>record['variants'][0]['duration']>record['variants'][2]['duration']
+    for variant in record['variants']:
+        assert c.get(variant['audio_url'],headers=auth('editor')).status_code==200
     assert record['duration']>1 and record['disclosure']=='synthetic'
     audio=c.get(record['audio_url'],headers=auth('editor'))
     assert audio.status_code==200
