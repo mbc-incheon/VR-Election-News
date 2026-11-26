@@ -10,7 +10,8 @@ function updateWorkflowGuidance(){
  const stage=document.getElementById('workflowStage'),next=document.getElementById('workflowNext'),handoff=document.getElementById('reviewHandoff'),production=document.getElementById('workflowProduction');if(!stage)return;
  const article=current,user=typeof loggedUser==='undefined'?null:loggedUser;
  handoff.hidden=!article||article.status==='APPROVED';if(article)handoff.href='/login?article='+encodeURIComponent(article.id);
- production.disabled=article?.status!=='APPROVED';
+ production.disabled=article?.status!=='APPROVED';production.textContent=production.disabled?'최종 승인 후 뉴스 제작':'승인 기사로 뉴스 제작';production.title=production.disabled?'승인 대기 상태입니다. 확인란과 승인 사유를 입력하고 최종 승인을 완료하세요.':'';
+ const approveShortcut=document.getElementById('workflowApprove');if(approveShortcut)approveShortcut.disabled=document.getElementById('approve').disabled;
  if(!article){stage.textContent='1. 기사 작성';next.textContent='04에서 후보와 제목을 입력하고 기사 초안 생성을 누르세요.';return}
  stage.textContent=article.title+' · '+(statuses[article.status]||article.status)+' · 작성자 '+article.author;
  if(article.status==='APPROVED'){next.textContent='최종 승인이 완료됐습니다. 승인본을 내보내거나 뉴스 제작을 시작하세요.';return}
@@ -20,8 +21,10 @@ function updateWorkflowGuidance(){
  if(user?.name===article.author){next.textContent='3. 규칙 검증 통과. 현재 계정이 이 기사의 작성자이므로 직접 승인할 수 없습니다. 아래에서 다른 편집자·관리자로 로그인하면 같은 기사를 이어서 엽니다.';return}
  if(!user||!['editor','admin'].includes(user.role)){next.textContent='3. 규칙 검증 통과. 다른 편집자 또는 관리자 계정으로 로그인해 최종 검토하세요.';return}
  const missing=[];if(!document.getElementById('checked').checked)missing.push('원문 대조 확인');if(!document.getElementById('aiAck').checked)missing.push('AI 미연결 확인');if(document.getElementById('reason').value.trim().length<5)missing.push('승인 사유 5자 이상');
- next.textContent=missing.length?'3. 최종 승인 준비: '+missing.join(' · '):'3. 최종 승인 버튼을 누를 수 있습니다.';
+ next.textContent=missing.length?'3. 최종 승인 준비: '+missing.join(' · '):'3. 검토 완료·최종 승인 버튼을 누르세요. 완료되면 뉴스 제작 버튼이 활성화됩니다.';
 }
+document.getElementById('workflowApprove').onclick=()=>document.getElementById('approve').click();
+document.getElementById('workflowRefresh').onclick=async()=>{try{if(!current)return;await wbIdentity();show(await api('/api/articles/'+current.id))}catch(error){document.getElementById('workflowNext').textContent=error.message}};
 document.getElementById('workflowProduction').onclick=()=>document.getElementById('productionToggle').click();
 updateWorkflowGuidance();
 (async()=>{

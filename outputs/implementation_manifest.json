@@ -1,12 +1,12 @@
 {
-  "captured_at": "2026-11-26T11:02:53.213774+09:00",
+  "captured_at": "2026-11-26T11:14:21.813523+09:00",
   "repository": "https://github.com/mbc-incheon/VR-Election-News",
   "release_version": "2.0.0",
   "imported_from": {
     "repository": "https://github.com/mbc-incheon/election-analysis-project-01",
     "commit": "00ac79dc6ec77d6bd4c1e883e152fd78f2e3ab91"
   },
-  "repository_base_commit": "9bebe2144be7764393e4647a9b9abdfc5d9b39bc",
+  "repository_base_commit": "15aace542175826d5c657ed5382f6ad8bd3f636d",
   "note": "Base commit is the parent context before this manifest is committed; exact publication commit is in Git history.",
   "runtime": {
     "python": "3.12.10"
@@ -44,8 +44,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 37563,
-      "sha256": "7210aad9f58fb4b3ed1311e80b3bb51e16efbe7c4e7e0d3c2f5f489753328c24"
+      "bytes": 38115,
+      "sha256": "bd723006f074f2e0ec8b971a3ffea8d7ea4fde6a5309c5134b363828245ba154"
     },
     {
       "path": "compose.yaml",
@@ -319,8 +319,8 @@
     },
     {
       "path": "election-news-server/dashboard.template.html",
-      "bytes": 15844,
-      "sha256": "af25c130d516994bcd4bbe8c355ae69fa6a1504a1da0919a537cfa9b41081411"
+      "bytes": 16137,
+      "sha256": "747a7577d02eedae73f11a9f6c980aa4b32cf6187fcb1944600468e3b40f043f"
     },
     {
       "path": "election-news-server/fixtures/fallback_snapshot.json",
@@ -334,8 +334,8 @@
     },
     {
       "path": "election-news-server/index.html",
-      "bytes": 62529,
-      "sha256": "60adf7353daa6159d5c551ad49b82c8c3e79e7c9290541d7e336a79d7e4b03b3"
+      "bytes": 62822,
+      "sha256": "9f57a3488318600425812752049d70f675d185f75a85d28fafab3e02004e294f"
     },
     {
       "path": "election-news-server/init_users.py",
@@ -404,8 +404,8 @@
     },
     {
       "path": "election-news-server/static/article-workflow.js",
-      "bytes": 4533,
-      "sha256": "fe6993de2f6c946dd40f72887edc45eaec1a0f0d111736a16d2bbc85ffa46dd9"
+      "bytes": 5341,
+      "sha256": "61c3c279330c5022b26ab5166ce4534c76d08090b2749c9c14c491b231564c6c"
     },
     {
       "path": "election-news-server/static/election-news-index.json",
@@ -1109,8 +1109,8 @@
     },
     {
       "path": "scripts/test_workflow_guidance.cjs",
-      "bytes": 1832,
-      "sha256": "01ed2687462e278c496f6ad88a18a14c1c03ff9f8881b5726a26333ff8f7700f"
+      "bytes": 1998,
+      "sha256": "b1feee7f537159688b0fceb7a928c823c15c6cc62f571f481ddda4fb33672ce3"
     },
     {
       "path": "setup.ps1",
