@@ -42,7 +42,7 @@ def test_news_selection_is_scoped_and_cannot_be_fabricated(room):
 
 def test_snapshot_is_fixed_while_demo_continues(room):
  room.receive(dict(sequence=901,mode='demo',rows=simulation_rows(10,901)))
- article=room.draft('계양구을','TEST-writer','demo','result')
+ article=room.draft('하늘도시갑','TEST-writer','demo','result')
  saved=copy.deepcopy(article['sentences'])
  room.receive(dict(sequence=902,mode='demo',rows=simulation_rows(80,902)))
  assert room.get(article['id'])['sentences']==saved

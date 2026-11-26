@@ -14,7 +14,7 @@ def simulation_rows(progress, sequence):
     progress = max(0, min(100, int(progress)))
     rows = []
     baseline = (datetime.fromisoformat('2024-04-10T20:00:00+09:00') + timedelta(seconds=progress*36)).isoformat()
-    for ri, region in enumerate(['계양구을', '연수구을', '서구병']):
+    for ri, region in enumerate(['하늘도시갑', '연수구을', '서구병']):
         votes = [0, 0, 0]
         for step in range(1, progress+1):
             a = int(1000*(0.43+0.13*math.sin(step/12+ri)))

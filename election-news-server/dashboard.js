@@ -2,7 +2,7 @@ const $=x=>document.getElementById(x);
 let snap={},current=null,selectionKey='',searchRequest=0,liveSocket,reconnectTimer;
 const selectedMode=()=> $('dataMode')?.value||'demo';
 let officialRegions=[];
-const selectedRegion=()=>selectedMode()==='demo'?'계양구을':($('region').value||'');
+const selectedRegion=()=>selectedMode()==='demo'?'하늘도시갑':($('region').value||'');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function setSelectOptions(select,markup){if(select&&select._optionsMarkup!==markup){select.innerHTML=markup;select._optionsMarkup=markup}}
 const showValue=(v,suffix='')=>v===null||v===undefined?'미제공':esc(v)+suffix;
@@ -120,7 +120,7 @@ function update(v){
 }
 function refreshRegionOptions(){
  const select=$('region'),selected=select.value;
- setSelectOptions(select,'<option value="">계양구을 · 가상 후보 3명 (기본)</option>'+officialRegions.map(region=>`<option value="${esc(region)}">${esc(region)} · 2024년 실제 결과</option>`).join(''));
+ setSelectOptions(select,'<option value="">하늘도시갑 · 가상 후보 3명 (기본)</option>'+officialRegions.map(region=>`<option value="${esc(region)}">${esc(region)} · 2024년 실제 결과</option>`).join(''));
  select.value=selectedMode()==='demo'?'':officialRegions.includes(selected)?selected:(officialRegions[0]||'');
  if($('evidenceRegion')){setSelectOptions($('evidenceRegion'),select.innerHTML);$('evidenceRegion').value=select.value}
  if($('articleRegion')){setSelectOptions($('articleRegion'),select.innerHTML);$('articleRegion').value=select.value}

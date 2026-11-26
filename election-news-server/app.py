@@ -66,7 +66,7 @@ def seed_demo_documents():
         if (doc.get('is_demo') and doc.get('publisher')=='VR 선거보도 시스템 가상 자료실'
                 and doc.get('url')=='demo://fixtures/pledges' and '가상후보 ' in doc.get('title','')):
             for chunk in doc['chunks']:room.retire(chunk['id'],'demo-profile-update')
-    for i,region in enumerate(['계양구을','연수구을','서구병']):
+    for i,region in enumerate(['하늘도시갑','연수구을','서구병']):
         for ci,profile in enumerate(DEMO_CANDIDATES):
             room.add_document(dict(title=f"{region} {profile['name']} 가상 공약",publisher='VR 선거보도 시스템 가상 자료실',
                 url='demo://fixtures/pledges',published_at='2024-04-01',collected_at='2026-11-25T00:00:00+09:00',

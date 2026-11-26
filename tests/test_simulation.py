@@ -30,3 +30,13 @@ def test_fictional_profiles_are_consistent_in_each_region():
   assert [r['party'] for r in rows[start:start+3]]==['미래민주연합','국민통합당','새길진보당']
   assert [r['candidate_number'] for r in rows[start:start+3]]==[1,2,3]
   assert all(r['is_demo'] and r['profile_message'] for r in rows[start:start+3])
+
+
+def test_fictional_district_rename_does_not_change_official_results():
+    import json
+    from pathlib import Path
+    rows=simulation_rows(60,1)
+    assert all(row['region_name']=='하늘도시갑' for row in rows[:3])
+    official=json.loads((Path(__file__).resolve().parents[1]/'data/clean/incheon_final_results.json').read_text(encoding='utf-8'))
+    assert any(row['region_name']=='계양구을' for row in official)
+    assert all(row['region_name']!='하늘도시갑' for row in official)

@@ -1,7 +1,7 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const source=fs.readFileSync('election-news-server/dashboard.js','utf8'),elements={newArticleTitle:{value:''},draftCandidate:{value:'a'},draftType:{value:'combined'}};
 const context=vm.createContext({$:id=>elements[id]});
-vm.runInContext(`const selectedRegion=()=> '계양구을',selectedMode=()=> 'demo';const snap={rows:[{region_name:'계양구을',candidate_id:'a',candidate_name:'서지훈',is_demo:true,candidate_number:1},{region_name:'계양구을',candidate_id:'b',candidate_name:'한도윤',is_demo:true,candidate_number:2}]};`+source.slice(source.indexOf('function syncDraftTitle('),source.indexOf('function syncDraftAvailability(')),context);
+vm.runInContext(`const selectedRegion=()=> '하늘도시갑',selectedMode=()=> 'demo';const snap={rows:[{region_name:'하늘도시갑',candidate_id:'a',candidate_name:'서지훈',is_demo:true,candidate_number:1},{region_name:'하늘도시갑',candidate_id:'b',candidate_name:'한도윤',is_demo:true,candidate_number:2}]};`+source.slice(source.indexOf('function syncDraftTitle('),source.indexOf('function syncDraftAvailability(')),context);
 vm.runInContext('syncDraftTitle()',context);assert.match(elements.newArticleTitle.value,/서지훈\(가상 후보 1\).*공약/);
 elements.draftCandidate.value='b';vm.runInContext('syncDraftTitle()',context);assert.match(elements.newArticleTitle.value,/한도윤/);
 elements.newArticleTitle.value='직접 작성한 제목';elements.draftType.value='news';vm.runInContext('syncDraftTitle()',context);assert.equal(elements.newArticleTitle.value,'직접 작성한 제목');

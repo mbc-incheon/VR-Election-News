@@ -15,7 +15,7 @@ def room(tmp_path):
     yield n
     n.db.close()
 
-def make(room):return room.draft('계양구을','TEST-writer')
+def make(room):return room.draft('하늘도시갑','TEST-writer')
 def test_success_export(room):
     a=make(room);assert room.validate(a)['status']=='PENDING_HUMAN'
     approved=room.approve(a['id'],'TEST-editor','자동 통합시험 전용 승인',True,True)
@@ -59,9 +59,9 @@ def test_correction_revokes(room):
 def test_duplicate_receive(room):
     e=room.latest();e.pop('snapshot_id');assert room.receive(e) is False
 def test_search_scope(room):
-    assert room.search('교통','계양구을','DEMO-0-0')
+    assert room.search('교통','하늘도시갑','DEMO-0-0')
     assert room.search('교통','부산','DEMO-0-0')==[]
-    assert room.search('교통','계양구을','DEMO-0-0',demo=False)==[]
+    assert room.search('교통','하늘도시갑','DEMO-0-0',demo=False)==[]
 def test_audit_chain(room):
     make(room);prev='0'*64
     for _,p,h,raw in room.db.execute('SELECT * FROM audit ORDER BY id'):

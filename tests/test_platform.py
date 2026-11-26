@@ -169,7 +169,7 @@ def test_real_fhd_video_and_approval_recheck(tmp_path):
     event=json.loads((ROOT/'fixtures/fallback_snapshot.json').read_text(encoding='utf-8'));room.receive(event)
     for row in event['rows']:
         room.add_document(dict(title='TEST video fixture',publisher='TEST',url='demo://TEST',published_at='2024-04-01',collected_at='2026-11-24T00:00:00+09:00',document_type='campaign',election_id=row['election_id'],region_name=row['region_name'],candidate_id=row['candidate_id'],text='TEST 교통 공약, 실제 보도 아님.',is_demo=True,rights='TEST'), 'TEST-writer')
-    article=room.draft('계양구을','TEST-writer');room.approve(article['id'],'TEST-editor','TEST 자동 시험 전용',True,True)
+    article=room.draft('하늘도시갑','TEST-writer');room.approve(article['id'],'TEST-editor','TEST 자동 시험 전용',True,True)
     producer=Production(room)
     try:
         with pytest.raises(ValueError,match='declare'):
@@ -347,7 +347,7 @@ def test_issued_roles_complete_draft_review_approval_without_shared_token(client
     editor=module.admin_auth.create('TEST-desk','editor','TEST 편집 담당')
     module.room.receive(json.loads((ROOT/'election-news-server/fixtures/fallback_snapshot.json').read_text(encoding='utf-8')))
     assert c.post('/api/session/login',headers=origin,json=dict(name=writer['name'],token=writer['token'])).status_code==200
-    draft=c.post('/api/articles',headers=origin,json=dict(region='계양구을',mode='demo'))
+    draft=c.post('/api/articles',headers=origin,json=dict(region='하늘도시갑',mode='demo'))
     assert draft.status_code==200,draft.text
     article=draft.json()
     assert article['author']==writer['name']
@@ -358,7 +358,7 @@ def test_issued_roles_complete_draft_review_approval_without_shared_token(client
     assert c.post('/api/articles/'+article['id']+'/approve',headers=origin,json=approval).status_code==403
     assert c.post('/api/session/logout',headers=origin,json={}).status_code==200
     assert c.post('/api/session/login',headers=origin,json=dict(name=editor['name'],token=editor['token'])).status_code==200
-    assert c.post('/api/articles',headers=origin,json=dict(region='계양구을',mode='demo')).status_code==403
+    assert c.post('/api/articles',headers=origin,json=dict(region='하늘도시갑',mode='demo')).status_code==403
     approved=c.post('/api/articles/'+article['id']+'/approve',headers=origin,json=approval)
     assert approved.status_code==200,approved.text
     assert approved.json()['status']=='APPROVED'
@@ -494,7 +494,7 @@ def test_unified_login_auto_routes_all_roles_and_keeps_permissions(client):
 def test_demo_article_handoff_survives_reviewer_login_and_approval(client):
     c,module=client
     module.room.receive(json.loads((ROOT/'fixtures/fallback_snapshot.json').read_text(encoding='utf-8')))
-    article=c.post('/api/articles',headers=auth(),json=dict(region='계양구을',mode='demo',article_type='result',title='TEST 가상 기사 검토 인계')).json()
+    article=c.post('/api/articles',headers=auth(),json=dict(region='하늘도시갑',mode='demo',article_type='result',title='TEST 가상 기사 검토 인계')).json()
     checked=c.post('/api/articles/'+article['id']+'/validate',headers=auth(),json={})
     assert checked.json()['status']=='PENDING_HUMAN'
     origin={'Origin':'http://testserver'}

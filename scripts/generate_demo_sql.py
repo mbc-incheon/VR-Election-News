@@ -29,7 +29,7 @@ def main():
                     election_id=row['election_id'], region_name=row['region_name'],
                     candidate_id=row['candidate_id'], text=row['candidate_name']+'('+row.get('party','가상 정당')+')의 가상 공약: '+row.get('profile_message','지역 현안 개선')+'. 실제 후보의 공약이 아니며 재원과 일정은 설정하지 않았다.',
                     is_demo=True, rights='프로젝트 제작 가상 자료'), 'SQL-demo-seed')
-            article = room.draft('계양구을', 'SQL-demo-writer')
+            article = room.draft('하늘도시갑', 'SQL-demo-writer')
             assert article['status'] == 'DRAFT'
             assert room.db.execute('SELECT COUNT(*) FROM approval').fetchone()[0] == 0
             # iterdump correctly escapes Korean strings, apostrophes and JSON.

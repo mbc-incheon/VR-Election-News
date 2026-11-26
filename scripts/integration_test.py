@@ -44,8 +44,8 @@ try:
         time.sleep(.2)
     check('Cross-server receive',bool(snap.get('rows')))
     asyncio.run(sockets())
-    check('No token cannot generate',httpx.post('http://127.0.0.1:18102/api/articles',json={'region':'계양구을'}).status_code==401)
-    a=call('/api/articles',{'region':'계양구을'}).json();aid=a['id']
+    check('No token cannot generate',httpx.post('http://127.0.0.1:18102/api/articles',json={'region':'하늘도시갑'}).status_code==401)
+    a=call('/api/articles',{'region':'하늘도시갑'}).json();aid=a['id']
     v=call(f'/api/articles/{aid}/validate',{}).json()
     check('Normal validation',v['validation']['rule']=='PASS')
     check('Writer cannot approve',call(f'/api/articles/{aid}/approve',dict(reason='시험용 확인 사유',evidence_checked=True,ai_unavailable_ack=True)).status_code==403)

@@ -49,7 +49,7 @@ try:
         demo=call('/api/snapshot?mode=demo').json()
         if demo.get('rows'):break
         time.sleep(.1)
-    article=call('/api/articles',dict(region='계양구을',mode='demo')).json();aid=article['id']
+    article=call('/api/articles',dict(region='하늘도시갑',mode='demo')).json();aid=article['id']
     check('Simulation article validation passes',call('/api/articles/'+aid+'/validate',{}).json()['validation']['rule']=='PASS')
     check('Render rejects unapproved article',call('/api/production/jobs',dict(article_ids=[aid],seconds_per_article=5)).status_code==409)
     check('TEST independent editor approval',call('/api/articles/'+aid+'/approve',dict(reason='TEST 자동 시험 전용. 실제 사람의 편집 승인이 아닙니다.',evidence_checked=True,ai_unavailable_ack=True),'editor').status_code==200)
