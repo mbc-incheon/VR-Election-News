@@ -504,3 +504,19 @@ def test_demo_article_handoff_survives_reviewer_login_and_approval(client):
     approved=c.post('/api/articles/'+article['id']+'/approve',headers=origin,json=dict(reason='TEST 검토자 인계 승인 시험',evidence_checked=True,ai_unavailable_ack=True))
     assert approved.status_code==200 and approved.json()['approved_by']=='TEST-editor'
     assert c.get('/api/articles/'+article['id']+'/export').status_code==200
+
+
+@pytest.mark.parametrize('sample_id',['opening','candidates','closing'])
+def test_sample_narration_can_enter_demo_production(client,monkeypatch,sample_id):
+    import base64
+    c,module=client
+    module.room.receive(json.loads((ROOT/'fixtures/fallback_snapshot.json').read_text(encoding='utf-8')))
+    article=module.room.draft('하늘도시갑','TEST-writer','demo','result')
+    module.room.approve(article['id'],'TEST-editor','TEST 샘플 음성 제작 시험 승인',True,True)
+    captured=[]
+    monkeypatch.setattr(module.production.pool,'submit',lambda *args:captured.append(args))
+    content=(ROOT/'election-news-server/static/samples/narration'/(sample_id+'.wav')).read_bytes()
+    response=c.post('/api/production/jobs',headers=auth('editor'),json=dict(article_ids=[article['id']],seconds_per_article=40,narration_wav_base64=base64.b64encode(content).decode(),narration_disclosure='synthetic'))
+    assert response.status_code==200,response.text
+    assert captured and captured[0][-1]==content
+    assert captured[0][2]['narration']=='synthetic'

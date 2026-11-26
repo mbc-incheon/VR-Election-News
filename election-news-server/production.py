@@ -61,7 +61,7 @@ def render_bundle(folder,bundles,seconds,audio=None,audio_disclosure='none'):
             draw.rectangle((0,900,1920,1080),fill='#113b51')
             draw.text((62,923),'근거 ID  '+', '.join(refs)[:110],font=font(23),fill='#cbe9ed')
             draw.text((62,966),bundle['disclosure']+' · 승인본 '+article['id'],font=font(25),fill='white')
-            voice_label={'none':'음성 없음','human':'제작자 확인 녹음 음성','synthetic':'AI 합성 음성 사용'}[audio_disclosure]
+            voice_label={'none':'음성 없음','human':'제작자 확인 녹음 음성','synthetic':'합성 음성 사용'}[audio_disclosure]
             draw.text((62,1010),'규칙 기반 초안 · 생성형 AI 미연결 · '+voice_label,font=font(23),fill='#e1eaf3')
             index=len(slides);filename=f'cg-{index:03}.png';image.save(folder/filename)
             slides.append((filename,duration));end=cursor+duration

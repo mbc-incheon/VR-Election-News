@@ -1,12 +1,12 @@
 {
-  "captured_at": "2026-11-26T11:14:21.813523+09:00",
+  "captured_at": "2026-11-26T11:36:44.463571+09:00",
   "repository": "https://github.com/mbc-incheon/VR-Election-News",
   "release_version": "2.0.0",
   "imported_from": {
     "repository": "https://github.com/mbc-incheon/election-analysis-project-01",
     "commit": "00ac79dc6ec77d6bd4c1e883e152fd78f2e3ab91"
   },
-  "repository_base_commit": "15aace542175826d5c657ed5382f6ad8bd3f636d",
+  "repository_base_commit": "cff88308ff89a5783372955d578bedfb3345d6bd",
   "note": "Base commit is the parent context before this manifest is committed; exact publication commit is in Git history.",
   "runtime": {
     "python": "3.12.10"
@@ -44,8 +44,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 38115,
-      "sha256": "bd723006f074f2e0ec8b971a3ffea8d7ea4fde6a5309c5134b363828245ba154"
+      "bytes": 39820,
+      "sha256": "86e9f687bdc7b1798215a156e0e61a7b59e7959a45815b6b0f702790e27d9391"
     },
     {
       "path": "compose.yaml",
@@ -319,8 +319,8 @@
     },
     {
       "path": "election-news-server/dashboard.template.html",
-      "bytes": 16137,
-      "sha256": "747a7577d02eedae73f11a9f6c980aa4b32cf6187fcb1944600468e3b40f043f"
+      "bytes": 16129,
+      "sha256": "67f011c9259fc76ae475671dc29e4c5472d4af29898cce326cbe42732a4e1d70"
     },
     {
       "path": "election-news-server/fixtures/fallback_snapshot.json",
@@ -334,8 +334,8 @@
     },
     {
       "path": "election-news-server/index.html",
-      "bytes": 62822,
-      "sha256": "9f57a3488318600425812752049d70f675d185f75a85d28fafab3e02004e294f"
+      "bytes": 62814,
+      "sha256": "88b121c78edd7e110d7c06e44b53f03049320d4a7dcc2a1ab27151f1f2b83fea"
     },
     {
       "path": "election-news-server/init_users.py",
@@ -349,8 +349,8 @@
     },
     {
       "path": "election-news-server/production.py",
-      "bytes": 9705,
-      "sha256": "62b821685e6d6af66280aedc67b965995360608ff2692dab00626eecfc0b8cbf"
+      "bytes": 9861,
+      "sha256": "2cfa879d8e51d01d99305b94f1207abefa5b1cdd77e4cb396536234ab2d6fc67"
     },
     {
       "path": "election-news-server/reference_data/incheon_final_results.json",
@@ -433,6 +433,46 @@
       "sha256": "ea0dac2b44d57f15b300d543c118b7969a503baf784fee7a2a79e62f9ed7ebe2"
     },
     {
+      "path": "election-news-server/static/samples/narration/candidates.txt",
+      "bytes": 469,
+      "sha256": "c6a67dbe1df86290a665ca16ed94b2bb21cd17d7b8a54230eb1c578d5e15b720"
+    },
+    {
+      "path": "election-news-server/static/samples/narration/candidates.wav",
+      "bytes": 1534938,
+      "sha256": "c9786e19ea1aae4b6f2bcf223433ba4aeb7ea771f858d0e60cb9b3e4c23a4ea0"
+    },
+    {
+      "path": "election-news-server/static/samples/narration/closing.txt",
+      "bytes": 394,
+      "sha256": "c97f0be72adc471770543fe4582954c3345c6606a72390a348ef4336f18cefb6"
+    },
+    {
+      "path": "election-news-server/static/samples/narration/closing.wav",
+      "bytes": 1218276,
+      "sha256": "d3906191e4c7282ac9bfea9b44efa0c66df47d62a2c812b0b43bf7e0ba0d36c6"
+    },
+    {
+      "path": "election-news-server/static/samples/narration/index.json",
+      "bytes": 2567,
+      "sha256": "574009ecee9c109ff0f5d878a86920904947b99419065d44edb9c52b74d01f1a"
+    },
+    {
+      "path": "election-news-server/static/samples/narration/opening.txt",
+      "bytes": 321,
+      "sha256": "9ad05cf3955909969c91fb1bc25e0caf4a92b21ad65be912e41ad9b41da95862"
+    },
+    {
+      "path": "election-news-server/static/samples/narration/opening.wav",
+      "bytes": 1017360,
+      "sha256": "aeec215d9bb4c4f825cfeb6a5ca9ec24b2f2212d17c32db0fae99cca8db9dba3"
+    },
+    {
+      "path": "election-news-server/static/samples/narration/scripts.json",
+      "bytes": 1641,
+      "sha256": "5945e71ded93d514ff01a0091bbd5eddb39c29d693c01c0ab0426e741f5b66aa"
+    },
+    {
       "path": "election-news-server/static/staff-login.html",
       "bytes": 191,
       "sha256": "04087c7e97c1f7d4166facae440b98b0126c6fbe0ed282afa74352f430b2dfd7"
@@ -479,13 +519,13 @@
     },
     {
       "path": "election-news-server/static/workbench.css",
-      "bytes": 7084,
-      "sha256": "525cb427730fe373bd6f3669a2cea6cf6012081e9d184a8cb226758546685393"
+      "bytes": 7572,
+      "sha256": "f7771df255c19aefd925b640452bda5dae2d6d8811b7824c5b2cba534482f34a"
     },
     {
       "path": "election-news-server/static/workbench.js",
-      "bytes": 16165,
-      "sha256": "45454332be3bfa9863917df16b591020715cf87a6d53f2573c023e4721a051b9"
+      "bytes": 19778,
+      "sha256": "5035bf2b89d2f29d33406b4388729c61d1ac4426e110aff278c283204fe02ee1"
     },
     {
       "path": "election-news-server/workflow.py",
@@ -898,6 +938,11 @@
       "sha256": "008dff06efe0475851b28c887896c00658b1427be69b48f1b4e9e8c12a88324e"
     },
     {
+      "path": "outputs/screenshots/narration-samples.jpg",
+      "bytes": 68145,
+      "sha256": "f661e22fbeef7706b0757ca5ef2828a80c634f62e371a03b3d2bfdbe57963257"
+    },
+    {
       "path": "outputs/screenshots/news-production-popup.jpg",
       "bytes": 61772,
       "sha256": "bbf27de8f2a3d7a290b3a9d20a44a27f94417f8dd184cdd3218b37cb2ce7cb95"
@@ -994,8 +1039,8 @@
     },
     {
       "path": "outputs/unit_results.xml",
-      "bytes": 7969,
-      "sha256": "b070bf5ef9895c77c2c5f20b922a2deb6759d65a69c23368246ed159571839c5"
+      "bytes": 8472,
+      "sha256": "a239a1834a5be275e45c2bb03400e24c2ae89cd6633faf27179518d68a234354"
     },
     {
       "path": "requirements.txt",
@@ -1011,6 +1056,11 @@
       "path": "scripts/build_implementation_manifest.py",
       "bytes": 2347,
       "sha256": "3c1dc696cfba2131f6558006b74b02b399d8fd5df34452c405ae0a155658287a"
+    },
+    {
+      "path": "scripts/build_narration_catalog.py",
+      "bytes": 1040,
+      "sha256": "d0b69bd4359b708658229d37351989d329a8e5eb0df92c253670d68be76e0b52"
     },
     {
       "path": "scripts/campaign_probe.py",
@@ -1046,6 +1096,11 @@
       "path": "scripts/generate_demo_sql.py",
       "bytes": 2661,
       "sha256": "339ad129cb351d0f15d1e07f91ee01220c4a840c54fc2bcdbc3b1a627077599a"
+    },
+    {
+      "path": "scripts/generate_narration_samples.ps1",
+      "bytes": 1146,
+      "sha256": "8b2a992ed112be0009af744e7a00f04ac224b05cc1335ee9ce980d108c1ca9c3"
     },
     {
       "path": "scripts/init_db.py",
@@ -1148,9 +1203,14 @@
       "sha256": "2834d7a9384d17833a3d162199f4285b073b9e88415ac9badfaddef61ba6f4be"
     },
     {
+      "path": "tests/test_narration_samples.py",
+      "bytes": 1152,
+      "sha256": "d8fb0f61f9fc4fe9e91efb050457649ea00f4077c33778a3acc2fb6975299ae6"
+    },
+    {
       "path": "tests/test_platform.py",
-      "bytes": 34843,
-      "sha256": "6e25d716e981656479acc75d015ef34c192fcc0e29e880126dc5a4a048fb0677"
+      "bytes": 35922,
+      "sha256": "18ef271f0fa3446e5f62745a7cb06d35fe4186a84cd562fd3a77857e06825244"
     },
     {
       "path": "tests/test_simulation.py",

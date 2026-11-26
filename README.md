@@ -23,6 +23,18 @@
 
 관리자는 계정관리와 함께 기사 작성·수정, 문서 등록, 자료·문서 검수, 최종 승인·내보내기·뉴스 제작을 수행합니다. 작성자·편집자의 기존 권한은 유지합니다. 관리자도 규칙 검증과 원문 대조를 거치며, 자신이 작성하거나 수정해 작성자가 된 기사 또는 자신이 등록한 자료를 직접 승인할 수 없습니다. 다른 작성자의 기사는 관리자가 최종 승인할 수 있습니다.
 
+## 07 샘플 내레이션과 음성
+
+뉴스 제작 팝업에서 샘플을 선택하고 대본·미리 듣기·WAV/TXT 다운로드를 이용합니다. **이 샘플을 제작에 사용**을 누르면 음성 출처가 합성 음성으로 설정되고 기본 영상 길이를 음성 길이에 맞춰 늘립니다. 승인 기사를 체크하고 **FHD 뉴스 제작**을 누르세요. 업로드한 음성을 선택하면 샘플 적용이 해제됩니다. 고정 샘플 대본이며 선택 기사의 본문을 자동 낭독하는 기능은 아닙니다. 하늘도시갑 가상 기사 제작에서만 적용합니다.
+
+| 샘플 | 길이 | 대본 | 한국어 PCM WAV |
+| --- | --- | --- | --- |
+| 오프닝 · 가상 개표 소개 | 23.07초 | [TXT](election-news-server/static/samples/narration/opening.txt) | [WAV](election-news-server/static/samples/narration/opening.wav) |
+| 가상 후보 세 명의 공약 소개 | 34.8초 | [TXT](election-news-server/static/samples/narration/candidates.txt) | [WAV](election-news-server/static/samples/narration/candidates.wav) |
+| 팩트체크 안내와 마무리 | 27.62초 | [TXT](election-news-server/static/samples/narration/closing.txt) | [WAV](election-news-server/static/samples/narration/closing.wav) |
+
+음성은 설치된 Microsoft Heami Windows TTS로 생성한 합성 음성입니다. 22,050Hz·모노·16bit PCM WAV이며 대본은 프로젝트용으로 작성했습니다. 원본 대본과 파일 해시·길이는 [샘플 카탈로그](election-news-server/static/samples/narration/index.json)에 보존합니다. Windows에서 같은 음성이 설치되어 있으면 `scripts/generate_narration_samples.ps1`로 재생성할 수 있습니다.
+
 ## 승인 대기에서 뉴스 제작으로
 
 05 상단에서 기사 상태를 확인합니다. 편집자로 로그인한 뒤 **원문 대조 확인**, **AI 미연결 확인**, **승인 사유 5자 이상**을 입력하고 **검토 완료·최종 승인**을 눌러야 승인 완료가 됩니다. 편집자 로그인·규칙 검증만으로 자동 승인하지 않습니다. 승인 전에는 제작 버튼이 **최종 승인 후 뉴스 제작**으로 표시됩니다. 다른 탭에서 승인했다면 **기사 상태 새로고침**을 누르세요.
