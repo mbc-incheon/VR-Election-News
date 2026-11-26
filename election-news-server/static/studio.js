@@ -1,3 +1,4 @@
+import {candidateColor} from './candidate-colors.js';
 import * as THREE from 'three';
 import {OrbitControls} from '/static/vendor/OrbitControls.js';
 const $=id=>document.getElementById(id);
@@ -29,7 +30,7 @@ function draw(){
  if(!renderer)return;const ctx=screenCanvas.getContext('2d');ctx.fillStyle='#071b31';ctx.fillRect(0,0,2048,1024);ctx.fillStyle='#19b8b2';ctx.fillRect(0,0,2048,12);
  ctx.font='bold 68px "Malgun Gothic", sans-serif';ctx.fillStyle='white';ctx.fillText('VR 선거보도 시스템',85,115);ctx.font='34px "Malgun Gothic", sans-serif';ctx.fillStyle='#8db7c8';ctx.fillText('2024 제22대 총선 · '+($('region').value||'인천 지역구'),85,178);
  const demo=snapshot.mode==='demo';ctx.fillStyle=demo?'#ffd17b':'#84dfd2';ctx.font='28px "Malgun Gothic", sans-serif';ctx.fillText(demo?'시뮬레이션 데이터 · 실제 후보와 수치가 아닙니다':('공식 파일 집계 · '+(snapshot.review?.status==='APPROVED'?'독립 검수 완료':'독립 검수 전')),85,232);
- const displayed=rows.slice(0,5);displayed.forEach((row,i)=>{const y=335+i*119;ctx.fillStyle='white';ctx.font='bold 52px "Malgun Gothic", sans-serif';ctx.fillText(row.candidate_name,85,y);ctx.font='30px "Malgun Gothic", sans-serif';ctx.fillStyle='#b6d4e6';ctx.fillText(Number(row.votes).toLocaleString('ko-KR')+'표',470,y);ctx.fillStyle='#17374c';ctx.fillRect(850,y-35,800,38);ctx.fillStyle=i%2?'#5485cc':'#14b6a7';ctx.fillRect(850,y-35,800*row.vote_share/100,38);ctx.fillStyle='white';ctx.fillText(row.vote_share.toFixed(2)+'%',1700,y)});
+ const displayed=rows.slice(0,5);displayed.forEach((row,i)=>{const y=335+i*119;ctx.fillStyle='white';ctx.font='bold 52px "Malgun Gothic", sans-serif';ctx.fillText(row.candidate_name,85,y);ctx.font='30px "Malgun Gothic", sans-serif';ctx.fillStyle='#b6d4e6';ctx.fillText(Number(row.votes).toLocaleString('ko-KR')+'표',470,y);ctx.fillStyle='#17374c';ctx.fillRect(850,y-35,800,38);ctx.fillStyle=candidateColor(row,i);ctx.fillRect(850,y-35,800*row.vote_share/100,38);ctx.fillStyle='white';ctx.fillText(row.vote_share.toFixed(2)+'%',1700,y)});
  ctx.font='24px "Malgun Gothic", sans-serif';ctx.fillStyle='#9bc0ce';ctx.fillText('득표율은 유효 후보 득표 합 기준 · 기준시각/개표율 미제공 값은 생성하지 않습니다',85,984);screenTexture.needsUpdate=true;
  while(chartGroup.children.length){const mesh=chartGroup.children[0];chartGroup.remove(mesh);mesh.geometry.dispose();mesh.material.dispose()}
  displayed.forEach((r,i)=>{const h=.2+r.vote_share/100*3;const bar=new THREE.Mesh(new THREE.BoxGeometry(.7,h,.7),material(i%2?'#4678ba':'#0bb5a8',.4));bar.position.set(-5.8+i*1.0,h/2,-.1);chartGroup.add(bar)});
