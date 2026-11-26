@@ -1,12 +1,12 @@
 {
-  "captured_at": "2026-11-26T12:26:07.395460+09:00",
+  "captured_at": "2026-11-26T12:40:42.373724+09:00",
   "repository": "https://github.com/mbc-incheon/VR-Election-News",
   "release_version": "2.0.0",
   "imported_from": {
     "repository": "https://github.com/mbc-incheon/election-analysis-project-01",
     "commit": "00ac79dc6ec77d6bd4c1e883e152fd78f2e3ab91"
   },
-  "repository_base_commit": "96f077bf4efd77a679b02297cc6d3bd33a3b7e09",
+  "repository_base_commit": "cdd2c6877a0d91c9360beef02476c407bca42c4e",
   "note": "Base commit is the parent context before this manifest is committed; exact publication commit is in Git history.",
   "runtime": {
     "python": "3.12.10"
@@ -44,8 +44,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 43095,
-      "sha256": "bbef600bb294e7bb66b7495b3ef51ff9c77e0fad9ccf15c76a19373bb6bf6a09"
+      "bytes": 43460,
+      "sha256": "764f1f55adc745082b0412ebd9d4771c1b3d6ff374ec8319b574daf668e01920"
     },
     {
       "path": "compose.yaml",
@@ -324,8 +324,8 @@
     },
     {
       "path": "election-news-server/dashboard.template.html",
-      "bytes": 16115,
-      "sha256": "08e76e15518d9972fa515d19f0a5001aa3592e88b31b922c0200199a337d104a"
+      "bytes": 16075,
+      "sha256": "d618366426b810adf3cd5d2709e770e2ad468e220a1da3e05964291fa472ac71"
     },
     {
       "path": "election-news-server/fixtures/fallback_snapshot.json",
@@ -339,8 +339,8 @@
     },
     {
       "path": "election-news-server/index.html",
-      "bytes": 64458,
-      "sha256": "f8775599e7796c2a340dc887afad43640528705f372d732352f7fa986dba406f"
+      "bytes": 64418,
+      "sha256": "fea2de39bbf46d1a224d2f865cbdaac11f9883b2591c65ee3f97566d123a0911"
     },
     {
       "path": "election-news-server/init_users.py",
@@ -529,8 +529,8 @@
     },
     {
       "path": "election-news-server/static/workbench.js",
-      "bytes": 28627,
-      "sha256": "97b4443952d6e6acfacaa4f00636005ad49b9d0214a6571f55520b39058069df"
+      "bytes": 30230,
+      "sha256": "019743d4d2520d77b579bb0e4ae7cf2b0ccfcd0b0069f339f3e11336477af717"
     },
     {
       "path": "election-news-server/workflow.py",
