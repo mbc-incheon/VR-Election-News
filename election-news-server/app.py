@@ -490,6 +490,11 @@ def integrity(user=Depends(identity)):
 class NarrationRequest(BaseModel):
     article_ids:list[str]=Field(min_length=1,max_length=30)
 
+@app.post('/api/production/narration/cached')
+def cached_article_narration(req:NarrationRequest,user=Depends(identity)):
+    try:return article_narration.cached(req.article_ids)
+    except ValueError as error:raise HTTPException(409,str(error))
+
 @app.post('/api/production/narration')
 async def create_article_narration(req:NarrationRequest,request:Request,user=Depends(identity)):
     same_origin(request)

@@ -535,6 +535,8 @@ def test_approved_article_narration_is_real_pcm_and_revocation_blocks_audio(clie
     response=c.post('/api/production/narration',headers={**auth('editor'),'Origin':'http://testserver'},json=body)
     assert response.status_code==200,response.text
     record=response.json()
+    cached=c.post('/api/production/narration/cached',headers=auth('editor'),json=body)
+    assert cached.status_code==200 and cached.json()['id']==record['id']
     from article_narration import broadcast_script
     assert record['text']==broadcast_script(module.room.prepare_render([article['id']]))
     assert '가상' not in record['text']
@@ -548,6 +550,7 @@ def test_approved_article_narration_is_real_pcm_and_revocation_blocks_audio(clie
     with wave.open(io.BytesIO(audio.content)) as wav:assert wav.getnframes()>0 and wav.getcomptype()=='NONE'
     changed=module.room.get(article['id']);changed['status']='DRAFT';module.room.save(changed)
     assert c.get(record['audio_url'],headers=auth('editor')).status_code==409
+    assert c.post('/api/production/narration/cached',headers=auth('editor'),json=body).status_code==409
 
 
 def test_article_list_delete_preserves_records_and_enforces_ownership(client):

@@ -44,8 +44,10 @@ def render_bundle(folder,bundles,seconds,audio=None,audio_disclosure='none'):
     slides=[];subtitles=[];timeline=[];cursor=0
     for bundle in bundles:
         article=bundle['article'];items=[]
+        from article_narration import broadcast_story
+        story=broadcast_story(article)
         measure=ImageDraw.Draw(Image.new('RGB',(1,1)))
-        for sentence in article['sentences']:
+        for sentence in story['sentences']:
             lines=wrap(measure,sentence['text'],font(39),1760)
             items.extend((sentence,lines[i:i+8]) for i in range(0,len(lines),8))
         duration=seconds/len(items)
@@ -53,7 +55,7 @@ def render_bundle(folder,bundles,seconds,audio=None,audio_disclosure='none'):
             image=Image.new('RGB',(1920,1080),'#0c213d');draw=ImageDraw.Draw(image)
             draw.rectangle((0,0,1920,105),fill='#163e5d');draw.text((62,25),'VR 선거보도 시스템',font=font(38),fill='white')
             draw.text((62,146),article['region_name']+'  |  '+('시뮬레이션' if article['mode']=='demo' else '2024년 공식 파일 집계'),font=font(32),fill='#57ddd3')
-            title_lines=wrap(draw,article['title'],font(46),1780)
+            title_lines=wrap(draw,story['title'],font(46),1780)
             y=215
             for line in title_lines[:2]:draw.text((62,y),line,font=font(46),fill='white');y+=64
             y+=40

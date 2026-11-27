@@ -1,44 +1,54 @@
 /* Opaque editor theme. Writer mode keeps the original light appearance. */
-body[data-workspace="editor"]{--editor-page:#0b1423;--editor-panel:#14243a;--editor-raised:#1c304a;--editor-line:#425b76;--editor-text:#f1f5fb;--editor-muted:#c0cfdf;background:var(--editor-page);color:var(--editor-text);color-scheme:dark;--line:var(--editor-line)}
-body[data-workspace="editor"] :is(.panel,dialog){background:var(--editor-panel);color:var(--editor-text);border-color:var(--editor-line);box-shadow:0 4px 16px #00000040}
-body[data-workspace="editor"] :is(.body,.react-results,.past-results,.past-scroll,.expanded,.bottom-button){background:transparent;color:var(--editor-text)}
-body[data-workspace="editor"] :is(.workbar,.evidence-card,.draft-card,.subpanel,.review-actions,.record-card,.source-directory,.evidence-summary,.article-region-search,.preparation-flow,.evidence-confirm,.draft-title-input,.draft-editor,.election-news,.news-result,.google-news-search,.news-next-step,.selected-news-summary,.react-candidate-card,.react-progress-panel,.production-card,.production-spec,.narration-samples,.material-instructions,.workflow-guide){background:var(--editor-raised);color:var(--editor-text);border-color:var(--editor-line);box-shadow:none}
-body[data-workspace="editor"] #adminWorkMode{background:var(--editor-raised)!important;color:var(--editor-text);border-color:var(--editor-line)!important}
-body[data-workspace="editor"] :is(.panel-head,.subhead,.dialog-head,.result-table-details>summary,.past-scroll th){background:#223e5b;color:#ffffff;border-color:var(--editor-line)}
-body[data-workspace="editor"] #productionDialog .dialog-head{background:#223e5b;color:#ffffff}
-body[data-workspace="editor"] :is(th,td){background:var(--editor-panel);color:var(--editor-text);border-color:var(--editor-line)}
-body[data-workspace="editor"] th{background:#223e5b}
-body[data-workspace="editor"] :is(input,select,textarea){background:#0b192b;color:#f1f5fb;border-color:#667f9b;accent-color:#62d6cf}
-body[data-workspace="editor"] ::placeholder{color:#afc0d3;opacity:1}
-body[data-workspace="editor"] :is(button.secondary,.react-candidate-heading button){background:#294560;color:#f1f5fb;border-color:#6a829d}
-body[data-workspace="editor"] button:disabled{background:#34475d;color:#b5c6d8;border-color:#526880}
-body[data-workspace="editor"] #productionDialog .dialog-head button{background:#294560;color:#f1f5fb;border-color:#6a829d}
-body[data-workspace="editor"] :is(a,.source-links a,.news-result h4 a,.draft-editor a,.sample-narration-actions a,.selected-news-summary a,.past-scroll a){color:#8cdeff}
-body[data-workspace="editor"] :is(h2,h3,h4,strong,.react-votes,.react-card-rate strong,.react-progress-panel dd,.react-feed-header h3,.election-news h3,.production-card h3){color:#f1f5fb}
-body[data-workspace="editor"] :is(.field-note,.meta,.role-note,.empty,.check-note,.bottom-note,.expanded,.evidence-meta,.evidence-disclosure,.evidence-method-note,.evidence-result-count,.evidence-summary span,.evidence-tools span,.article-region-search span,.draft-title-input p,.details-checks,.react-party,.react-profile-message,.react-candidate-source,.react-data-note,.react-connection,.react-candidate-party,.table-candidate-party,.react-article-label small,.react-progress-panel dt,.past-description,.past-controls output,.news-meta,.news-result p,.news-result small,.news-pick,.news-more,.election-news>p,.rundown-row small,.news-pagination){color:var(--editor-muted)}
-body[data-workspace="editor"] :is(.mode-note,.react-feed-badge,.react-article-status,.pill){background:#2a425e;color:#e2ecf7;border-color:#58728d}
-body[data-workspace="editor"] :is(.good,.status-APPROVED){background:#174a3b;color:#a6f2cb}
-body[data-workspace="editor"] :is(.warn,.notice,.react-feed-badge.demo,.status-REVIEW_REQUIRED){background:#4b391b;color:#ffe0a3;border-color:#8e713e}
-body[data-workspace="editor"] :is(.bad,.error,.message.is-error){background:#4e2532;color:#ffbcc9;border-color:#956273}
-body[data-workspace="editor"] :is(.message,#dialogMessage,.check-errors){color:#a6f2cb}
-body[data-workspace="editor"] .check-errors{color:#ffbcc9}
-body[data-workspace="editor"] .evidence-tag{background:#194854;color:#a6f3f0}
-body[data-workspace="editor"] :is(pre,.details-checks pre,.record-card pre){background:#0b192b;color:#dce9f7;border-color:var(--editor-line)}
-body[data-workspace="editor"] :is(.bar,.react-share-track,.react-count-track){background:#40556e}
-body[data-workspace="editor"] #articles .react-article-item{background:var(--editor-raised);color:var(--editor-text);border-color:var(--editor-line)}
-body[data-workspace="editor"] #articles .react-article-row button{color:#f1f5fb;background:#294560;border-color:#6a829d}
-body[data-workspace="editor"] :is(.react-candidate-card.selected,.react-article-item.selected){outline:2px solid #72d9d1;outline-offset:1px}
-body[data-workspace="editor"] :is(.time,.reason-group,.bottom-note,.check-row,.article-body p,.news-caution,.rundown-row,.job-card,.audit-entry){border-color:var(--editor-line)}
-body[data-workspace="editor"] footer{background:#0b1423;color:var(--editor-muted)}
-body[data-workspace="editor"] :is(button,input,select,textarea,a):focus-visible{outline:3px solid #ffd36f;outline-offset:3px}
-body[data-workspace="editor"] .evidence-link{background:#294560;color:#8cdeff;border-color:#6a829d}
-body[data-workspace="editor"] :is(.bottom-icon,.chevron,.workflow-guide-actions a,.news-meta>span:first-child){color:#8cdeff}
-body[data-workspace="editor"] .draft-pill{background:#233f6b;color:#c5dcff}
-body[data-workspace="editor"] #articles .react-article-actions .article-delete{background:#4e2532;color:#ffbcc9;border-color:#956273}
-body[data-workspace="editor"] #articles .react-article-actions button:disabled{background:#34475d;color:#b5c6d8;border-color:#526880}
+:is(body[data-workspace="editor"],#productionDialog){--editor-page:#0b1423;--editor-panel:#14243a;--editor-raised:#1c304a;--editor-line:#425b76;--editor-text:#f1f5fb;--editor-muted:#c0cfdf;background:var(--editor-page);color:var(--editor-text);color-scheme:dark;--line:var(--editor-line)}
+:is(body[data-workspace="editor"],#productionDialog) :is(.panel,dialog){background:var(--editor-panel);color:var(--editor-text);border-color:var(--editor-line);box-shadow:0 4px 16px #00000040}
+:is(body[data-workspace="editor"],#productionDialog) :is(.body,.react-results,.past-results,.past-scroll,.expanded,.bottom-button){background:transparent;color:var(--editor-text)}
+:is(body[data-workspace="editor"],#productionDialog) :is(.workbar,.evidence-card,.draft-card,.subpanel,.review-actions,.record-card,.source-directory,.evidence-summary,.article-region-search,.preparation-flow,.evidence-confirm,.draft-title-input,.draft-editor,.election-news,.news-result,.google-news-search,.news-next-step,.selected-news-summary,.react-candidate-card,.react-progress-panel,.production-card,.production-spec,.narration-samples,.material-instructions,.workflow-guide){background:var(--editor-raised);color:var(--editor-text);border-color:var(--editor-line);box-shadow:none}
+:is(body[data-workspace="editor"],#productionDialog) #adminWorkMode{background:var(--editor-raised)!important;color:var(--editor-text);border-color:var(--editor-line)!important}
+:is(body[data-workspace="editor"],#productionDialog) :is(.panel-head,.subhead,.dialog-head,.result-table-details>summary,.past-scroll th){background:#223e5b;color:#ffffff;border-color:var(--editor-line)}
+:is(body[data-workspace="editor"],#productionDialog) #productionDialog .dialog-head{background:#223e5b;color:#ffffff}
+:is(body[data-workspace="editor"],#productionDialog) :is(th,td){background:var(--editor-panel);color:var(--editor-text);border-color:var(--editor-line)}
+:is(body[data-workspace="editor"],#productionDialog) th{background:#223e5b}
+:is(body[data-workspace="editor"],#productionDialog) :is(input,select,textarea){background:#0b192b;color:#f1f5fb;border-color:#667f9b;accent-color:#62d6cf}
+:is(body[data-workspace="editor"],#productionDialog) ::placeholder{color:#afc0d3;opacity:1}
+:is(body[data-workspace="editor"],#productionDialog) :is(button.secondary,.react-candidate-heading button){background:#294560;color:#f1f5fb;border-color:#6a829d}
+:is(body[data-workspace="editor"],#productionDialog) button:disabled{background:#34475d;color:#b5c6d8;border-color:#526880}
+:is(body[data-workspace="editor"],#productionDialog) #productionDialog .dialog-head button{background:#294560;color:#f1f5fb;border-color:#6a829d}
+:is(body[data-workspace="editor"],#productionDialog) :is(a,.source-links a,.news-result h4 a,.draft-editor a,.sample-narration-actions a,.selected-news-summary a,.past-scroll a){color:#8cdeff}
+:is(body[data-workspace="editor"],#productionDialog) :is(h2,h3,h4,strong,.react-votes,.react-card-rate strong,.react-progress-panel dd,.react-feed-header h3,.election-news h3,.production-card h3){color:#f1f5fb}
+:is(body[data-workspace="editor"],#productionDialog) :is(.field-note,.meta,.role-note,.empty,.check-note,.bottom-note,.expanded,.evidence-meta,.evidence-disclosure,.evidence-method-note,.evidence-result-count,.evidence-summary span,.evidence-tools span,.article-region-search span,.draft-title-input p,.details-checks,.react-party,.react-profile-message,.react-candidate-source,.react-data-note,.react-connection,.react-candidate-party,.table-candidate-party,.react-article-label small,.react-progress-panel dt,.past-description,.past-controls output,.news-meta,.news-result p,.news-result small,.news-pick,.news-more,.election-news>p,.rundown-row small,.news-pagination){color:var(--editor-muted)}
+:is(body[data-workspace="editor"],#productionDialog) :is(.mode-note,.react-feed-badge,.react-article-status,.pill){background:#2a425e;color:#e2ecf7;border-color:#58728d}
+:is(body[data-workspace="editor"],#productionDialog) :is(.good,.status-APPROVED){background:#174a3b;color:#a6f2cb}
+:is(body[data-workspace="editor"],#productionDialog) :is(.warn,.notice,.react-feed-badge.demo,.status-REVIEW_REQUIRED){background:#4b391b;color:#ffe0a3;border-color:#8e713e}
+:is(body[data-workspace="editor"],#productionDialog) :is(.bad,.error,.message.is-error){background:#4e2532;color:#ffbcc9;border-color:#956273}
+:is(body[data-workspace="editor"],#productionDialog) :is(.message,#dialogMessage,.check-errors){color:#a6f2cb}
+:is(body[data-workspace="editor"],#productionDialog) .check-errors{color:#ffbcc9}
+:is(body[data-workspace="editor"],#productionDialog) .evidence-tag{background:#194854;color:#a6f3f0}
+:is(body[data-workspace="editor"],#productionDialog) :is(pre,.details-checks pre,.record-card pre){background:#0b192b;color:#dce9f7;border-color:var(--editor-line)}
+:is(body[data-workspace="editor"],#productionDialog) :is(.bar,.react-share-track,.react-count-track){background:#40556e}
+:is(body[data-workspace="editor"],#productionDialog) #articles .react-article-item{background:var(--editor-raised);color:var(--editor-text);border-color:var(--editor-line)}
+:is(body[data-workspace="editor"],#productionDialog) #articles .react-article-row button{color:#f1f5fb;background:#294560;border-color:#6a829d}
+:is(body[data-workspace="editor"],#productionDialog) :is(.react-candidate-card.selected,.react-article-item.selected){outline:2px solid #72d9d1;outline-offset:1px}
+:is(body[data-workspace="editor"],#productionDialog) :is(.time,.reason-group,.bottom-note,.check-row,.article-body p,.news-caution,.rundown-row,.job-card,.audit-entry){border-color:var(--editor-line)}
+:is(body[data-workspace="editor"],#productionDialog) footer{background:#0b1423;color:var(--editor-muted)}
+:is(body[data-workspace="editor"],#productionDialog) :is(button,input,select,textarea,a):focus-visible{outline:3px solid #ffd36f;outline-offset:3px}
+:is(body[data-workspace="editor"],#productionDialog) .evidence-link{background:#294560;color:#8cdeff;border-color:#6a829d}
+:is(body[data-workspace="editor"],#productionDialog) :is(.bottom-icon,.chevron,.workflow-guide-actions a,.news-meta>span:first-child){color:#8cdeff}
+:is(body[data-workspace="editor"],#productionDialog) .draft-pill{background:#233f6b;color:#c5dcff}
+:is(body[data-workspace="editor"],#productionDialog) #articles .react-article-actions .article-delete{background:#4e2532;color:#ffbcc9;border-color:#956273}
+:is(body[data-workspace="editor"],#productionDialog) #articles .react-article-actions button:disabled{background:#34475d;color:#b5c6d8;border-color:#526880}
 
 /* Editors are already in the review workspace; keep the handoff link for writers. */
-body[data-workspace="editor"] #reviewHandoff{display:none!important}
+:is(body[data-workspace="editor"],#productionDialog) #reviewHandoff{display:none!important}
 
-body[data-workspace="editor"] .approval-requirements{background:#22384e;color:#e2ecf7;border-color:#58728d}
-body[data-workspace="editor"] .approval-requirements.ready{background:#174a3b;color:#a6f2cb}
+:is(body[data-workspace="editor"],#productionDialog) .approval-requirements{background:#22384e;color:#e2ecf7;border-color:#58728d}
+:is(body[data-workspace="editor"],#productionDialog) .approval-requirements.ready{background:#174a3b;color:#a6f2cb}
+
+#productionDialog{background:var(--editor-panel);color:var(--editor-text);border-color:var(--editor-line)}
+#productionDialog .production-defaults{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+#productionDialog .production-defaults>h3,#productionDialog .production-defaults>p,#productionDialog .production-defaults>button,#productionDialog .production-defaults>.notice{grid-column:1/-1}
+#productionDialog .production-defaults>.record-card{margin:0;min-width:0}
+#productionDialog .candidate-production-pick{width:100%;margin-bottom:14px;background:#294560;border-color:#6a829d;color:#f1f5fb}
+#productionDialog .candidate-production-pick[aria-pressed="true"]{background:#176057;border-color:#70d9ce;color:white}
+#productionDialog .production-defaults h4{font-size:16px;line-height:1.6;margin:14px 0}
+#productionDialog .production-defaults textarea{min-height:230px;font-size:13px;line-height:1.8;resize:vertical}
+@media(max-width:950px){#productionDialog .production-defaults{grid-template-columns:1fr}}
