@@ -1008,6 +1008,44 @@
         }
       }
     },
+    "/api/production/default-articles": {
+      "post": {
+        "summary": "Production Default Articles",
+        "operationId": "production_default_articles_api_production_default_articles_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/articles/{aid}/delete": {
       "post": {
         "summary": "Delete Article",

@@ -351,6 +351,12 @@ def draft(req:Draft,user=Depends(identity)):
     role(user,'writer')
     try:return room.draft(req.region,user['name'],req.mode,req.article_type,req.candidate_id,req.news_ids,req.period_from,req.period_to,req.title,req.evidence_ids)
     except ValueError as e:raise HTTPException(422,str(e))
+@app.post('/api/production/default-articles')
+def production_default_articles(user=Depends(identity)):
+    role(user,'writer')
+    try:return room.ensure_haneul_articles(user['name'])
+    except ValueError as error:raise HTTPException(422,str(error))
+
 @app.get('/api/articles')
 def articles(user=Depends(identity)):
     return [a for r in room.db.execute('SELECT payload FROM article ORDER BY rowid DESC') if not (a:=json.loads(r[0])).get('deleted_at')]

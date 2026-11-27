@@ -191,6 +191,21 @@ class Newsroom(WorkflowMixin):
         return a
 
     @locked
+    def ensure_haneul_articles(self,actor):
+        from election_simulation import DEMO_CANDIDATES
+        existing=[json.loads(row[0]) for row in self.db.execute('SELECT payload FROM article ORDER BY rowid DESC')]
+        result=[]
+        for i,profile in enumerate(DEMO_CANDIDATES):
+            matches=[a for a in existing if not a.get('deleted_at') and a.get('mode')=='demo' and a.get('region_name')=='하늘도시갑' and a.get('candidate_id')==f'DEMO-0-{i}' and a.get('candidate_names')==[profile['name']]]
+            article=next((a for a in matches if a['status']=='APPROVED'),matches[0] if matches else None)
+            if article is None:
+                article=self.draft('하늘도시갑',actor,'demo','combined',f'DEMO-0-{i}',title=f"하늘도시갑 {profile['name']} 후보 개표 현황과 공약")
+                article=self.validate(article,actor)
+                self.audit('production_default_draft',actor,dict(article_id=article['id'],candidate=profile['name']))
+            result.append(article)
+        return result
+
+    @locked
     def save(self,a):
         previous=self.db.execute('SELECT payload FROM article WHERE id=?',(a['id'],)).fetchone()
         if previous and json.loads(previous[0]).get('deleted_at') and not a.get('deleted_at'):raise ValueError('삭제된 기사는 변경할 수 없습니다.')

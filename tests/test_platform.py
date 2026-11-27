@@ -569,3 +569,19 @@ def test_article_list_delete_preserves_records_and_enforces_ownership(client):
     with pytest.raises(ValueError):module.room.save(stale)
     other=module.room.draft('하늘도시갑','other-writer','demo','result')
     assert c.post('/api/articles/'+other['id']+'/delete',headers={'Authorization':'Bearer TEST-list-admin'},json={}).status_code==200
+
+def test_production_candidate_defaults_are_idempotent_and_never_auto_approved(client):
+    c,module=client
+    module.room.receive(json.loads((ROOT/'fixtures/fallback_snapshot.json').read_text(encoding='utf-8')))
+    assert c.post('/api/production/default-articles',json={},headers=auth('editor')).status_code==403
+    first=c.post('/api/production/default-articles',json={},headers=auth()).json()
+    assert len(first)==3
+    assert [a['candidate_names'] for a in first]==[['서지도'],['한반도'],['박리본']]
+    assert all(a['mode']=='demo' and a['region_name']=='하늘도시갑' and a['author']=='TEST-writer' for a in first)
+    assert all(a['status']!='APPROVED' and not a.get('approved_by') for a in first)
+    second=c.post('/api/production/default-articles',json={},headers=auth()).json()
+    assert [a['id'] for a in first]==[a['id'] for a in second]
+    module.room.archive_article(first[1]['id'],'TEST-writer')
+    third=c.post('/api/production/default-articles',json={},headers=auth()).json()
+    assert third[1]['id']!=first[1]['id']
+    assert third[0]['id']==first[0]['id'] and third[2]['id']==first[2]['id']
