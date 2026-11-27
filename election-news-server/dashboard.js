@@ -33,7 +33,7 @@ function renderArticleButtons(articles){
  publishNewsroom({articles});
  if(typeof window!=='undefined'&&window.newsroomReactLists)return;
  $('articles').innerHTML='';
- articles.forEach(a=>{const item=document.createElement('button');item.className='secondary';item.textContent=a.title+' · '+(statuses[a.status]||a.status);item.onclick=action(async()=>{show(await api('/api/articles/'+a.id));focusArticleWorkspace('editor')});$('articles').appendChild(item)});
+ articles.forEach(a=>{const item=document.createElement('button');item.className='secondary';item.textContent=a.title+' · '+(statuses[a.status]||a.status);item.onclick=action(()=>openSelectedArticle(a.id));$('articles').appendChild(item)});
 }
 
 let preparation={key:'',confirmed:{},loaded:null};
@@ -66,6 +66,18 @@ async function confirmEvidenceAndContinue(){
 function focusArticleWorkspace(view='editor'){
  const target=view==='list'?$('articles'):$('inlineArticleWorkspace');
  target.scrollIntoView({behavior:'smooth',block:'start'});
+}
+async function openSelectedArticle(id){
+ const user=await ensureArticleSession(),article=await api('/api/articles/'+id);
+ if(article.mode!==selectedMode()||article.region_name!==selectedRegion()){
+  const snapshot=await api('/api/snapshot?mode='+article.mode);
+  if(article.mode==='official')officialRegions=[...new Set(snapshot.rows.map(row=>row.region_name))];
+  $('dataMode').value=article.mode;refreshRegionOptions();$('dataMode').onchange();$('region').value=article.mode==='demo'?'':article.region_name;update(snapshot);await loadSelectedArticles();
+ }
+ show(article);
+ if(user.role==='editor'||document.body.dataset.workspace==='editor'){
+  location.hash='review';$('review').focus({preventScroll:true});$('review').scrollIntoView({behavior:'smooth',block:'start'});syncApproval();
+ }else focusArticleWorkspace('editor');
 }
 function syncDraftTitle(force=false){
  const field=$('newArticleTitle'),region=selectedRegion();if(!field||!region)return;
@@ -254,7 +266,7 @@ if(typeof window!=='undefined'){
  window.addEventListener('newsroom:candidate' ,event=>{if([...$('candidate').options].some(option=>option.value===event.detail)){$('candidate').value=event.detail;$('draftCandidate').value=event.detail;table()}});
  window.addEventListener('newsroom:edit-article',event=>{void action(async()=>{const user=await ensureArticleSession();if(!['writer','admin'].includes(user.role))throw Error('작성자 또는 관리자 계정으로 수정할 수 있습니다.');show(await api('/api/articles/'+event.detail));await $('editArticle').onclick()})()});
  window.addEventListener('newsroom:delete-article',event=>{void action(async()=>{const user=await ensureArticleSession();const article=await api('/api/articles/'+event.detail);if(user.role!=='admin'&&(user.role!=='writer'||user.name!==article.author))throw Error('작성자는 본인 기사만 삭제할 수 있습니다. 관리자는 전체 기사를 관리합니다.');wbOpen('기사 삭제 확인','<p><strong>'+esc(article.title)+'</strong></p><p>작성 기사 목록에서 삭제합니다. 원문과 승인·감사 이력은 보존합니다. 승인 기사를 삭제하면 해당 기사의 음성·제작물 다운로드가 차단됩니다.</p><button id="confirmArticleDelete" type="button">목록에서 삭제</button> <button id="cancelArticleDelete" class="secondary" type="button">취소</button>');$('cancelArticleDelete').onclick=()=>wbDialog.close();$('confirmArticleDelete').onclick=wbAction(async()=>{$('confirmArticleDelete').disabled=true;try{await api('/api/articles/'+article.id+'/delete',{});if(current?.id===article.id)resetArticleWorkspace();await loadSelectedArticles();wbDialog.close();$('draftMessage').textContent='기사를 목록에서 삭제했습니다. 원문과 승인·감사 이력은 보존됩니다.'}finally{if($('confirmArticleDelete'))$('confirmArticleDelete').disabled=false}})})()});
- window.addEventListener('newsroom:select-article',event=>{if(window.newsroomView?.articles?.some(article=>article.id===event.detail))void action(async()=>{const article=await api('/api/articles/'+event.detail);show(article);focusArticleWorkspace('editor')})()});
+ window.addEventListener('newsroom:select-article',event=>{if(window.newsroomView?.articles?.some(article=>article.id===event.detail))void action(()=>openSelectedArticle(event.detail))()});
  window.addEventListener('pageshow',event=>{if(event.persisted)connect()});
  window.addEventListener('pagehide',()=>{clearTimeout(reconnectTimer);if(liveSocket){liveSocket.onclose=null;liveSocket.close()}});
 }
