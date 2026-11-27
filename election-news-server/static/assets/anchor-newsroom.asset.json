@@ -1,0 +1,7 @@
+{
+  "asset": "anchor-newsroom.png",
+  "method": "Built-in image generation tool; transparent reference-based extraction",
+  "reference": "Gemini_Generated_Image_vfe5qjvfe5qjvfe5.png (user-provided)",
+  "use": "Static billboard portrait in the PC 3D newsroom; not animated or lip-synced",
+  "prompt": "Create a transparent PNG cutout asset for a virtual election newsroom. The supplied image is the anchor reference/edit target. Extract only the seated female news anchor from the reference: preserve face, hair, dark charcoal blazer, white blouse, microphone, natural clasped hands. Front-facing medium shot from top of hair to just below hands, complete hair silhouette, centered. Remove ALL background, chair, desk, papers, tablet, graphics and text. Genuine transparent alpha outside the person, no floor or shadow, no checkerboard baked in. Soft neutral studio lighting. This will be a flat portrait texture placed behind a 3D desk, not an animated avatar."
+}
