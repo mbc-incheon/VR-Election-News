@@ -25,12 +25,12 @@ function init(){
  const display=new THREE.Mesh(new THREE.PlaneGeometry(15.2,7.2),new THREE.MeshBasicMaterial({map:screenTexture}));display.position.set(0,5,-6.25);scene.add(display);
  // Large circular glass desk with a brushed metal rim and pedestal.
  const glass=new THREE.MeshPhysicalMaterial({color:'#bfdfeb',metalness:.25,roughness:.13,transparent:true,opacity:.58,depthWrite:false,side:THREE.DoubleSide});
- const desk=new THREE.Mesh(new THREE.CylinderGeometry(4.8,4.8,.16,128),glass);desk.position.set(0,1.65,2.8);desk.receiveShadow=true;scene.add(desk);
- const rim=new THREE.Mesh(new THREE.TorusGeometry(4.8,.065,12,128),material('#c3d3dc',.8));rim.rotation.x=Math.PI/2;rim.position.set(0,1.65,2.8);scene.add(rim);
- const innerRim=new THREE.Mesh(new THREE.TorusGeometry(3.75,.025,8,128),material('#a5c4d3',.7));innerRim.rotation.x=Math.PI/2;innerRim.position.set(0,1.66,2.8);scene.add(innerRim);
- const pedestal=new THREE.Mesh(new THREE.CylinderGeometry(1.55,2.1,1.4,96),material('#17364b',.65));pedestal.position.set(0,.83,2.8);pedestal.castShadow=true;scene.add(pedestal);
- const deskLight=new THREE.Mesh(new THREE.TorusGeometry(2.05,.035,8,96),new THREE.MeshBasicMaterial({color:'#51cbd5'}));deskLight.rotation.x=Math.PI/2;deskLight.position.set(0,.18,2.8);scene.add(deskLight);
- box(1.2,.025,.8,-.7,1.76,1.3,'#e1ebef');box(.95,.04,.7,.8,1.76,1.3,'#b1c4d2');box(.85,.015,.6,.8,1.79,1.3,'#122b42');
+ const desk=new THREE.Mesh(new THREE.CylinderGeometry(4.8,4.8,.16,128),glass);desk.position.set(0,1.65,5.8);desk.receiveShadow=true;scene.add(desk);
+ const rim=new THREE.Mesh(new THREE.TorusGeometry(4.8,.065,12,128),material('#c3d3dc',.8));rim.rotation.x=Math.PI/2;rim.position.set(0,1.65,5.8);scene.add(rim);
+ const innerRim=new THREE.Mesh(new THREE.TorusGeometry(3.75,.025,8,128),material('#a5c4d3',.7));innerRim.rotation.x=Math.PI/2;innerRim.position.set(0,1.66,5.8);scene.add(innerRim);
+ const pedestal=new THREE.Mesh(new THREE.CylinderGeometry(1.55,2.1,1.4,96),material('#17364b',.65));pedestal.position.set(0,.83,5.8);pedestal.castShadow=true;scene.add(pedestal);
+ const deskLight=new THREE.Mesh(new THREE.TorusGeometry(2.05,.035,8,96),new THREE.MeshBasicMaterial({color:'#51cbd5'}));deskLight.rotation.x=Math.PI/2;deskLight.position.set(0,.18,5.8);scene.add(deskLight);
+ box(1.2,.025,.8,-.7,1.76,4.3,'#e1ebef');box(.95,.04,.7,.8,1.76,4.3,'#b1c4d2');box(.85,.015,.6,.8,1.79,4.3,'#122b42');
  addAnchorWall(scene);
  const resize=()=>{const {width,height}=$('stage').getBoundingClientRect();renderer.setSize(width,height);camera.aspect=width/height;camera.fov=THREE.MathUtils.radToDeg(2*Math.atan(Math.tan(THREE.MathUtils.degToRad(24))*Math.max(1,.95/camera.aspect)));camera.updateProjectionMatrix()};new ResizeObserver(resize).observe($('stage'));resize();
  renderer.setAnimationLoop(()=>{controls.update();renderer.render(scene,camera)});$('canvasStatus').hidden=true;draw();

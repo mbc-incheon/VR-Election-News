@@ -1,12 +1,12 @@
 {
-  "captured_at": "2026-11-27T18:12:10.124188+09:00",
+  "captured_at": "2026-11-27T18:15:50.820827+09:00",
   "repository": "https://github.com/mbc-incheon/VR-Election-News",
   "release_version": "2.0.0",
   "imported_from": {
     "repository": "https://github.com/mbc-incheon/election-analysis-project-01",
     "commit": "00ac79dc6ec77d6bd4c1e883e152fd78f2e3ab91"
   },
-  "repository_base_commit": "73dbfb2841fd630396a0958a91d4323fa3b6ee53",
+  "repository_base_commit": "3ceb10ea314416f1950f3359dae05f44ca73d55c",
   "note": "Base commit is the parent context before this manifest is committed; exact publication commit is in Git history.",
   "runtime": {
     "python": "3.12.10"
@@ -534,13 +534,13 @@
     },
     {
       "path": "election-news-server/static/studio.html",
-      "bytes": 2992,
-      "sha256": "a79b22f65d07d090831b29befa912c0b4023a8b010068ac4f62b5ab4ef6f36e8"
+      "bytes": 2994,
+      "sha256": "f1eae8fe0c1eeb5975cf8319783cf95b8fbf8d34c769ee666d07c9673876bdec"
     },
     {
       "path": "election-news-server/static/studio.js",
       "bytes": 12589,
-      "sha256": "42c364af6cb7ce9a4be81136a755708db1ca8771e4f83fcae287d1ef00f44351"
+      "sha256": "0b36d1b114ec0311cf2c2a93a82462f3da726f4704c31fb564189740a30fa4ac"
     },
     {
       "path": "election-news-server/static/vendor/OrbitControls.js",
@@ -1149,8 +1149,8 @@
     },
     {
       "path": "outputs/screenshots/studio-anchor-left-wall.jpg",
-      "bytes": 76769,
-      "sha256": "c24a33f50520e245cb2abc0a78f7ef601d3010fbf7abd9e1df1afeabd53e771c"
+      "bytes": 78142,
+      "sha256": "513caa1592a6a84884e8550a4b1ca888da9b91d6e6c45b175e3da5f33ef02790"
     },
     {
       "path": "outputs/screenshots/studio-anchor-newsroom.jpg",
