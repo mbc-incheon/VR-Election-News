@@ -1,0 +1,14 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert/strict');
+const source=fs.readFileSync('election-news-server/dashboard.js','utf8');
+const context=vm.createContext({});
+vm.runInContext(source.slice(source.indexOf('function approvalBlockers('),source.indexOf('function syncApproval(')),context);
+const article={author:'writer',status:'PENDING_HUMAN',validation:{rule:'PASS',errors:[],disagreement:false}},editor={name:'editor',role:'editor'};
+const check=(a=article,u=editor,c=true,ai=true,r='원문 대조 완료')=>Array.from(context.approvalBlockers(a,u,c,ai,r));
+assert.equal(check().length,0);assert(check(article,{name:'writer',role:'admin'}).some(x=>x.includes('작성자')));assert(check(article,{name:'writer',role:'writer'}).some(x=>x.includes('로그인')));assert(check(article,editor,false,false,'').length===3);assert(check({...article,status:'APPROVED'})[0].includes('이미'));assert(check({...article,validation:{rule:'PASS',disagreement:true}}).some(x=>x.includes('불일치')));assert(check(null).length===1);
+const elements=new Map();const $=id=>{if(!elements.has(id))elements.set(id,{checked:true,value:'원문 대조 완료',textContent:''});return elements.get(id)};
+context.$=$;context.current=article;context.loggedUser={name:'writer',role:'writer'};context.publishNewsroom=()=>{};context.document={visibilityState:'visible',addEventListener(){}};context.window={addEventListener(){}};let refreshed=0;
+context.wbIdentity=async()=>{refreshed++;context.loggedUser=editor;context.syncApproval()};
+vm.runInContext(source.slice(source.indexOf('function syncApproval('),source.indexOf("['checked','aiAck','reason']")),context);
+context.syncApproval();assert.equal($('approve').disabled,true);
+const workbench=fs.readFileSync('election-news-server/static/workbench.js','utf8');vm.runInContext(workbench.slice(workbench.indexOf('let approvalIdentityRefresh=')),context);
+(async()=>{await context.refreshApprovalIdentity();await new Promise(resolve=>setImmediate(resolve));assert.equal(refreshed,1);assert.equal($('approve').disabled,false);assert($('approvalRequirements').textContent.includes('준비 완료'));console.log('Verified approval conditions, missing-condition messages, self-approval block and cross-tab role refresh.');})();

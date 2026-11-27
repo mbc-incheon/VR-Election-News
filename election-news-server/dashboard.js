@@ -145,8 +145,27 @@ function show(a){
  $('aiBadge').textContent=v?.disagreement?'규칙·AI 판정 불일치':a.ai_review?.verdict==='UNAVAILABLE'?'AI 보조 검토 미연결':'AI 판정: '+(a.ai_review?.verdict||'미확인');$('aiBadge').className='pill '+(v?.disagreement?'bad':'warn');$('checkErrors').textContent=(v?.errors||[]).join(' / ');$('checkErrors').hidden=!v?.errors?.length;
  $('validate').disabled=false;syncApproval();$('export').disabled=a.status!=='APPROVED';
 }
-function syncApproval(){const v=current?.validation,allowed=typeof loggedUser==='undefined'||['editor','admin'].includes(loggedUser?.role);$('approve').disabled=!(allowed&&(typeof loggedUser==='undefined'||loggedUser?.name!==current?.author)&&current?.status==='PENDING_HUMAN'&&v?.rule==='PASS'&&!v?.disagreement&&$('checked').checked&&$('aiAck').checked&&$('reason').value.trim().length>=5);if(typeof updateWorkflowGuidance==='function')updateWorkflowGuidance()}
-['checked','aiAck','reason'].forEach(id=>$(id).addEventListener('input',syncApproval));
+function approvalBlockers(article,user,checked,aiAck,reason){
+ const missing=[];
+ if(!article)return ['04에서 검토할 기사를 선택하세요.'];
+ if(article.status==='APPROVED')return ['이미 최종 승인된 기사입니다.'];
+ if(!user||!['editor','admin'].includes(user.role))missing.push('편집자 또는 관리자 계정으로 로그인하세요.');
+ if(user?.name===article.author)missing.push('현재 계정이 작성자입니다. 다른 편집자·관리자가 승인해야 합니다.');
+ if(article.validation?.rule!=='PASS'||article.validation?.errors?.length)missing.push('규칙 검증을 통과해야 합니다.');
+ if(article.validation?.disagreement)missing.push('규칙·AI 판정 불일치를 해소하세요.');
+ if(article.status!=='PENDING_HUMAN'&&article.validation?.rule==='PASS')missing.push('기사 상태 새로고침 후 규칙 검증을 다시 실행하세요.');
+ if(!checked)missing.push('원문 대조 확인을 체크하세요.');
+ if(!aiAck)missing.push('AI 미연결 확인을 체크하세요.');
+ if((reason||'').trim().length<5)missing.push('승인 사유를 5자 이상 입력하세요.');
+ return missing;
+}
+function syncApproval(){
+ const missing=approvalBlockers(current,typeof loggedUser==='undefined'?null:loggedUser,$('checked').checked,$('aiAck').checked,$('reason').value);
+ $('approve').disabled=missing.length>0;$('approve').title=missing.join(' ');
+ const hint=$('approvalRequirements');if(hint){hint.textContent=missing.length?'최종 승인 대기: '+missing.join(' '):'최종 승인 준비 완료 · 확인을 마쳤다면 최종 승인을 누르세요.';hint.className='approval-requirements '+(missing.length?'pending':'ready')}
+ if(typeof updateWorkflowGuidance==='function')updateWorkflowGuidance();
+}
+['checked','aiAck','reason'].forEach(id=>{for(const event of ['input','change'])$(id).addEventListener(event,syncApproval)});
 const action=f=>async()=>{try{await f();$('message').className='message';$('message').textContent='처리했습니다.'}catch(e){$('message').className='message is-error';$('message').textContent=e.message}};
 function renderEvidence(hits,context,query,view='all'){
  const source=context.directory,showPublications=view!=='existing',showExisting=view!=='publications';
@@ -218,7 +237,7 @@ $('list').onclick=async()=>{
  }catch(error){notice.className='message is-error';notice.textContent=error.message}
  finally{button.disabled=false;button.textContent='☷ 기사 목록'}
 };
-$('validate').onclick=action(async()=>show(await api(`/api/articles/${current.id}/validate`,{})));
+$('validate').onclick=action(async()=>{await wbIdentity();show(await api(`/api/articles/${current.id}/validate`,{}))});
 $('approve').onclick=action(async()=>show(await api(`/api/articles/${current.id}/approve`,{reason:$('reason').value,evidence_checked:$('checked').checked,ai_unavailable_ack:$('aiAck').checked})));
 $('export').onclick=action(async()=>{const v=await api(`/api/articles/${current.id}/export`),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(v,null,2)],{type:'application/json'}));a.download=current.id+'.json';a.click();URL.revokeObjectURL(a.href)});
 if(typeof window!=='undefined'){

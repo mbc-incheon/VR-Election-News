@@ -93,3 +93,12 @@ const wbOldProduction=$('productionToggle').onclick;$('productionToggle').onclic
 
 $('signOut').onclick=wbAction(async()=>{await api('/api/session/logout',{});loggedUser=null;location.href='/login'});
 wbIdentity().catch(()=>{});
+
+// Another tab may have changed the shared login session while this page was open.
+let approvalIdentityRefresh=null;
+function refreshApprovalIdentity(){
+ if(!current||document.visibilityState==='hidden'||approvalIdentityRefresh)return;
+ approvalIdentityRefresh=wbIdentity().catch(()=>{loggedUser=null;publishNewsroom({user:null});syncApproval();$('accountStatus').textContent='로그인 상태를 확인하지 못했습니다. 통합 로그인 또는 계정 확인을 이용하세요.'}).finally(()=>{approvalIdentityRefresh=null});
+}
+window.addEventListener('focus',refreshApprovalIdentity);
+document.addEventListener('visibilitychange',refreshApprovalIdentity);

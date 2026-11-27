@@ -39,3 +39,6 @@ body[data-workspace="editor"] #articles .react-article-actions button:disabled{b
 
 /* Editors are already in the review workspace; keep the handoff link for writers. */
 body[data-workspace="editor"] #reviewHandoff{display:none!important}
+
+body[data-workspace="editor"] .approval-requirements{background:#22384e;color:#e2ecf7;border-color:#58728d}
+body[data-workspace="editor"] .approval-requirements.ready{background:#174a3b;color:#a6f2cb}
