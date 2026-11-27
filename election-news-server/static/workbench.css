@@ -23,7 +23,3 @@ body[data-workspace="editor"]{background:#111d2d;min-height:100vh}
 body[data-workspace="editor"]>.studio-link,body[data-workspace="editor"] .account-line,body[data-workspace="editor"] .account-line a,body[data-workspace="editor"] main>a.studio-link{color:#c5dfed}
 body[data-workspace="editor"] footer{background:#0b1523;color:#c5dfed}
 .production-spec a{font-weight:700;text-decoration:underline}
-
-/* Only the editor panel background is translucent; content remains fully opaque. */
-body[data-workspace="editor"] .panel{background:rgba(255,255,255,.5);box-shadow:0 3px 0 rgba(226,237,245,.2),0 0 0 4px rgba(255,255,255,.12)}
-body[data-workspace="editor"] .panel .react-results,body[data-workspace="editor"] .panel .bottom-button{background:transparent}
