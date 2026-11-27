@@ -68,14 +68,19 @@ function focusArticleWorkspace(view='editor'){
  target.scrollIntoView({behavior:'smooth',block:'start'});
 }
 async function openSelectedArticle(id){
- const user=await ensureArticleSession(),article=await api('/api/articles/'+id);
+ const user=await ensureArticleSession();let article=await api('/api/articles/'+id);
+ const reviewing=user.role==='editor'||document.body.dataset.workspace==='editor';
+ if(reviewing&&article.status!=='APPROVED'){
+  location.hash='review';$('message').textContent='선택 기사 v'+(article.revision||1)+'의 규칙 검증을 확인하고 있습니다…';
+  article=await api('/api/articles/'+id+'/validate',{});
+ }
  if(article.mode!==selectedMode()||article.region_name!==selectedRegion()){
   const snapshot=await api('/api/snapshot?mode='+article.mode);
   if(article.mode==='official')officialRegions=[...new Set(snapshot.rows.map(row=>row.region_name))];
   $('dataMode').value=article.mode;refreshRegionOptions();$('dataMode').onchange();$('region').value=article.mode==='demo'?'':article.region_name;update(snapshot);await loadSelectedArticles();
  }
  show(article);
- if(user.role==='editor'||document.body.dataset.workspace==='editor'){
+ if(reviewing){
   location.hash='review';$('review').focus({preventScroll:true});$('review').scrollIntoView({behavior:'smooth',block:'start'});syncApproval();
  }else focusArticleWorkspace('editor');
 }

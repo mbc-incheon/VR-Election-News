@@ -13,7 +13,7 @@ function updateWorkflowGuidance(){
  production.disabled=article?.status!=='APPROVED';production.textContent=production.disabled?'최종 승인 후 뉴스 제작':'승인 기사로 뉴스 제작';production.title=production.disabled?'승인 대기 상태입니다. 확인란과 승인 사유를 입력하고 최종 승인을 완료하세요.':'';
  const approveShortcut=document.getElementById('workflowApprove');if(approveShortcut)approveShortcut.disabled=document.getElementById('approve').disabled;
  if(!article){stage.textContent='1. 기사 작성';next.textContent='04에서 후보와 제목을 입력하고 기사 초안 생성을 누르세요.';return}
- stage.textContent=article.title+' · '+(statuses[article.status]||article.status)+' · 작성자 '+article.author;
+ stage.textContent=article.title+' · v'+(article.revision||1)+' · '+(statuses[article.status]||article.status)+' · 작성자 '+article.author;
  if(article.status==='APPROVED'){next.textContent='최종 승인이 완료됐습니다. 승인본을 내보내거나 뉴스 제작을 시작하세요.';return}
  if(article.validation?.errors?.length){next.textContent='2. 검증 보완: '+[...new Set(article.validation.errors.map(workflowErrorLabel))].join(' ');return}
  if(article.validation?.disagreement){next.textContent='2. 규칙 검증과 AI 보조 판정이 다릅니다. 근거를 대조하고 불일치를 해소한 뒤 다시 검증하세요.';return}
@@ -34,6 +34,6 @@ updateWorkflowGuidance();
   await ensureArticleSession();const article=await api('/api/articles/'+id);const snapshot=await api('/api/snapshot?mode='+article.mode);
   $('dataMode').value=article.mode;officialRegions=snapshot.mode==='official'?[...new Set(snapshot.rows.map(row=>row.region_name))]:officialRegions;refreshRegionOptions();$('region').value=article.mode==='demo'?'':article.region_name;$('dataMode').onchange();$('region').value=article.mode==='demo'?'':article.region_name;update(snapshot);
   await loadSelectedArticles();selectedNews={region:article.region_name,ids:(article.news_references||[]).map(item=>item.id),references:article.news_references||[],from:article.news_period?.start,to:article.news_period?.end};
-  $('newArticleTitle').value=article.title;$('draftType').value=article.article_type||'combined';show(article);syncPreparation();location.hash=production?'production':'review';if(production)await $('productionToggle').onclick();
+  $('newArticleTitle').value=article.title;$('draftType').value=article.article_type||'combined';if(loggedUser?.role==='editor'||document.body.dataset.workspace==='editor')await openSelectedArticle(article.id);else show(article);syncPreparation();location.hash=production?'production':'review';if(production)await $('productionToggle').onclick();
  }catch(error){document.getElementById('workflowStage').textContent='검토할 기사를 열지 못했습니다.';document.getElementById('workflowNext').textContent=error.message;const link=document.getElementById('reviewHandoff');link.hidden=false;link.href='/login?article='+encodeURIComponent(id);location.hash='review'}
 })();

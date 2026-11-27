@@ -9286,8 +9286,9 @@ function ae({ articles: e = [], selected: t, user: n, onSelect: r, onEdit: i, on
 						/* @__PURE__ */ (0, T.jsx)("button", {
 							type: "button",
 							onClick: () => r(e.id),
-							"aria-label": e.title + " 선택",
-							children: "선택"
+							"aria-label": e.title + " v" + (e.revision || 1) + " 선택",
+							"aria-pressed": t === e.id,
+							children: t === e.id ? "선택됨" : "v" + (e.revision || 1) + " 선택"
 						}),
 						/* @__PURE__ */ (0, T.jsx)("button", {
 							type: "button",
