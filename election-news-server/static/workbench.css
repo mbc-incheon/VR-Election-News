@@ -23,3 +23,10 @@ body[data-workspace="editor"]{background:#111d2d;min-height:100vh}
 body[data-workspace="editor"]>.studio-link,body[data-workspace="editor"] .account-line,body[data-workspace="editor"] .account-line a,body[data-workspace="editor"] main>a.studio-link{color:#c5dfed}
 body[data-workspace="editor"] footer{background:#0b1523;color:#c5dfed}
 .production-spec a{font-weight:700;text-decoration:underline}
+
+/* Leave room for the full district label and the native select arrow. */
+#results .panel-head{flex-wrap:wrap}
+#results .region-control{gap:10px;max-width:100%;flex-wrap:wrap}
+#results .region-control label{white-space:nowrap}
+#results .region-control select{width:36ch;max-width:100%;height:auto;min-height:38px;padding-right:32px;font-size:15px}
+@media(max-width:600px){#results .region-control{width:100%;margin-left:0}#results .region-control select{width:100%;min-width:0;font-size:14px}#results .panel-head{padding-bottom:10px}}
