@@ -8,7 +8,13 @@ let target=new URL(links.url('studio',{article:'abcdef0123456789',mode:'demo',re
 target=new URL(links.url('production',{article:'abcdef0123456789',mode:'official',region:'계양구을'}),'http://localhost');assert.equal(target.searchParams.get('production'),'1');assert.equal(target.hash,'#production');assert.equal(target.searchParams.get('mode'),'official');
 assert(!links.url('studio',{article:'https://evil.test',mode:'unsafe'}).includes('evil'));
 vm.runInContext(fs.readFileSync(root+'role-workspace.js','utf8'),context);
-context.applyWorkspace({role:'writer'},'editor');assert.equal(context.document.body.dataset.workspace,'writer');assert.equal(element('editorWorkspace').hidden,true);assert.equal(element('writing').hidden,false);assert.equal(element('approve').hidden,true);assert.equal(element('checked-label').hidden,true);
-context.applyWorkspace({role:'editor'},'writer');assert.equal(context.document.body.dataset.workspace,'editor');assert.equal(element('editorWorkspace').hidden,false);assert.equal(element('writing').hidden,true);assert.equal(element('openDocuments').hidden,true);assert.equal(element('approve').hidden,false);
-context.applyWorkspace({role:'admin'},'writer');assert.equal(element('writing').hidden,false);context.applyWorkspace({role:'admin'},'approval');assert.equal(element('writing').hidden,true);assert.equal(element('approve').hidden,false);
-console.log('Verified writer/editor/admin workspaces and safe article-context links.');
+context.applyWorkspace({role:'writer'},'editor');assert.equal(context.document.body.dataset.workspace,'writer');
+context.applyWorkspace({role:'editor'},'writer');assert.equal(context.document.body.dataset.workspace,'editor');
+context.applyWorkspace({role:'admin'},'writer');assert.equal(context.document.body.dataset.workspace,'writer');
+context.applyWorkspace({role:'admin'},'approval');assert.equal(context.document.body.dataset.workspace,'editor');
+context.applyWorkspace(null,'writer');assert.equal(context.document.body.dataset.workspace,'writer');
+const template=fs.readFileSync('election-news-server/dashboard.template.html','utf8');
+assert(!template.includes('id="editorWorkspace"'));assert(!template.includes('id="workspaceHeading"'));
+assert(template.includes('id="writing"')&&template.includes('id="pledges"')&&template.includes('id="review"'));
+assert(!fs.readFileSync(root+'role-workspace.js','utf8').includes('.hidden='));
+console.log('Verified shared layout, editor dark background mode and safe article-context links.');
