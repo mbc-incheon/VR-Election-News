@@ -36,3 +36,6 @@ body[data-workspace="editor"] :is(.bottom-icon,.chevron,.workflow-guide-actions 
 body[data-workspace="editor"] .draft-pill{background:#233f6b;color:#c5dcff}
 body[data-workspace="editor"] #articles .react-article-actions .article-delete{background:#4e2532;color:#ffbcc9;border-color:#956273}
 body[data-workspace="editor"] #articles .react-article-actions button:disabled{background:#34475d;color:#b5c6d8;border-color:#526880}
+
+/* Editors are already in the review workspace; keep the handoff link for writers. */
+body[data-workspace="editor"] #reviewHandoff{display:none!important}
