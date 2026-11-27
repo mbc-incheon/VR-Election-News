@@ -1,4 +1,4 @@
-import {addAnchorWall} from './studio-anchor-wall.js?v=20261127-wall';
+import {addAnchorWall} from './studio-anchor-wall.js?v=20261127-original-image';
 import {candidateColor} from './candidate-colors.js';
 import * as THREE from 'three';
 import {OrbitControls} from '/static/vendor/OrbitControls.js';
