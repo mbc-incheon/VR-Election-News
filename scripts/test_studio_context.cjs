@@ -1,0 +1,10 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert/strict');
+const nodes=new Map();const node=id=>{if(!nodes.has(id))nodes.set(id,{value:'',style:{},textContent:'',replaceChildren(...children){this.children=children;if(id==='region'&&children.length)this.value=children[0].value},append(...children){this.children=children}});return nodes.get(id)};
+const article={id:'abcdef0123456789',title:'TEST 승인 기사',mode:'demo',region_name:'하늘도시갑',sentences:[{kind:'result',row_ids:['TEST-1'],values:{candidate_name:'서지도',votes:300,vote_share:60,region_name:'하늘도시갑'}}]};
+const context=vm.createContext({console,URLSearchParams,location:{search:'?mode=demo'},document:{getElementById:node,createElement:()=>({style:{},append(...children){this.children=children}})},Option:function(text,value){this.text=text;this.value=value},fetch:async url=>({json:async()=>url==='/api/studio/articles'?[{article,script:'TEST 대본',disclosure:'시뮬레이션'}]:{mode:'demo',rows:[{candidate_name:'서지도',votes:9999,vote_share:99}]}})});
+vm.runInContext(fs.readFileSync('election-news-server/static/newsroom-links.js','utf8'),context);
+const source=fs.readFileSync('election-news-server/static/studio.js','utf8').replace(/^import .*;\r?\n/gm,'');
+vm.runInContext(source.slice(0,source.indexOf("document.querySelectorAll('[data-camera]')")),context);
+vm.runInContext("function candidateColor(){return '#4169E1'};snapshot={mode:'demo'};rows=[{candidate_name:'서지도',party:'미래민주연합',vote_share:60}];renderSummary()",context);
+assert.equal(node('candidateSummary').children[0].children[0].textContent,'서지도 · 미래민주연합');
+(async()=>{node('article').value=article.id;await node('article').onchange();assert.equal(vm.runInContext('rows[0].votes',context),300);assert(node('script').textContent.includes('TEST 대본'));const link=new URL(node('studioProductionLink').href,'http://localhost');assert.equal(link.searchParams.get('article'),article.id);assert.equal(link.searchParams.get('production'),'1');assert.equal(link.searchParams.get('region'),'하늘도시갑');console.log('Verified studio summary rendering, pinned article values and return-to-production context.');})();

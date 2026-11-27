@@ -9,11 +9,11 @@
   select.value=initial.mode;const status=document.createElement('span');status.setAttribute('role','status');status.textContent=initial.account+' · 관리자 로그인 유지';
   const hint=document.createElement('small');hint.textContent='작업 모드는 화면 이동용입니다. 실제 계정과 승인 책임은 유지됩니다.';
   host.append(label,select,status,hint);
-  select.onchange=async()=>{const mode=select.value;select.disabled=true;try{const result=await fetch('/api/admin/work-mode',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode})});const data=await result.json();if(!result.ok)throw Error(typeof data.detail==='string'?data.detail:'모드를 변경하지 못했습니다.');initial.mode=data.mode;status.textContent=data.account+' · '+select.selectedOptions[0].textContent+' 모드';
-   const target=mode==='writer'?'article-generator':mode==='editor'?'pledges':'review';
+  select.onchange=async()=>{const mode=select.value;select.disabled=true;try{const result=await fetch('/api/admin/work-mode',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode})});const data=await result.json();if(!result.ok)throw Error(typeof data.detail==='string'?data.detail:'모드를 변경하지 못했습니다.');initial.mode=data.mode;window.dispatchEvent(new CustomEvent('newsroom:work-mode',{detail:data.mode}));status.textContent=data.account+' · '+select.selectedOptions[0].textContent+' 모드';
+   const target=mode==='writer'?'article-generator':mode==='editor'?'editorWorkspace':'review';
    if(location.pathname==='/admin'){location.assign('/#'+target);return}
    if(typeof resetReviewConfirmation==='function')resetReviewConfirmation();location.hash=target;
-   if(mode==='editor'&&typeof wbReviewList==='function')await wbReviewList();
+
   }catch(error){select.value=initial.mode;status.textContent=error.message}finally{select.disabled=false}};
  }catch{host.hidden=true}
 })();
