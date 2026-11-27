@@ -9,6 +9,8 @@ function workflowErrorLabel(code){
 function updateWorkflowGuidance(){
  const stage=document.getElementById('workflowStage'),next=document.getElementById('workflowNext'),handoff=document.getElementById('reviewHandoff'),production=document.getElementById('workflowProduction');if(!stage)return;
  const article=current,user=typeof loggedUser==='undefined'?null:loggedUser;
+ const request=document.getElementById('workflowRefresh'),writerView=document.body.dataset.workspace!=='editor';
+ request.textContent=writerView?'편집자 승인 요청':'기사 상태 새로고침';request.disabled=!article||(writerView&&article.status==='APPROVED');
  handoff.hidden=!article||article.status==='APPROVED';if(article)handoff.href='/login?article='+encodeURIComponent(article.id);
  production.disabled=article?.status!=='APPROVED';production.textContent=production.disabled?'최종 승인 후 뉴스 제작':'승인 기사로 뉴스 제작';production.title=production.disabled?'승인 대기 상태입니다. 확인란과 승인 사유를 입력하고 최종 승인을 완료하세요.':'';
  const approveShortcut=document.getElementById('workflowApprove');if(approveShortcut)approveShortcut.disabled=document.getElementById('approve').disabled;
@@ -24,7 +26,13 @@ function updateWorkflowGuidance(){
  next.textContent=missing.length?'3. 최종 승인 준비: '+missing.join(' · '):'3. 검토 완료·최종 승인 버튼을 누르세요. 완료되면 뉴스 제작 버튼이 활성화됩니다.';
 }
 document.getElementById('workflowApprove').onclick=()=>document.getElementById('approve').click();
-document.getElementById('workflowRefresh').onclick=async()=>{try{if(!current)return;await wbIdentity();show(await api('/api/articles/'+current.id))}catch(error){document.getElementById('workflowNext').textContent=error.message}};
+document.getElementById('workflowRefresh').onclick=async()=>{
+ const button=document.getElementById('workflowRefresh');if(!current||button.disabled)return;button.disabled=true;
+ try{await wbIdentity();const writerView=document.body.dataset.workspace!=='editor';
+ const path='/api/articles/'+current.id;const article=writerView?await api(path+'/validate',{}):await api(path);show(article);
+ if(writerView)document.getElementById('workflowNext').textContent=article.status==='PENDING_HUMAN'?'편집자 승인 요청이 완료됐습니다. 편집자는 기사 목록에서 이 기사를 선택해 검토·최종 승인할 수 있습니다.':'승인 요청을 완료하지 못했습니다. 검증 실패 항목을 보완한 뒤 다시 요청하세요.';
+ }catch(error){document.getElementById('workflowNext').textContent=error.message}finally{button.disabled=!current||(document.body.dataset.workspace!=='editor'&&current.status==='APPROVED')}
+};
 document.getElementById('workflowProduction').onclick=()=>document.getElementById('productionToggle').click();
 updateWorkflowGuidance();
 (async()=>{
