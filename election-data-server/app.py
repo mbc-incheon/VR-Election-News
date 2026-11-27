@@ -11,7 +11,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from election_common import load_official
 from election_simulation import simulation_rows
 
-from fastapi import FastAPI, HTTPException, Header, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, Header, Query, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 
 ROOT = Path(os.environ.get('DATA_DIR', 'runtime/data'))
@@ -19,16 +19,42 @@ KST = timezone(timedelta(hours=9))
 def now(): return datetime.now(KST).isoformat()
 def digest(data): return hashlib.sha256(data).hexdigest()
 
+class SavedEvents:
+    """Index preserved files by sequence, reading only requested event pages."""
+    def __init__(self,folder):
+        self.folder=Path(folder)
+        self.paths=sorted(self.folder.glob('*.json'))
+        self.sequences=[int(path.stem) for path in self.paths]
+        self._cache=(None,None)
+    @property
+    def cached_event(self):return self._cache[1]
+    def __len__(self):return len(self.paths)
+    def __getitem__(self,index):
+        if index<0:index+=len(self.paths)
+        if index<0 or index>=len(self.paths):raise IndexError(index)
+        cached_index,cached_event=self._cache
+        if index==cached_index:return cached_event
+        event=json.loads(self.paths[index].read_text(encoding='utf-8'))
+        self._cache=(index,event)
+        return event
+    def append(self,event):
+        self.paths.append(self.folder/f"{event['sequence']:08d}.json")
+        self.sequences.append(event['sequence'])
+        self._cache=(len(self.paths)-1,event)
+    def after(self,sequence,limit=None):
+        from bisect import bisect_right
+        start=bisect_right(self.sequences,sequence)
+        end=len(self.paths) if limit is None else min(len(self.paths),start+limit)
+        return [self[index] for index in range(start,end)]
+
 class Store:
     def __init__(self, root):
         self.root = Path(root)
         (self.root / 'raw').mkdir(parents=True, exist_ok=True)
         (self.root / 'clean').mkdir(exist_ok=True)
-        self.events = []
+        self.events = SavedEvents(self.root/'clean')
         self.error = None
         self.demo_step = 0
-        for p in sorted((self.root/'clean').glob('*.json')):
-            self.events.append(json.loads(p.read_text(encoding='utf-8')))
 
     def append(self, payload, url, status=200):
         body = json.dumps(payload, ensure_ascii=False, sort_keys=True).encode()
@@ -104,7 +130,12 @@ def health(): return dict(status='ok',mode=os.environ.get('DATA_MODE','hybrid'),
 @app.get('/snapshot')
 def snapshot(): return store.events[-1] if store.events else dict(sequence=0,mode='unavailable',rows=[])
 @app.get('/events')
-def events(after:int=0): return [e for e in store.events if e['sequence']>after]
+def events(after:int=0,limit:int|None=Query(default=None,ge=1,le=1000)):
+    if isinstance(store.events,SavedEvents):return store.events.after(after,limit)
+    pending=(e for e in store.events if e['sequence']>after)
+    if limit is None:return list(pending)
+    from itertools import islice
+    return list(islice(pending,limit))
 @app.post('/ingest')
 def ingest(payload:dict,authorization:str=Header(default='')):
     token=os.environ.get('INGEST_TOKEN')
@@ -117,7 +148,7 @@ async def ws(websocket:WebSocket,after:int=0):
     await websocket.accept()
     try:
         while True:
-            pending=[e for e in store.events if e['sequence']>after]
+            pending=store.events.after(after) if isinstance(store.events,SavedEvents) else [e for e in store.events if e['sequence']>after]
             for e in pending:
                 await websocket.send_json(e); after=e['sequence']
             if not pending: await websocket.send_json(dict(type='heartbeat',server_at=now()))

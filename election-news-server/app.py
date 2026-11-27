@@ -80,11 +80,17 @@ def seed_demo_documents():
 async def receive_loop():
     while True:
         try:
-            # Catch-up before the streaming connection. Replays of duplicate events are idempotent.
+            # Resume after preserved events instead of replaying the entire growing archive.
+            cursor=room.db.execute('SELECT COALESCE(MAX(sequence),0) FROM snapshot').fetchone()[0]
             async with httpx.AsyncClient(timeout=5) as client:
-                r=await client.get(UPSTREAM+'/events',params={'after':0});r.raise_for_status()
-                for event in r.json():room.receive(event)
-            async with websockets.connect(UPSTREAM.replace('http','ws',1)+'/ws?after=0',max_size=2**22) as ws:
+                while True:
+                    r=await client.get(UPSTREAM+'/events',params={'after':cursor,'limit':100});r.raise_for_status()
+                    batch=r.json()
+                    for event in batch:
+                        room.receive(event);cursor=max(cursor,event['sequence'])
+                        connection.update(state='CONNECTED',error=None,last_received_at=now(),mode=event['mode'])
+                    if len(batch)<100:break
+            async with websockets.connect(UPSTREAM.replace('http','ws',1)+'/ws?after='+str(cursor),max_size=2**22) as ws:
                 connection.update(state='CONNECTED',error=None)
                 async for raw in ws:
                     event=json.loads(raw)

@@ -14,6 +14,11 @@ def now(): return datetime.now(timezone(timedelta(hours=9))).isoformat()
 def canonical(v): return json.dumps(v,sort_keys=True,ensure_ascii=False,separators=(',',':'))
 def sha(v): return hashlib.sha256(canonical(v).encode()).hexdigest()
 
+def news_reference_text(reference):
+    if reference.get('source_kind')=='demo_adaptation':
+        return f"가상 참고자료 ‘{reference['title']}’는 계양구을 보도 색인을 바탕으로 재구성했다. 검색 기준일은 {reference['published_date']}이며 실제 후보의 발언·당선·득표를 가상 후보에게 옮긴 자료가 아니다."
+    return f"{reference['published_date']} {reference['publisher']}은 ‘{reference['title']}’ 제목의 보도를 게재했다."
+
 def locked(fn):
     @wraps(fn)
     def call(self,*args,**kwargs):
@@ -32,6 +37,7 @@ class Newsroom(WorkflowMixin):
 
     def news_catalogue(self):
         items=json.loads((Path(__file__).with_name('static')/'election-news-index.json').read_text(encoding='utf-8'))['items']
+        items+=json.loads((Path(__file__).with_name('static')/'election-news-demo-index.json').read_text(encoding='utf-8'))['items']
         folder=self.root/'google_news'
         if folder.exists():
             for path in folder.glob('*.json'):
@@ -145,7 +151,6 @@ class Newsroom(WorkflowMixin):
         references=[]
         if article_type=='news' and not news_ids:raise ValueError('선거 전후 언론 기사에서 참고할 보도를 선택하세요.')
         if news_ids:
-            if snap['mode']!='official':raise ValueError('실제 보도 정리는 실제 선거구에서 사용하세요.')
             if not news_ids:raise ValueError('선거 전후 언론 기사에서 참고할 보도를 선택하세요.')
             from datetime import date
             try:
@@ -155,7 +160,7 @@ class Newsroom(WorkflowMixin):
             catalogue=self.news_catalogue()
             for nid in dict.fromkeys(news_ids):
                 item=next((item for item in catalogue if item['id']==nid),None)
-                if not item or region not in item['regions'] or not period_from<=item['published_date']<=period_to or (candidate_id and rows[0]['candidate_name'] not in item['candidate_names']):raise ValueError('선택 보도의 후보·지역·기간이 일치하지 않습니다.')
+                if not item or bool(item.get('is_demo'))!=(snap['mode']=='demo') or region not in item['regions'] or not period_from<=item['published_date']<=period_to or (candidate_id and rows[0]['candidate_name'] not in item['candidate_names']):raise ValueError('선택 보도의 후보·지역·기간이 일치하지 않습니다.')
                 references.append(item)
         sentences=[]
         for r in rows:
@@ -174,7 +179,7 @@ class Newsroom(WorkflowMixin):
             for c in (hits if explicit_evidence_ids is not None else hits[:1]):
                 sentences.append(dict(kind='pledge',text=f"{r['candidate_name']}의 공약 자료에는 다음 내용이 제시돼 있다: {c['text']}",candidate_id=r['candidate_id'],region_name=region,evidence_ids=[c['id']],evidence_hashes=[c['sha256']]))
         for reference in references:
-            text=f"{reference['published_date']} {reference['publisher']}은 ‘{reference['title']}’ 제목의 보도를 게재했다."
+            text=news_reference_text(reference)
             if reference.get('source_kind')=='google_news':text+=' (구글 뉴스 검색 메타데이터 기준이며 원문 본문은 확인하지 않았다.)'
             sentences.append(dict(kind='news',text=text,evidence_ids=[reference['id']],evidence_hashes=[sha(reference)],region_name=region,candidate_id=candidate_id or '',source_url=reference['url']))
         a=dict(id=secrets.token_hex(8),revision=1,author=author,created_at=now(),snapshot_id=snap['snapshot_id'],mode=snap['mode'],region_name=region,
@@ -253,7 +258,7 @@ class Newsroom(WorkflowMixin):
             elif s['kind']=='news':
                 reference=next((item for item in a.get('news_references',[]) if s.get('evidence_ids')==[item['id']]),None)
                 if not reference:errors.append(prefix+'NEWS_REFERENCE_MISSING');continue
-                expected=f"{reference['published_date']} {reference['publisher']}은 ‘{reference['title']}’ 제목의 보도를 게재했다."
+                expected=news_reference_text(reference)
                 if reference.get('source_kind')=='google_news':expected+=' (구글 뉴스 검색 메타데이터 기준이며 원문 본문은 확인하지 않았다.)'
                 if s['text']!=expected or s.get('evidence_hashes')!=[sha(reference)] or s.get('source_url')!=reference['url'] or s.get('region_name')!=a['region_name']:errors.append(prefix+'NEWS_REFERENCE_MISMATCH')
             else:errors.append(prefix+'UNSUPPORTED_CLAIM')
@@ -264,7 +269,7 @@ class Newsroom(WorkflowMixin):
             for reference in a.get('news_references',[]):
                 original=next((item for item in catalogue if item['id']==reference.get('id')),None)
                 period=a.get('news_period',{})
-                if original!=reference or a['mode']!='official' or a['region_name'] not in reference.get('regions',[]) or not period.get('start','9999')<=reference.get('published_date','')<=period.get('end',''):errors.append('NEWS_REFERENCE_MISMATCH')
+                if original!=reference or bool(reference.get('is_demo'))!=(a['mode']=='demo') or a['region_name'] not in reference.get('regions',[]) or not period.get('start','9999')<=reference.get('published_date','')<=period.get('end',''):errors.append('NEWS_REFERENCE_MISMATCH')
         if 'summary' in a and a['summary']!=(a['sentences'][0]['text'] if a['sentences'] else ''):errors.append('SUMMARY_MISMATCH')
         rule='FAIL' if errors else 'PASS'
         ai=a['ai_review']['verdict']

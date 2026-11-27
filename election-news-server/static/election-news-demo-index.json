@@ -1,0 +1,167 @@
+{
+  "election_date": "2024-04-10",
+  "scope": "하늘도시갑 가상 참고 자료",
+  "disclosure": "계양구을 기사 메타데이터에서 재구성한 가상 참고 기사. 날짜는 원본 검색 기준일이며 실제 보도일이 아님.",
+  "items": [
+    {
+      "id": "DEMO-HANEUL-NEWS24-002",
+      "title": "하늘도시갑 선거 후 후보별 보도 정리",
+      "publisher": "VR 선거보도 시스템 가상 자료실",
+      "published_date": "2024-04-11",
+      "url": "demo://news/DEMO-HANEUL-NEWS24-002",
+      "regions": [
+        "하늘도시갑"
+      ],
+      "candidate_names": [
+        "서지도",
+        "한반도",
+        "박리본"
+      ],
+      "candidate_regions": {
+        "서지도": [
+          "하늘도시갑"
+        ],
+        "한반도": [
+          "하늘도시갑"
+        ],
+        "박리본": [
+          "하늘도시갑"
+        ]
+      },
+      "kind": "가상 참고 기사",
+      "checked_at": "2026-11-27",
+      "is_demo": true,
+      "source_kind": "demo_adaptation",
+      "verification": "계양구을 기사 색인의 날짜·자료 유형을 가상 기사 형식으로 재구성. 실제 후보와 가상 후보 간 대응·실제 당선·발언·득표를 의미하지 않음.",
+      "source_original": {
+        "id": "NEWS24-002",
+        "title": "[4·10 총선]이재명, '명룡대전' 인천 계양을서 당선",
+        "publisher": "뉴시스",
+        "published_date": "2024-04-11",
+        "url": "https://www.newsis.com/view/NISX20240410_0002695062"
+      },
+      "source_region": "계양구을",
+      "candidate_mapping": "세 가상 후보를 함께 다루는 형식 예시. 실제 후보별 사실을 대응시키지 않음."
+    },
+    {
+      "id": "DEMO-HANEUL-NEWS24-015",
+      "title": "하늘도시갑 후보별 최종 집계 보도 형식 참고",
+      "publisher": "VR 선거보도 시스템 가상 자료실",
+      "published_date": "2024-04-11",
+      "url": "demo://news/DEMO-HANEUL-NEWS24-015",
+      "regions": [
+        "하늘도시갑"
+      ],
+      "candidate_names": [
+        "서지도",
+        "한반도",
+        "박리본"
+      ],
+      "candidate_regions": {
+        "서지도": [
+          "하늘도시갑"
+        ],
+        "한반도": [
+          "하늘도시갑"
+        ],
+        "박리본": [
+          "하늘도시갑"
+        ]
+      },
+      "kind": "가상 참고 기사",
+      "checked_at": "2026-11-27",
+      "is_demo": true,
+      "source_kind": "demo_adaptation",
+      "verification": "계양구을 기사 색인의 날짜·자료 유형을 가상 기사 형식으로 재구성. 실제 후보와 가상 후보 간 대응·실제 당선·발언·득표를 의미하지 않음.",
+      "source_original": {
+        "id": "NEWS24-015",
+        "title": "[후보 득표현황]-인천(최종)",
+        "publisher": "연합뉴스 (파이낸셜뉴스 게재)",
+        "published_date": "2024-04-11",
+        "url": "https://www.fnnews.com/news/202404110847226477"
+      },
+      "source_region": "계양구을",
+      "candidate_mapping": "세 가상 후보를 함께 다루는 형식 예시. 실제 후보별 사실을 대응시키지 않음."
+    },
+    {
+      "id": "DEMO-HANEUL-NEWS24-016",
+      "title": "하늘도시갑 후보별 개표상황 보도 형식 참고",
+      "publisher": "VR 선거보도 시스템 가상 자료실",
+      "published_date": "2024-04-10",
+      "url": "demo://news/DEMO-HANEUL-NEWS24-016",
+      "regions": [
+        "하늘도시갑"
+      ],
+      "candidate_names": [
+        "서지도",
+        "한반도",
+        "박리본"
+      ],
+      "candidate_regions": {
+        "서지도": [
+          "하늘도시갑"
+        ],
+        "한반도": [
+          "하늘도시갑"
+        ],
+        "박리본": [
+          "하늘도시갑"
+        ]
+      },
+      "kind": "가상 참고 기사",
+      "checked_at": "2026-11-27",
+      "is_demo": true,
+      "source_kind": "demo_adaptation",
+      "verification": "계양구을 기사 색인의 날짜·자료 유형을 가상 기사 형식으로 재구성. 실제 후보와 가상 후보 간 대응·실제 당선·발언·득표를 의미하지 않음.",
+      "source_original": {
+        "id": "NEWS24-016",
+        "title": "[후보 득표현황]-인천(10일 23시 현재)",
+        "publisher": "연합뉴스",
+        "published_date": "2024-04-10",
+        "url": "https://www.yna.co.kr/view/AKR20240410086900065"
+      },
+      "source_region": "계양구을",
+      "candidate_mapping": "세 가상 후보를 함께 다루는 형식 예시. 실제 후보별 사실을 대응시키지 않음."
+    },
+    {
+      "id": "DEMO-HANEUL-NEWS24-019",
+      "title": "하늘도시갑 세 후보의 발언·공약 비교 보도 형식 참고",
+      "publisher": "VR 선거보도 시스템 가상 자료실",
+      "published_date": "2024-04-02",
+      "url": "demo://news/DEMO-HANEUL-NEWS24-019",
+      "regions": [
+        "하늘도시갑"
+      ],
+      "candidate_names": [
+        "서지도",
+        "한반도",
+        "박리본"
+      ],
+      "candidate_regions": {
+        "서지도": [
+          "하늘도시갑"
+        ],
+        "한반도": [
+          "하늘도시갑"
+        ],
+        "박리본": [
+          "하늘도시갑"
+        ]
+      },
+      "kind": "가상 참고 기사",
+      "checked_at": "2026-11-27",
+      "is_demo": true,
+      "source_kind": "demo_adaptation",
+      "verification": "계양구을 기사 색인의 날짜·자료 유형을 가상 기사 형식으로 재구성. 실제 후보와 가상 후보 간 대응·실제 당선·발언·득표를 의미하지 않음.",
+      "source_original": {
+        "id": "NEWS24-019",
+        "title": "이재명 \"계양 갑자기 왔나\" vs 원희룡 \"2년간 뭘 했나\"…첫 토론서 공방",
+        "publisher": "뉴스핌",
+        "published_date": "2024-04-02",
+        "url": "https://search.newspim.com/news/view/20240402001055"
+      },
+      "source_region": "계양구을",
+      "candidate_mapping": "세 가상 후보를 함께 다루는 형식 예시. 실제 후보별 사실을 대응시키지 않음."
+    }
+  ]
+}
