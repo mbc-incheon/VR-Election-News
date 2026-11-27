@@ -1,12 +1,12 @@
 {
-  "captured_at": "2026-11-27T18:04:57.852770+09:00",
+  "captured_at": "2026-11-27T18:12:10.124188+09:00",
   "repository": "https://github.com/mbc-incheon/VR-Election-News",
   "release_version": "2.0.0",
   "imported_from": {
     "repository": "https://github.com/mbc-incheon/election-analysis-project-01",
     "commit": "00ac79dc6ec77d6bd4c1e883e152fd78f2e3ab91"
   },
-  "repository_base_commit": "73d388334befd56add164d731487aeab2dec2372",
+  "repository_base_commit": "73dbfb2841fd630396a0958a91d4323fa3b6ee53",
   "note": "Base commit is the parent context before this manifest is committed; exact publication commit is in Git history.",
   "runtime": {
     "python": "3.12.10"
@@ -44,8 +44,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 52691,
-      "sha256": "df5ebd091ad0f3be4aa3bab97e1c0741196092d2170092dd7eb8f4234a21f83f"
+      "bytes": 52753,
+      "sha256": "8a62e311b7be187fb5ded2455d753be0d50175499803bfb0b6f2f51e6b133737"
     },
     {
       "path": "compose.yaml",
@@ -534,13 +534,13 @@
     },
     {
       "path": "election-news-server/static/studio.html",
-      "bytes": 2996,
-      "sha256": "3b51eb4059a736cdd0797d796f848759e1fd17ca160ecf1dc8985faebf0d1d9c"
+      "bytes": 2992,
+      "sha256": "a79b22f65d07d090831b29befa912c0b4023a8b010068ac4f62b5ab4ef6f36e8"
     },
     {
       "path": "election-news-server/static/studio.js",
-      "bytes": 11915,
-      "sha256": "e08b83294f38197c57b7a02e93b88fc4b53382518bdeaf5534792782ddf3c723"
+      "bytes": 12589,
+      "sha256": "42c364af6cb7ce9a4be81136a755708db1ca8771e4f83fcae287d1ef00f44351"
     },
     {
       "path": "election-news-server/static/vendor/OrbitControls.js",
@@ -1149,8 +1149,8 @@
     },
     {
       "path": "outputs/screenshots/studio-anchor-left-wall.jpg",
-      "bytes": 75655,
-      "sha256": "c703a67d823c5cc41d23a8ca025768e8f07cf9c811496660a8f4a2f82446a294"
+      "bytes": 76769,
+      "sha256": "c24a33f50520e245cb2abc0a78f7ef601d3010fbf7abd9e1df1afeabd53e771c"
     },
     {
       "path": "outputs/screenshots/studio-anchor-newsroom.jpg",

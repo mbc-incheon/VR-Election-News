@@ -5,7 +5,7 @@ import {OrbitControls} from '/static/vendor/OrbitControls.js';
 const $=id=>document.getElementById(id);
 const contextParams=new URLSearchParams(location.search),requestedArticle=contextParams.get('article'),requestedRegion=contextParams.get('region');let initialRegionPending=!!requestedRegion;
 const modeParam=contextParams.get('mode');if(['official','demo'].includes(modeParam))$('mode').value=modeParam;
-let renderer,scene,camera,controls,screenTexture,screenCanvas,chartGroup,rows=[],snapshot={},approved=[],currentBundle=null,ws;
+let renderer,scene,camera,controls,screenTexture,screenCanvas,rows=[],snapshot={},approved=[],currentBundle=null,ws;
 const material=(color,metalness=.1)=>new THREE.MeshStandardMaterial({color,metalness,roughness:.5});
 function box(w,h,d,x,y,z,color){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material(color));m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m}
 function init(){
@@ -23,9 +23,15 @@ function init(){
  box(15.8,7.8,.4,0,5,-6.5,'#244c65');
  screenCanvas=document.createElement('canvas');screenCanvas.width=2048;screenCanvas.height=1024;screenTexture=new THREE.CanvasTexture(screenCanvas);screenTexture.colorSpace=THREE.SRGBColorSpace;
  const display=new THREE.Mesh(new THREE.PlaneGeometry(15.2,7.2),new THREE.MeshBasicMaterial({map:screenTexture}));display.position.set(0,5,-6.25);scene.add(display);
- const desk=box(7.0,.45,2,0,1.4,3.0,'#d8e7ee');desk.rotation.y=-.04;box(6.2,1.2,1.5,0,.6,3.0,'#0c4a5c');box(5.7,.06,.08,0,1.03,3.79,'#20d9c8');
+ // Large circular glass desk with a brushed metal rim and pedestal.
+ const glass=new THREE.MeshPhysicalMaterial({color:'#bfdfeb',metalness:.25,roughness:.13,transparent:true,opacity:.58,depthWrite:false,side:THREE.DoubleSide});
+ const desk=new THREE.Mesh(new THREE.CylinderGeometry(4.8,4.8,.16,128),glass);desk.position.set(0,1.65,2.8);desk.receiveShadow=true;scene.add(desk);
+ const rim=new THREE.Mesh(new THREE.TorusGeometry(4.8,.065,12,128),material('#c3d3dc',.8));rim.rotation.x=Math.PI/2;rim.position.set(0,1.65,2.8);scene.add(rim);
+ const innerRim=new THREE.Mesh(new THREE.TorusGeometry(3.75,.025,8,128),material('#a5c4d3',.7));innerRim.rotation.x=Math.PI/2;innerRim.position.set(0,1.66,2.8);scene.add(innerRim);
+ const pedestal=new THREE.Mesh(new THREE.CylinderGeometry(1.55,2.1,1.4,96),material('#17364b',.65));pedestal.position.set(0,.83,2.8);pedestal.castShadow=true;scene.add(pedestal);
+ const deskLight=new THREE.Mesh(new THREE.TorusGeometry(2.05,.035,8,96),new THREE.MeshBasicMaterial({color:'#51cbd5'}));deskLight.rotation.x=Math.PI/2;deskLight.position.set(0,.18,2.8);scene.add(deskLight);
+ box(1.2,.025,.8,-.7,1.76,1.3,'#e1ebef');box(.95,.04,.7,.8,1.76,1.3,'#b1c4d2');box(.85,.015,.6,.8,1.79,1.3,'#122b42');
  addAnchorWall(scene);
- chartGroup=new THREE.Group();scene.add(chartGroup);
  const resize=()=>{const {width,height}=$('stage').getBoundingClientRect();renderer.setSize(width,height);camera.aspect=width/height;camera.fov=THREE.MathUtils.radToDeg(2*Math.atan(Math.tan(THREE.MathUtils.degToRad(24))*Math.max(1,.95/camera.aspect)));camera.updateProjectionMatrix()};new ResizeObserver(resize).observe($('stage'));resize();
  renderer.setAnimationLoop(()=>{controls.update();renderer.render(scene,camera)});$('canvasStatus').hidden=true;draw();
 }
@@ -35,8 +41,7 @@ function draw(){
  const demo=snapshot.mode==='demo';ctx.fillStyle=demo?'#ffd17b':'#84dfd2';ctx.font='28px "Malgun Gothic", sans-serif';ctx.fillText(demo?'시뮬레이션 데이터 · 실제 후보와 수치가 아닙니다':('공식 파일 집계 · '+(snapshot.review?.status==='APPROVED'?'독립 검수 완료':'독립 검수 전')),85,232);
  const displayed=rows.slice(0,5);displayed.forEach((row,i)=>{const y=335+i*119;ctx.fillStyle='white';ctx.font='bold 52px "Malgun Gothic", sans-serif';ctx.fillText(row.candidate_name,85,y);ctx.font='30px "Malgun Gothic", sans-serif';ctx.fillStyle='#b6d4e6';ctx.fillText(Number(row.votes).toLocaleString('ko-KR')+'표',470,y);ctx.fillStyle='#17374c';ctx.fillRect(850,y-35,800,38);ctx.fillStyle=candidateColor(row,i);ctx.fillRect(850,y-35,800*row.vote_share/100,38);ctx.fillStyle='white';ctx.fillText(row.vote_share.toFixed(2)+'%',1700,y)});
  ctx.font='24px "Malgun Gothic", sans-serif';ctx.fillStyle='#9bc0ce';ctx.fillText('득표율은 유효 후보 득표 합 기준 · 기준시각/개표율 미제공 값은 생성하지 않습니다',85,984);screenTexture.needsUpdate=true;
- while(chartGroup.children.length){const mesh=chartGroup.children[0];chartGroup.remove(mesh);mesh.geometry.dispose();mesh.material.dispose()}
- displayed.forEach((r,i)=>{const h=.2+r.vote_share/100*3;const bar=new THREE.Mesh(new THREE.BoxGeometry(.7,h,.7),material(candidateColor(r,i),.4));bar.position.set(-5.8+i*1.0,h/2,-.1);chartGroup.add(bar)});
+
 }
 function update(data){
  if(currentBundle)return;snapshot=data;const selected=$('region').value,regions=[...new Set((data.rows||[]).map(r=>r.region_name))];$('region').replaceChildren(...regions.map(r=>new Option(r,r)));if(initialRegionPending&&regions.includes(requestedRegion)){$('region').value=requestedRegion;initialRegionPending=false}else if(regions.includes(selected))$('region').value=selected;
